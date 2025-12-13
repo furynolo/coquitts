@@ -1,0 +1,392 @@
+Acherus, Ack-er-us.
+Aegwynn, Eg-win.
+Ahn'Qiraj, Ahn-key-raj.
+Amani, Ah-man-ee.
+Anduin, An-doo-in.
+An'she, Ahn-sheh.
+Arathi, Ah-rah-thi.
+Archimonde, Ark-im-mond.
+Ardenweald, Ar-den-weeld.
+Arthas, Ar-thas.
+Ashbringer, Ash-bring-er.
+Azeroth, Az-er-oth.
+Auchindoun, Ah-kind-doon.
+Azuremyst, Az-ure-mist.
+Azshara, Az-SHAR-ah.
+Baine, Bane.
+Bolvar, Bol-var.
+Brann, Bran.
+C'Thun, K'Thun.
+Cairne, Carn.
+Cenarion, Sen-air-ee-on.
+Chromie, Crow-mee.
+Dalaran, Dal-ah-ran.
+Darnassus, Dar-nass-us.
+Darkmoon, Dark-moon.
+Deathwing, Death-wing.
+Draenei, Dray-nay.
+Draenor, Drah-nor.
+Dun Morogh, Dun Mor-oh.
+Durotar, Doo-roh-tar.
+Ebon, Ebb-on.
+Elune, Eh-loon.
+Elwynn, El-win.
+Eredar, Eh-red-ar.
+Exodar, Ex-oh-dar.
+Feralas, Fehr-AHL-ahs.
+Fjarnskaggl, Fj-arn-skaggol.
+Gallywix, Gal-ee-wix.
+Gamon, Gam-on.
+Garithos, Garr-ih-thos.
+Genn, Gen.
+Gilneas, Gil-nay-uhs.
+Gnomeregan, No-mer-gon.
+Gorehowl, Gor-howl.
+Grommash, Grom-ash.
+Grimtotem, Grim-toh-tem.
+Gul'dan, Ghoul-dan.
+Hearthstone, Harth-stone.
+Hogger, Hog-er.
+Illidan, Ill-ih-dan.
+Ironforge, Iron-forge.
+Jaina, Jay-na.
+Kael'thas, Kale-thas.
+Kalimdor, Kal-im-door.
+Karazhan, Kar-az-ahn.
+Khadgar, Kad-gar.
+Khaz Modan, Kaz Mo-dan.
+Kirin, Kear-in.
+Kul Tiras, Kool Tear-as.
+Lich, Litch.
+Lordaeron, Lor-DARE-on.
+Mage, Maj.
+Mage-Tower, Maj-tow-er.
+Malfurion, Mal-fury-on.
+Melee, May-lay.
+Medivh, Meh-deev.
+Mekkatorque, Mek-ah-tork.
+Mogu'shan, Moh-goo-shahn.
+Murozond, Moor-oh-zond.
+Murky, Mur-key.
+Nagrand, Nuh-Grand.
+Nazjatar, Naz-ja-tar.
+Ner'zhul, Ner-zhool.
+Neptulon, Nep-too-lon.
+Nozdormu, Noz-dor-moo.
+N'Zoth, Enn-zoth.
+Onyxia, Oh-nix-ee-ah.
+Orgrimmar, Oh-grim-mar.
+Oshu'gun, Oh-shoo-goon.
+Pantheon, Pan-thee-on.
+Quel'dorei, Kwel-dohr-eye.
+Quel'serrar, Kwel-ser-ar.
+Quel'Thalas, Kwel-Thal-ahs.
+Ragnaros, Rag-nah-ros.
+Reagents, ree-ay-gents.
+Retribution, Ret-rih-byoo-shun.
+Rogue, Rohg.
+Sargeras, Sar-Gair-as.
+Saurfang, Sour-fang.
+Scholomance, Skow-lo-mance.
+Shalamayne, Shal-ah-main.
+Shaman, Shah-man.
+Silithus, Sil-ith-us.
+Stormrage, Storm-rage.
+Stratholme, Strath-olm.
+Sunstrider, Sun-strid-er.
+Sylvanas, Sil-van-as.
+Teldrassil, Tel-drass-il.
+Thalassian, Thal-ass-ian.
+Thrall, Thrawl.
+Tirion, Teer-ee-on.
+Tyrande, Tear-and-uh.
+Ulduar, OOL-doo-ar.
+Undercity, Un-der-cit-ee.
+Uther, Oo-ther.
+Varian, Var-ee-an.
+Velen, Vel-en.
+Vol'jin, Vol-jin.
+Vrykul, Vrai-cool.
+Worgen, Wor-gen.
+WotLK, Wottle-kay.
+Wrynn, Rin.
+Y'Shaarj, Ya-sha-raj.
+Ysera, Eee-sair-ah.
+Zul'Gurub, Zul-Goo-rub.
+A'dal, Ah-dahl.
+Abbysian, Ab-iss-ee-an.
+Ahn'kahet, Ahn-kah-het.
+Algalon, Al-gah-lon.
+Alexstrasza, Ah-lek-STRAH-zah.
+Alonsus Faol, Ah-lon-sus Fay-ohl.
+An'Qira, Ahn-kee-rah.
+Anub'arak, Ah-noob-ah-rak.
+Anubisath, Ah-noo-bi-sath.
+Apocalypse, Ah-pok-ah-lips.
+Argus, Ar-gus.
+Arthas Menethil, Ar-thas Men-eh-thill.
+Ashamane, Ash-ah-mane.
+Ashenvale, ASH-en-vail.
+Ashran, ASH-ran.
+Azerite, AZ-er-ite.
+Azjol-Nerub, Az-jol Neh-roob.
+Azshara Crater, Az-SHAR-ah Cray-ter.
+Azsuna, Az-SOO-nah.
+Baelgun, Bale-gun.
+Baine Bloodhoof, Bane Blood-hoof.
+Balnazzar, Bal-NAH-zar.
+Baradin Hold, Bar-ah-din Hold.
+Barov, BEAR-ov.
+Blackfathom Deeps, Black-fath-um Deeps.
+Blackhand, Black-hand.
+Blackrock Depths, Black-rock Depths.
+Blackrock Mountain, Black-rock Mountain.
+Black Temple, Black Temple.
+Blackwing Descent, Black-wing Dee-sent.
+Blackwing Lair, Black-wing Lair.
+Blood Elf, Blood Elf.
+Bloodhoof, Blood-hoof.
+Bolvar Fordragon, Bol-var For-drag-on.
+Boralus, Bor-AL-us.
+Bridenbrad, BRIDE-en-brad.
+Broken Isles, BRO-ken Isles.
+Broxigar, BROX-ih-gar.
+Cairne Bloodhoof, Carn Blood-hoof.
+Calia Menethil, KAL-ee-ah Men-eh-thill.
+Calimdor, Kal-im-door.
+Caverns of Time, Cav-erns of Time.
+Cenarion Circle, Sen-air-ee-on Circle.
+Cenarius, Sen-ARR-ee-us.
+Chromaggus, Kro-MAG-gus.
+Council of Tirisfal, Council of TEER-iss-fall.
+Crusader's Coliseum, Crew-say-der's Kohl-ee-zee-um.
+Crystalsong Forest, KRIS-tal-song Forest.
+Dark Iron, Dark Iron.
+Dark Irons, Dark Ironz.
+Dark Portal, Dark Portal.
+Darkshore, Dark-shore.
+Dark Iron Dwarf, Dark Iron Dworf.
+Dark Ranger, Dark Rayn-jer.
+Darkshire, Dark-shyre.
+Death Knight, Death Nite.
+Demon Hunter, Dee-mon Hun-ter.
+Desolace, DEH-so-liss.
+Dire Maul, Dye-er Mawl.
+Doomhammer, Doom-ham-er.
+Dracthyr, Drak-theer.
+Dragonblight, DRAG-en-blite.
+Dragon Isles, DRAG-en Isles.
+Druid, Droo-id.
+Dun Baldar, Dun Ball-dar.
+Dun Morogh, Dun Mor-oh.
+Duskwood, Dusk-wood.
+Ebon Blade, Ebb-on Blade.
+Eastern Kingdoms, EES-tern King-dums.
+Echo Isles, Eh-koh Isles.
+Elemental Plane, El-eh-men-tal Plane.
+Elwynn Forest, El-win Forest.
+Emerald Dream, Em-er-ald Dreem.
+Emerald Nightmare, Em-er-ald Nite-mare.
+Emerald Dreamway, Em-er-ald Dreem-way.
+Empyrean, Em-peer-ee-an.
+Felwood, Fell-wood.
+Fel Fire, Fell Fire.
+Felguard, Fell-guard.
+Felstorm, Fell-storm.
+Frostmourne, Frost-morn.
+Frostwolf, Frost-wolf.
+Frostwolves, Frost-wolves.
+Frozen Throne, Fro-zun Throne.
+Garrosh Hellscream, Gar-osh Hell-skreem.
+Genn Greymane, Gen Gray-mane.
+Ghostlands, Ghost-lands.
+Gilnean, Gil-nay-an.
+Gnomish, No-mish.
+Goblin, Gob-lin.
+Golden Lotus, Goal-den Low-tus.
+Grizzly Hills, Griz-lee Hills.
+Gruul, Grool.
+Gruul's Lair, Groolz Lair.
+Halls of Lightning, Halls of Lite-ning.
+Halls of Stone, Halls of Stone.
+Helheim, Hell-hime.
+Helheim Helya, Hell-hime Hel-yah.
+Helya, Hel-yah.
+Highborne, High-born.
+High Elf, High Elf.
+Highmountain, High-moun-tin.
+Highmountain Tauren, High-moun-tin Tor-en.
+Hyjal, High-jahl.
+Hydraxis, Hy-DRAX-iss.
+Icecrown, Ice-crown.
+Icecrown Citadel, Ice-crown Sitt-uh-del.
+Illidari, Ill-ih-dar-ee.
+Iron Horde, Eye-urn Hoard.
+Ironforge Dwarf, Eye-urn-forge Dworf.
+Isle of Quel'Danas, Isle of Kwel-Dahn-ahs.
+Jade Forest, Jayd Forest.
+Jinyu, Jin-you.
+Jormungar, YOR-mun-gar.
+Justice Points, Juss-tiss Points.
+Kaja'mite, Kah-jah-mite.
+Kalecgos, KAY-lek-gos.
+Kalimdor, Kal-im-door.
+Karazhan Crypts, Kar-az-ahn Cripts.
+Kel'Thuzad, Kel-THOO-zahd.
+Kezan, KEH-zan.
+Kil'jaeden, Kill-JAY-den.
+Kultiran, Kool-TEER-an.
+Kul Tiran, Kool-TEER-an.
+Kun-Lai Summit, Koon-Lie Sum-it.
+Lady Liadrin, Lay-dee Lee-AH-drin.
+Lady Vashj, Lady Vosh.
+Light's Hope Chapel, Lites Hope Chapel.
+Lightforged Draenei, Lite-forged Dray-nay.
+Loa, Low-ah.
+Loa of Death, Low-ah of Death.
+Lord Jaraxxus, Lord Ja-RAX-us.
+Lord Marrowgar, Lord MAIR-oh-gar.
+Lordaeron Keep, Lor-DARE-on Keep.
+Lor'themar Theron, Lore-the-mar THAIR-on.
+Mag'har, Mag-har.
+Mag'har Orc, Mag-har Ork.
+Magni Bronzebeard, MAG-nee Bronze-beard.
+Malygos, MAL-ih-gos.
+Mannoroth, MAN-or-oth.
+Maraudon, MARE-oh-don.
+Mardum, MAR-dum.
+Mists of Pandaria, Mists of Pan-DARE-ee-ah.
+Moonglade, Moon-glade.
+Mount Hyjal, Mount High-jahl.
+Mulgore, MULL-gore.
+Muradin, MUR-ah-din.
+Naxxramas, Naks-RAH-mas.
+Nether, Neth-er.
+Netherstorm, Neth-er-storm.
+Netherlight, Neth-er-lite.
+Netherlight Temple, Neth-er-lite Tem-pull.
+Night Elf, Night Elf.
+Nightborne, Night-born.
+Nighthold, Night-hold.
+Nighthold Suramar, Night-hold SIR-ah-mar.
+Nordrassil, Nor-drah-sill.
+Northrend, North-rend.
+Obsidian Sanctum, Ob-SID-ee-an Sank-tum.
+Ogrimmar, Oh-grim-mar.
+Order of the Silver Hand, Order of the Sil-ver Hand.
+Oribos, ORR-ih-bos.
+Outland, Out-land.
+Pandaren, Pan-DARE-en.
+Pandaria, Pan-DARE-ee-ah.
+Plaguelands, Plague-lands.
+Plague of Undeath, Plague of Un-death.
+Priest, Preest.
+Prot Warrior, Prott War-ee-or.
+Quel'Danas, Kwel-Dahn-ahs.
+Quel'Lithien, Kwel-LITH-ee-en.
+Quel'thalas Spire, Kwel-tha-las Spy-er.
+Ravencrest, Ray-ven-crest.
+Ravenholdt, Ray-ven-holt.
+Redridge, Red-ridge.
+Redridge Mountains, Red-ridge Mountains.
+Revendreth, REV-en-dreth.
+Rhonin, ROH-nin.
+Scarlet Crusade, Scar-let Crew-sade.
+Scarlet Monastery, Scar-let Mon-as-tair-ee.
+Scourge, Skurge.
+Seething Shore, See-thing Shore.
+Shadowlands, Shadow-lands.
+Shadowmoon Valley, Shadow-moon Valley.
+Shadow Priest, Shadow Preest.
+Shattrath, SHAT-trath.
+Shattrath City, SHAT-trath City.
+Shen'dralar, Shen-DRAH-lar.
+Sholazar Basin, SHOW-lah-zar Bay-sin.
+Silvermoon, Sil-ver-moon.
+Silvermoon City, Sil-ver-moon City.
+Silverpine Forest, Sil-ver-pine Forest.
+Sindragosa, Sin-drah-GO-sah.
+Skywall, Sky-wall.
+Stormheim, STORM-hime.
+Stormsong Valley, STORM-song Valley.
+Stormwind, STORM-wind.
+Stormwind City, STORM-wind City.
+Stranglethorn, Strangle-thorn.
+Stranglethorn Vale, Strangle-thorn Vail.
+Suramar, SIR-ah-mar.
+Tanaan Jungle, Tah-NAHN Jungle.
+Tauren, Tor-en.
+Teldrassil Tree, Tel-drass-il Tree.
+Temple of Ahn'Qiraj, Temple of Ahn-key-raj.
+Temple of Karabor, Temple of KAH-rah-bor.
+Tempest Keep, TEM-pest Keep.
+Ten Storms, Ten Stormz.
+Terrace of Endless Spring, Tair-iss of End-less Spring.
+The Barrens, The Bair-enz.
+The Burning Crusade, The Burn-ing Crew-sade.
+The Deadmines, The Ded-mines.
+The Exodar, The Ex-oh-dar.
+The Forsaken, The For-SAY-ken.
+The Frozen Throne, The Fro-zun Throne.
+The Lich King, The Litch King.
+The Maw, The Maw.
+The Nexus, The NEX-us.
+The Ruby Sanctum, The Roo-bee Sank-tum.
+The Undercity, The Un-der-cit-ee.
+Theramore, THAIR-ah-more.
+Theramore Isle, THAIR-ah-more Isle.
+Thousand Needles, Thou-zand Need-uls.
+Thunder Bluff, THUN-der Bluff.
+Tirisfal Glades, TEER-iss-fall Gladz.
+Tol Barad, Toll Bah-RAD.
+Torghast, Torg-ast.
+Transmogrification, Trans-mog-rih-fih-KAY-shun.
+Trial of the Crusader, Try-ull of the Crew-say-der.
+Twilight Highlands, TWY-lite High-lands.
+Twin Emperors, Twin Em-per-ers.
+Uldaman, OOL-dah-man.
+Uldir, OOL-deer.
+Uldum, OOL-doom.
+Undead, Un-dead.
+Un'goro Crater, Oon-GORE-oh Cray-ter.
+Upper Blackrock Spire, Upper Black-rock Spy-er.
+Vale of Eternal Blossoms, Vail of Ee-turn-al Bloss-ums.
+Valithria Dreamwalker, Val-ITH-ree-ah Dreem-walk-er.
+Val'sharah, Val-sha-RAH.
+Vashj'ir, Vash-EER.
+Vault of the Wardens, Vault of the War-dens.
+Venthyr, VEN-theer.
+Violet Hold, Vy-oh-let Hold.
+Void Elf, Voyd Elf.
+Void Elves, Voyd Elvz.
+Voidwalker, Voyd-walk-er.
+Vol'dun, Vole-DOON.
+Vrykul Village, Vry-cool Village.
+Wailing Caverns, Way-ling Cav-erns.
+Warsong, War-song.
+Warsong Clan, War-song Klan.
+Warsong Gulch, War-song Gulch.
+Westfall, West-fall.
+Western Plaguelands, West-ern Plague-lands.
+Wetlands, Wet-lands.
+Wildhammer, Wilde-ham-er.
+Wintergrasp, Win-ter-grasp.
+Winterspring, Win-ter-spring.
+World Tree, World Tree.
+Wrathgate, Wrath-gate.
+Xavius, ZAY-vee-us.
+Xal'atath, Zal-ah-tath.
+Xoroth, ZOR-oth.
+Yogg-Saron, Yogg-sah-ROHN.
+Yrel, Yeh-rel.
+Zandalari, Zan-dah-LAR-ee.
+Zandalari Troll, Zan-dah-LAR-ee Trol.
+Zandalar, ZAN-dah-lar.
+Zangarmarsh, ZANG-ar-marsh.
+Zereth Mortis, ZEH-reth MOR-tiss.
+Zin-Azshari, Zin Az-SHAR-ee.
+Zul'Aman, Zool-ah-MAHN.
+Zul'aman Trolls, Zool-ah-MAHN Trolz.
+Zul'Drak, Zool-Drak.
+Zul'Farrak, Zool-FARR-ak.
+Zul'Gurub Raid, Zool-Goo-rub Rayd.
