@@ -144,10 +144,11 @@ def normalize_for_tts(text):
         '"': '"',  # U+201E DOUBLE LOW-9 QUOTATION MARK
         '"': '"',  # U+201F DOUBLE HIGH-REVERSED-9 QUOTATION MARK
         '"': '"',  # U+2E42 DOUBLE LOW-REVERSED-9 QUOTATION MARK
-        # Dashes
+        # Dashes and hyphens
         "—": "-",  # U+2014 EM DASH
         "–": "-",  # U+2013 EN DASH
         "―": "-",  # U+2015 HORIZONTAL BAR
+        "‐": "-",  # U+2010 HYPHEN (non-breaking hyphen)
         # Ellipsis
         "…": "...",  # U+2026 HORIZONTAL ELLIPSIS
         # Spaces
@@ -180,6 +181,10 @@ def normalize_for_tts(text):
     # Catch any remaining double quote variants
     quote_pattern = re.compile(r'[\u201C\u201D\u201E\u201F\u2E42]')
     text = quote_pattern.sub('"', text)
+    
+    # Catch any remaining hyphen/dash variants
+    dash_pattern = re.compile(r'[\u2010\u2011\u2012\u2013\u2014\u2015]')
+    text = dash_pattern.sub('-', text)
     
     return text
 
@@ -261,15 +266,12 @@ def preprocess_text(text, is_short_input=False, pronunciations=None):
     if pronunciations:
         text = apply_pronunciations(text, pronunciations)
     
-    # Step 3: Replace asterisks used for scene breaks with newlines
-    # First, handle multiple asterisks (scene breaks)
+    # Step 3: Remove all asterisks (they're not in TTS vocabulary)
+    # First, handle multiple asterisks (scene breaks) - convert to paragraph breaks
     text = re.sub(r'\*{3,}', '\n\n', text)  # Multiple asterisks
     text = re.sub(r'^\*+$', '', text, flags=re.MULTILINE)  # Lines of only asterisks
-    # Remove remaining single asterisks (they're not in TTS vocabulary)
-    # But preserve asterisks that are part of words or common patterns
-    # Only remove standalone asterisks surrounded by spaces or at line boundaries
-    text = re.sub(r'(\s)\*(\s|$)', r'\1\2', text)  # Remove asterisks with spaces around them
-    text = re.sub(r'^\*(\s|$)', r'\1', text, flags=re.MULTILINE)  # Remove asterisks at line start
+    # Remove ALL remaining asterisks (they cause TTS errors)
+    text = text.replace('*', '')
     
     # Step 4: Normalize multiple spaces
     text = re.sub(r' +', ' ', text)
@@ -295,7 +297,7 @@ def preprocess_text(text, is_short_input=False, pronunciations=None):
 def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
     """
     Split text into chunks for processing.
-    Tries to split at sentence boundaries, then paragraph boundaries, then line boundaries.
+    Always splits at sentence boundaries to ensure natural breaks.
     
     Args:
         text: Text to split
@@ -309,70 +311,71 @@ def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
     if len(text) <= max_chunk_size:
         return [text]
     
+    # Split text into sentences
+    # Pattern matches: sentence text + sentence ending punctuation + optional whitespace
+    # This preserves the punctuation and spacing
+    sentence_pattern = r'([^.!?]+[.!?]+(?:\s+|$))'
+    sentence_matches = re.finditer(sentence_pattern, text)
+    
+    sentences = []
+    for match in sentence_matches:
+        sentence = match.group(1).strip()
+        if sentence:  # Only add non-empty sentences
+            sentences.append(sentence)
+    
+    # If no sentences found (unlikely but possible), fall back to paragraph splitting
+    if not sentences:
+        # Fall back to paragraph-based splitting
+        paragraphs = text.split('\n\n')
+        sentences = [p.strip() for p in paragraphs if p.strip()]
+    
+    # If still no sentences, fall back to line splitting
+    if not sentences:
+        lines = text.split('\n')
+        sentences = [l.strip() for l in lines if l.strip()]
+    
+    # Build chunks by adding sentences until we approach max_chunk_size
     chunks = []
     current_chunk = ""
     
-    # Split by paragraphs first
-    paragraphs = text.split('\n\n')
-    
-    for para in paragraphs:
-        # If paragraph is very long, try to split by sentences first
-        if len(para) > max_chunk_size:
-            sentences = re.split(r'([.!?]+\s+)', para)
-            # If sentence splitting didn't work (only one element), try splitting by lines
-            if len(sentences) <= 1:
-                # Split by single newlines as fallback
-                lines = para.split('\n')
-                for line in lines:
-                    if len(current_chunk) + len(line) + 1 > max_chunk_size and current_chunk:
-                        if len(current_chunk) >= min_chunk_size:
-                            chunks.append(current_chunk.strip())
-                            current_chunk = line
-                        else:
-                            current_chunk += "\n" + line
-                    else:
-                        current_chunk += "\n" + line if current_chunk else line
+    for sentence in sentences:
+        # Calculate what the chunk would be if we add this sentence
+        potential_chunk = current_chunk + " " + sentence if current_chunk else sentence
+        
+        # If adding this sentence would exceed max size (with some buffer for safety)
+        # and we have enough content, start a new chunk
+        if len(potential_chunk) > max_chunk_size and current_chunk:
+            # Check if current chunk meets minimum size requirement
+            if len(current_chunk.strip()) >= min_chunk_size:
+                chunks.append(current_chunk.strip())
+                current_chunk = sentence
             else:
-                # Process sentence pairs
-                sentence_pairs = []
-                for i in range(0, len(sentences) - 1, 2):
-                    if i + 1 < len(sentences):
-                        sentence_pairs.append(sentences[i] + sentences[i + 1])
-                    else:
-                        sentence_pairs.append(sentences[i])
-                
-                for sentence in sentence_pairs:
-                    if len(current_chunk) + len(sentence) > max_chunk_size and current_chunk:
-                        if len(current_chunk) >= min_chunk_size:
-                            chunks.append(current_chunk.strip())
-                            current_chunk = sentence
-                        else:
-                            # If chunk is too small, append to it anyway
-                            current_chunk += " " + sentence
-                    else:
-                        current_chunk += " " + sentence if current_chunk else sentence
+                # Current chunk is too small, add sentence anyway
+                # This prevents very small chunks (they'll be merged later if needed)
+                current_chunk = potential_chunk
         else:
-            # Check if adding this paragraph would exceed max size
-            if len(current_chunk) + len(para) + 2 > max_chunk_size and current_chunk:
-                if len(current_chunk) >= min_chunk_size:
-                    chunks.append(current_chunk.strip())
-                    current_chunk = para
-                else:
-                    current_chunk += "\n\n" + para
-            else:
-                current_chunk += "\n\n" + para if current_chunk else para
+            # Add sentence to current chunk
+            current_chunk = potential_chunk
     
-    # Add remaining chunk
+    # Add the last chunk if it has content
     if current_chunk.strip():
         chunks.append(current_chunk.strip())
     
     # Final safety check: if we somehow ended up with no chunks, split by character count
+    # This should rarely happen, but ensures we always return something
     if not chunks:
-        # Force split by character count as last resort
-        for i in range(0, len(text), max_chunk_size):
-            chunk = text[i:i + max_chunk_size]
-            if chunk.strip():
-                chunks.append(chunk.strip())
+        # Force split by character count as last resort (but try to break at spaces)
+        words = text.split()
+        current_chunk = ""
+        for word in words:
+            potential_chunk = current_chunk + " " + word if current_chunk else word
+            if len(potential_chunk) > max_chunk_size and current_chunk:
+                chunks.append(current_chunk.strip())
+                current_chunk = word
+            else:
+                current_chunk = potential_chunk
+        if current_chunk.strip():
+            chunks.append(current_chunk.strip())
     
     return chunks if chunks else [text]  # Ensure we always return at least one chunk
 
@@ -475,15 +478,29 @@ def synthesize_text_chunk(tts, text, chunk_path):
         True if successful, False otherwise
     """
     try:
+        # Clean and validate text
+        text = text.strip()
+        
         # Ensure minimum length to avoid kernel errors
-        if len(text.strip()) < 50:
-            print(f"  Warning: Chunk too short ({len(text)} chars), skipping...")
-            return False
+        # TTS models need sufficient text to generate proper audio
+        if len(text) < 100:
+            print(f"  Warning: Chunk too short ({len(text)} chars), attempting anyway...")
+            # Don't skip - try to process it anyway since it might be the only content
+        
+        # Check if text has enough actual content (not just whitespace/punctuation)
+        # Count alphanumeric characters as a proxy for meaningful content
+        alphanumeric_count = sum(1 for c in text if c.isalnum())
+        if alphanumeric_count < 20:
+            print(f"  Warning: Chunk has little content ({alphanumeric_count} alphanumeric chars), attempting anyway...")
+            # Don't skip - try to process it anyway
         
         tts.tts_to_file(text=text, file_path=chunk_path)
         return True
     except Exception as e:
         print(f"  Error synthesizing chunk: {e}")
+        # If it's a kernel size error and the chunk is small, suggest merging
+        if "kernel size" in str(e).lower() and len(text.strip()) < 200:
+            print(f"  Note: This chunk may need to be merged with adjacent chunks.")
         return False
 
 def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None):
@@ -557,18 +574,108 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             # Multiple chunks - process and combine
             print(f"Splitting into {len(chunks)} chunks for processing...")
             
+            # Merge small chunks with adjacent chunks to avoid losing content
+            merged_chunks = []
+            i = 0
+            while i < len(chunks):
+                chunk = chunks[i]
+                chunk_len = len(chunk.strip())
+                alphanumeric_count = sum(1 for c in chunk if c.isalnum())
+                
+                # If chunk is too small, merge with adjacent chunks
+                if chunk_len < 100 or alphanumeric_count < 20:
+                    merged = chunk
+                    j = i + 1
+                    
+                    # Keep merging with next chunks until we have enough content
+                    while j < len(chunks):
+                        next_chunk = chunks[j]
+                        test_merge = merged + " " + next_chunk
+                        test_len = len(test_merge.strip())
+                        test_alnum = sum(1 for c in test_merge if c.isalnum())
+                        
+                        # If merged chunk is still too small, continue merging
+                        if test_len < 100 or test_alnum < 20:
+                            merged = test_merge
+                            j += 1
+                        else:
+                            # Merged chunk is now large enough
+                            break
+                    
+                    # If we still don't have enough and there's a previous chunk, merge backwards
+                    if (len(merged.strip()) < 100 or sum(1 for c in merged if c.isalnum()) < 20) and len(merged_chunks) > 0:
+                        merged_chunks[-1] = merged_chunks[-1] + " " + merged
+                    else:
+                        merged_chunks.append(merged)
+                    
+                    i = j  # Move to the next unprocessed chunk
+                else:
+                    # Chunk is large enough, use as-is
+                    merged_chunks.append(chunk)
+                    i += 1
+            
+            if len(merged_chunks) != len(chunks):
+                print(f"  Merged small chunks: {len(chunks)} -> {len(merged_chunks)} chunks")
+            
             output_dir = Path(output_path).parent
             output_stem = Path(output_path).stem
-            chunk_files = []
+            chunk_files_dict = {}  # Dict of index -> path to maintain order
+            failed_indices = set()  # Track which chunk indices failed
             
-            for i, chunk in enumerate(chunks, 1):
+            # First pass: try to process all chunks
+            for i, chunk in enumerate(merged_chunks, 1):
                 chunk_path = output_dir / f"{output_stem}_chunk_{i:04d}.wav"
-                print(f"  Processing chunk {i}/{len(chunks)} ({len(chunk)} chars)...")
+                print(f"  Processing chunk {i}/{len(merged_chunks)} ({len(chunk)} chars)...")
                 
+                # Chunks are already preprocessed, so use them directly
                 if synthesize_text_chunk(tts, chunk, str(chunk_path)):
-                    chunk_files.append(chunk_path)
+                    chunk_files_dict[i] = chunk_path
                 else:
                     print(f"  ✗ Failed to process chunk {i}")
+                    failed_indices.add(i)
+            
+            # Second pass: retry failed chunks by merging with adjacent chunks
+            if failed_indices:
+                print(f"\n  Retrying {len(failed_indices)} failed chunks by merging with adjacent content...")
+                retry_attempts = {}
+                
+                for failed_idx in sorted(failed_indices):
+                    failed_chunk = merged_chunks[failed_idx - 1]  # Convert to 0-based
+                    retry_path = output_dir / f"{output_stem}_retry_{failed_idx:04d}.wav"
+                    
+                    # Try merging with next chunk first
+                    if failed_idx < len(merged_chunks):
+                        next_chunk = merged_chunks[failed_idx]  # Next chunk (0-based)
+                        merged_retry = failed_chunk + " " + next_chunk
+                        print(f"    Retrying chunk {failed_idx} merged with chunk {failed_idx + 1} ({len(merged_retry)} chars)...")
+                        if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
+                            retry_attempts[failed_idx] = retry_path
+                            print(f"    ✓ Retry successful for chunk {failed_idx}")
+                            # If next chunk was also in chunk_files_dict, remove it since we merged
+                            if (failed_idx + 1) in chunk_files_dict:
+                                del chunk_files_dict[failed_idx + 1]
+                            continue
+                    
+                    # If next merge didn't work, try merging with previous chunk
+                    if failed_idx > 1:
+                        prev_chunk = merged_chunks[failed_idx - 2]  # Previous chunk (0-based)
+                        merged_retry = prev_chunk + " " + failed_chunk
+                        print(f"    Retrying chunk {failed_idx} merged with chunk {failed_idx - 1} ({len(merged_retry)} chars)...")
+                        if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
+                            retry_attempts[failed_idx] = retry_path
+                            print(f"    ✓ Retry successful for chunk {failed_idx}")
+                            # If previous chunk was in chunk_files_dict, remove it since we merged
+                            if (failed_idx - 1) in chunk_files_dict:
+                                del chunk_files_dict[failed_idx - 1]
+                            continue
+                    
+                    print(f"    ✗ Retry failed for chunk {failed_idx}")
+                
+                # Update chunk_files_dict with successful retries
+                chunk_files_dict.update(retry_attempts)
+            
+            # Convert to sorted list of paths
+            chunk_files = [chunk_files_dict[i] for i in sorted(chunk_files_dict.keys())]
             
             if not chunk_files:
                 print("✗ All chunks failed to process.")
