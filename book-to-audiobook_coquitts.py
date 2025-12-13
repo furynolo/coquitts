@@ -128,20 +128,58 @@ def normalize_for_tts(text):
     # Normalize Unicode compatibility forms (e.g., fancy characters)
     text = unicodedata.normalize("NFKC", text)
     
-    # Replace curly quotes and dashes with ASCII equivalents
+    # Replace curly quotes, apostrophes, dashes, and other special characters with ASCII equivalents
+    # Comprehensive list of apostrophe-like characters
     replacements = {
-        "'": "'",
-        "'": "'",
-        '"': '"',
-        '"': '"',
-        "—": "-",
-        "–": "-",
-        "…": "...",
-        "\u00a0": " ",  # non-breaking space
+        # Apostrophes and single quotes
+        "'": "'",  # U+2019 RIGHT SINGLE QUOTATION MARK
+        "'": "'",  # U+2018 LEFT SINGLE QUOTATION MARK
+        "'": "'",  # U+201B SINGLE HIGH-REVERSED-9 QUOTATION MARK
+        "'": "'",  # U+02BC MODIFIER LETTER APOSTROPHE
+        "'": "'",  # U+02BB MODIFIER LETTER TURNED COMMA
+        "'": "'",  # U+201A SINGLE LOW-9 QUOTATION MARK
+        # Double quotes
+        '"': '"',  # U+201C LEFT DOUBLE QUOTATION MARK
+        '"': '"',  # U+201D RIGHT DOUBLE QUOTATION MARK
+        '"': '"',  # U+201E DOUBLE LOW-9 QUOTATION MARK
+        '"': '"',  # U+201F DOUBLE HIGH-REVERSED-9 QUOTATION MARK
+        '"': '"',  # U+2E42 DOUBLE LOW-REVERSED-9 QUOTATION MARK
+        # Dashes
+        "—": "-",  # U+2014 EM DASH
+        "–": "-",  # U+2013 EN DASH
+        "―": "-",  # U+2015 HORIZONTAL BAR
+        # Ellipsis
+        "…": "...",  # U+2026 HORIZONTAL ELLIPSIS
+        # Spaces
+        "\u00a0": " ",  # U+00A0 NON-BREAKING SPACE
+        "\u2000": " ",  # U+2000 EN QUAD
+        "\u2001": " ",  # U+2001 EM QUAD
+        "\u2002": " ",  # U+2002 EN SPACE
+        "\u2003": " ",  # U+2003 EM SPACE
+        "\u2004": " ",  # U+2004 THREE-PER-EM SPACE
+        "\u2005": " ",  # U+2005 FOUR-PER-EM SPACE
+        "\u2006": " ",  # U+2006 SIX-PER-EM SPACE
+        "\u2007": " ",  # U+2007 FIGURE SPACE
+        "\u2008": " ",  # U+2008 PUNCTUATION SPACE
+        "\u2009": " ",  # U+2009 THIN SPACE
+        "\u200a": " ",  # U+200A HAIR SPACE
+        "\u202f": " ",  # U+202F NARROW NO-BREAK SPACE
+        "\u205f": " ",  # U+205F MEDIUM MATHEMATICAL SPACE
+        "\u3000": " ",  # U+3000 IDEOGRAPHIC SPACE
     }
     
     for bad, good in replacements.items():
         text = text.replace(bad, good)
+    
+    # Final pass: catch any remaining apostrophe-like characters that might have slipped through
+    # This uses a regex to find any remaining quotation mark or apostrophe-like characters
+    # and replaces them with standard apostrophe
+    apostrophe_pattern = re.compile(r'[\u2018\u2019\u201A\u201B\u02BC\u02BB]')
+    text = apostrophe_pattern.sub("'", text)
+    
+    # Catch any remaining double quote variants
+    quote_pattern = re.compile(r'[\u201C\u201D\u201E\u201F\u2E42]')
+    text = quote_pattern.sub('"', text)
     
     return text
 
@@ -224,8 +262,14 @@ def preprocess_text(text, is_short_input=False, pronunciations=None):
         text = apply_pronunciations(text, pronunciations)
     
     # Step 3: Replace asterisks used for scene breaks with newlines
+    # First, handle multiple asterisks (scene breaks)
     text = re.sub(r'\*{3,}', '\n\n', text)  # Multiple asterisks
     text = re.sub(r'^\*+$', '', text, flags=re.MULTILINE)  # Lines of only asterisks
+    # Remove remaining single asterisks (they're not in TTS vocabulary)
+    # But preserve asterisks that are part of words or common patterns
+    # Only remove standalone asterisks surrounded by spaces or at line boundaries
+    text = re.sub(r'(\s)\*(\s|$)', r'\1\2', text)  # Remove asterisks with spaces around them
+    text = re.sub(r'^\*(\s|$)', r'\1', text, flags=re.MULTILINE)  # Remove asterisks at line start
     
     # Step 4: Normalize multiple spaces
     text = re.sub(r' +', ' ', text)
