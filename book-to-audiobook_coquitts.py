@@ -481,26 +481,37 @@ def synthesize_text_chunk(tts, text, chunk_path):
         # Clean and validate text
         text = text.strip()
         
+        # Count words (split by whitespace and filter out empty strings)
+        words = [w for w in text.split() if w.strip()]
+        word_count = len(words)
+        
+        # TTS models need a minimum number of words to process properly
+        # Kernel size errors often occur when there aren't enough tokens
+        if word_count < 10:
+            print(f"  Warning: Chunk has very few words ({word_count} words, {len(text)} chars), may fail...")
+        
         # Ensure minimum length to avoid kernel errors
-        # TTS models need sufficient text to generate proper audio
         if len(text) < 100:
             print(f"  Warning: Chunk too short ({len(text)} chars), attempting anyway...")
-            # Don't skip - try to process it anyway since it might be the only content
         
         # Check if text has enough actual content (not just whitespace/punctuation)
-        # Count alphanumeric characters as a proxy for meaningful content
         alphanumeric_count = sum(1 for c in text if c.isalnum())
         if alphanumeric_count < 20:
             print(f"  Warning: Chunk has little content ({alphanumeric_count} alphanumeric chars), attempting anyway...")
-            # Don't skip - try to process it anyway
         
         tts.tts_to_file(text=text, file_path=chunk_path)
         return True
     except Exception as e:
+        error_msg = str(e).lower()
         print(f"  Error synthesizing chunk: {e}")
-        # If it's a kernel size error and the chunk is small, suggest merging
-        if "kernel size" in str(e).lower() and len(text.strip()) < 200:
-            print(f"  Note: This chunk may need to be merged with adjacent chunks.")
+        
+        # Kernel size errors indicate insufficient tokenizable content
+        if "kernel size" in error_msg:
+            words = [w for w in text.split() if w.strip()]
+            word_count = len(words)
+            print(f"  Note: Chunk has insufficient content for TTS model ({word_count} words, {len(text)} chars)")
+            print(f"  This chunk will be merged with adjacent chunks and retried.")
+        
         return False
 
 def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None):
@@ -544,7 +555,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             # Validate audio duration to detect infinite loops
             is_valid, duration, max_expected = validate_audio_duration(output_path, len(text))
             if not is_valid:
-                print(f"⚠ Warning: Generated audio is unusually long!")
+                print(f"[WARNING] Generated audio is unusually long!")
                 print(f"  Duration: {duration:.2f}s (expected max: {max_expected:.2f}s)")
                 print(f"  This may indicate the TTS model got stuck in a loop.")
                 
@@ -557,9 +568,9 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                             max_duration_ms = int(max_expected * 2 * 1000)  # 2x expected as safety limit
                             truncated = audio[:max_duration_ms]
                             truncated.export(output_path, format="wav")
-                            print(f"  ✓ Audio truncated successfully.")
+                            print(f"  [OK] Audio truncated successfully.")
                         except Exception as e:
-                            print(f"  ✗ Could not truncate audio: {e}")
+                            print(f"  [ERROR] Could not truncate audio: {e}")
                     else:
                         print(f"  Install pydub to enable automatic truncation: pip install pydub")
                 
@@ -567,7 +578,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             elif duration is not None:
                 print(f"  Audio duration: {duration:.2f}s")
             
-            print(f"✓ Speech generated successfully!")
+            print(f"[OK] Speech generated successfully!")
             print(f"  Output saved to: {output_path}")
             return True
         else:
@@ -575,15 +586,19 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             print(f"Splitting into {len(chunks)} chunks for processing...")
             
             # Merge small chunks with adjacent chunks to avoid losing content
+            # Check both character count and word count for better validation
             merged_chunks = []
             i = 0
             while i < len(chunks):
                 chunk = chunks[i]
                 chunk_len = len(chunk.strip())
+                words = [w for w in chunk.split() if w.strip()]
+                word_count = len(words)
                 alphanumeric_count = sum(1 for c in chunk if c.isalnum())
                 
-                # If chunk is too small, merge with adjacent chunks
-                if chunk_len < 100 or alphanumeric_count < 20:
+                # If chunk is too small (by chars, words, or content), merge with adjacent chunks
+                # TTS models need sufficient words/tokens, not just characters
+                if chunk_len < 100 or word_count < 10 or alphanumeric_count < 20:
                     merged = chunk
                     j = i + 1
                     
@@ -592,10 +607,12 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                         next_chunk = chunks[j]
                         test_merge = merged + " " + next_chunk
                         test_len = len(test_merge.strip())
+                        test_words = [w for w in test_merge.split() if w.strip()]
+                        test_word_count = len(test_words)
                         test_alnum = sum(1 for c in test_merge if c.isalnum())
                         
                         # If merged chunk is still too small, continue merging
-                        if test_len < 100 or test_alnum < 20:
+                        if test_len < 100 or test_word_count < 10 or test_alnum < 20:
                             merged = test_merge
                             j += 1
                         else:
@@ -603,7 +620,9 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                             break
                     
                     # If we still don't have enough and there's a previous chunk, merge backwards
-                    if (len(merged.strip()) < 100 or sum(1 for c in merged if c.isalnum()) < 20) and len(merged_chunks) > 0:
+                    merged_words = [w for w in merged.split() if w.strip()]
+                    merged_word_count = len(merged_words)
+                    if (len(merged.strip()) < 100 or merged_word_count < 10 or sum(1 for c in merged if c.isalnum()) < 20) and len(merged_chunks) > 0:
                         merged_chunks[-1] = merged_chunks[-1] + " " + merged
                     else:
                         merged_chunks.append(merged)
@@ -625,51 +644,83 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             # First pass: try to process all chunks
             for i, chunk in enumerate(merged_chunks, 1):
                 chunk_path = output_dir / f"{output_stem}_chunk_{i:04d}.wav"
-                print(f"  Processing chunk {i}/{len(merged_chunks)} ({len(chunk)} chars)...")
+                words = [w for w in chunk.split() if w.strip()]
+                word_count = len(words)
+                print(f"  Processing chunk {i}/{len(merged_chunks)} ({word_count} words, {len(chunk)} chars)...")
                 
                 # Chunks are already preprocessed, so use them directly
                 if synthesize_text_chunk(tts, chunk, str(chunk_path)):
                     chunk_files_dict[i] = chunk_path
                 else:
-                    print(f"  ✗ Failed to process chunk {i}")
+                    print(f"  [ERROR] Failed to process chunk {i}")
                     failed_indices.add(i)
             
             # Second pass: retry failed chunks by merging with adjacent chunks
             if failed_indices:
                 print(f"\n  Retrying {len(failed_indices)} failed chunks by merging with adjacent content...")
                 retry_attempts = {}
+                processed_indices = set()  # Track which chunks we've already processed in retries
                 
                 for failed_idx in sorted(failed_indices):
+                    if failed_idx in processed_indices:
+                        continue  # Skip if already processed as part of another merge
+                    
                     failed_chunk = merged_chunks[failed_idx - 1]  # Convert to 0-based
                     retry_path = output_dir / f"{output_stem}_retry_{failed_idx:04d}.wav"
+                    merged_retry = failed_chunk
+                    merged_indices = {failed_idx}
                     
-                    # Try merging with next chunk first
-                    if failed_idx < len(merged_chunks):
-                        next_chunk = merged_chunks[failed_idx]  # Next chunk (0-based)
-                        merged_retry = failed_chunk + " " + next_chunk
-                        print(f"    Retrying chunk {failed_idx} merged with chunk {failed_idx + 1} ({len(merged_retry)} chars)...")
-                        if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
-                            retry_attempts[failed_idx] = retry_path
-                            print(f"    ✓ Retry successful for chunk {failed_idx}")
-                            # If next chunk was also in chunk_files_dict, remove it since we merged
-                            if (failed_idx + 1) in chunk_files_dict:
-                                del chunk_files_dict[failed_idx + 1]
-                            continue
+                    # Try merging with next chunks first (more aggressive)
+                    j = failed_idx
+                    while j < len(merged_chunks) and len(merged_indices) < 3:  # Merge up to 3 chunks
+                        if j < len(merged_chunks):
+                            next_chunk = merged_chunks[j]  # Next chunk (0-based)
+                            merged_retry = merged_retry + " " + next_chunk
+                            merged_indices.add(j + 1)  # j+1 is 1-based index
+                            j += 1
+                            
+                            words = [w for w in merged_retry.split() if w.strip()]
+                            word_count = len(words)
+                            print(f"    Retrying chunk {failed_idx} merged with {len(merged_indices)-1} next chunk(s) ({word_count} words, {len(merged_retry)} chars)...")
+                            
+                            if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
+                                retry_attempts[failed_idx] = retry_path
+                                print(f"    [OK] Retry successful for chunk {failed_idx}")
+                                processed_indices.update(merged_indices)
+                                # Remove merged chunks from chunk_files_dict
+                                for idx in merged_indices:
+                                    if idx in chunk_files_dict:
+                                        del chunk_files_dict[idx]
+                                break
                     
-                    # If next merge didn't work, try merging with previous chunk
-                    if failed_idx > 1:
-                        prev_chunk = merged_chunks[failed_idx - 2]  # Previous chunk (0-based)
-                        merged_retry = prev_chunk + " " + failed_chunk
-                        print(f"    Retrying chunk {failed_idx} merged with chunk {failed_idx - 1} ({len(merged_retry)} chars)...")
-                        if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
-                            retry_attempts[failed_idx] = retry_path
-                            print(f"    ✓ Retry successful for chunk {failed_idx}")
-                            # If previous chunk was in chunk_files_dict, remove it since we merged
-                            if (failed_idx - 1) in chunk_files_dict:
-                                del chunk_files_dict[failed_idx - 1]
-                            continue
+                    # If next merge didn't work, try merging with previous chunks
+                    if failed_idx not in retry_attempts and failed_idx > 1:
+                        merged_retry = failed_chunk
+                        merged_indices = {failed_idx}
+                        j = failed_idx - 2  # Start from previous chunk (0-based)
+                        
+                        while j >= 0 and len(merged_indices) < 3:  # Merge up to 3 chunks
+                            prev_chunk = merged_chunks[j]
+                            merged_retry = prev_chunk + " " + merged_retry
+                            merged_indices.add(j + 1)  # j+1 is 1-based index
+                            j -= 1
+                            
+                            words = [w for w in merged_retry.split() if w.strip()]
+                            word_count = len(words)
+                            print(f"    Retrying chunk {failed_idx} merged with {len(merged_indices)-1} previous chunk(s) ({word_count} words, {len(merged_retry)} chars)...")
+                            
+                            if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
+                                retry_attempts[failed_idx] = retry_path
+                                print(f"    [OK] Retry successful for chunk {failed_idx}")
+                                processed_indices.update(merged_indices)
+                                # Remove merged chunks from chunk_files_dict
+                                for idx in merged_indices:
+                                    if idx in chunk_files_dict:
+                                        del chunk_files_dict[idx]
+                                break
                     
-                    print(f"    ✗ Retry failed for chunk {failed_idx}")
+                    if failed_idx not in retry_attempts:
+                        print(f"    [ERROR] Retry failed for chunk {failed_idx}")
                 
                 # Update chunk_files_dict with successful retries
                 chunk_files_dict.update(retry_attempts)
@@ -678,7 +729,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             chunk_files = [chunk_files_dict[i] for i in sorted(chunk_files_dict.keys())]
             
             if not chunk_files:
-                print("✗ All chunks failed to process.")
+                print("[ERROR] All chunks failed to process.")
                 return False
             
             # Combine audio files if pydub is available
@@ -693,7 +744,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                     combined += AudioSegment.silent(duration=500)  # 500ms pause
                 
                 combined.export(output_path, format="wav")
-                print(f"✓ Combined audio saved to: {output_path}")
+                print(f"[OK] Combined audio saved to: {output_path}")
                 
                 # Clean up chunk files
                 for chunk_file in chunk_files:
@@ -702,15 +753,20 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             elif len(chunk_files) == 1:
                 # Only one chunk succeeded, just rename it
                 chunk_files[0].rename(output_path)
-                print(f"✓ Audio saved to: {output_path}")
+                print(f"[OK] Audio saved to: {output_path}")
             else:
-                print(f"✓ Processed {len(chunk_files)} chunks (not combined - install pydub to combine)")
+                print(f"[OK] Processed {len(chunk_files)} chunks (not combined - install pydub to combine)")
                 print(f"  Chunk files saved in: {output_dir}")
             
             return True
         
     except Exception as e:
-        print(f"Error during synthesis: {e}")
+        # Handle encoding errors gracefully
+        try:
+            error_msg = str(e)
+            print(f"Error during synthesis: {error_msg}")
+        except UnicodeEncodeError:
+            print(f"Error during synthesis: {repr(e)}")
         print("\nTip: Try specifying a different model or check available models with scripts/list_models.py")
         return False
 
@@ -860,7 +916,7 @@ Examples:
     
     if success:
         print(f"\n{'='*50}")
-        print(f"✓ Conversion complete!")
+        print(f"[OK] Conversion complete!")
         print(f"  Input:  {input_source}")
         print(f"  Output: {output_file}")
         
@@ -868,12 +924,12 @@ Examples:
         if args.play:
             print(f"\nPlaying audio...")
             if play_audio(output_file):
-                print("✓ Audio playback complete.")
+                print("[OK] Audio playback complete.")
             else:
-                print("✗ Audio playback failed.")
+                print("[ERROR] Audio playback failed.")
     else:
         print(f"\n{'='*50}")
-        print("✗ Conversion failed.")
+        print("[ERROR] Conversion failed.")
         sys.exit(1)
 
 if __name__ == "__main__":
