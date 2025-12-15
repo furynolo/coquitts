@@ -342,16 +342,18 @@ def preprocess_text(text, is_short_input=False, pronunciations=None):
 def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
     """
     Split text into chunks for processing.
-    Always splits at sentence boundaries to ensure natural breaks.
+    Each chunk is a single sentence to ensure natural breaks and pauses in speech.
     Uses NLTK sentence tokenizer if available for better accuracy, otherwise falls back to regex.
+    If a sentence exceeds max_chunk_size, it will be split further by clauses (commas, semicolons)
+    or word boundaries as a last resort.
     
     Args:
         text: Text to split
-        max_chunk_size: Maximum characters per chunk
-        min_chunk_size: Minimum characters per chunk (to avoid kernel errors)
+        max_chunk_size: Maximum characters per chunk (for sentences that exceed this, they'll be split further)
+        min_chunk_size: Minimum characters per chunk (to avoid kernel errors, used for validation)
         
     Returns:
-        List of text chunks
+        List of text chunks, where each chunk is typically a single sentence
     """
     # If text is short enough, return as single chunk
     if len(text) <= max_chunk_size:
@@ -398,50 +400,98 @@ def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
         lines = text.split('\n')
         sentences = [l.strip() for l in lines if l.strip()]
     
-    # Build chunks by adding sentences until we approach max_chunk_size
+    # Build chunks: each sentence becomes its own chunk
+    # If a sentence exceeds max_chunk_size, split it further by clauses/commas
     chunks = []
-    current_chunk = ""
     
     for sentence in sentences:
-        # Calculate what the chunk would be if we add this sentence
-        potential_chunk = current_chunk + " " + sentence if current_chunk else sentence
+        sentence = sentence.strip()
+        if not sentence:
+            continue
         
-        # If adding this sentence would exceed max size (with some buffer for safety)
-        # and we have enough content, start a new chunk
-        if len(potential_chunk) > max_chunk_size and current_chunk:
-            # Check if current chunk meets minimum size requirement
-            if len(current_chunk.strip()) >= min_chunk_size:
-                chunks.append(current_chunk.strip())
-                current_chunk = sentence
-            else:
-                # Current chunk is too small, add sentence anyway
-                # This prevents very small chunks (they'll be merged later if needed)
-                current_chunk = potential_chunk
+        # If sentence fits within max_chunk_size, use it as-is
+        if len(sentence) <= max_chunk_size:
+            chunks.append(sentence)
         else:
-            # Add sentence to current chunk
-            current_chunk = potential_chunk
-    
-    # Add the last chunk if it has content
-    if current_chunk.strip():
-        chunks.append(current_chunk.strip())
-    
-    # Final safety check: if we somehow ended up with no chunks, split by character count
-    # This should rarely happen, but ensures we always return something
-    if not chunks:
-        # Force split by character count as last resort (but try to break at spaces)
-        words = text.split()
-        current_chunk = ""
-        for word in words:
-            potential_chunk = current_chunk + " " + word if current_chunk else word
-            if len(potential_chunk) > max_chunk_size and current_chunk:
-                chunks.append(current_chunk.strip())
-                current_chunk = word
+            # Sentence is too long - split it by clauses (commas, semicolons, colons)
+            # This preserves natural speech breaks better than word boundaries
+            clause_pattern = r'([^,;:]+[,;:]+(?:\s+|$))'
+            clause_matches = list(re.finditer(clause_pattern, sentence))
+            
+            if clause_matches:
+                # Split by clauses
+                current_subchunk = ""
+                for match in clause_matches:
+                    clause = match.group(1).strip()
+                    if not clause:
+                        continue
+                    
+                    potential_subchunk = current_subchunk + " " + clause if current_subchunk else clause
+                    
+                    # If adding this clause would exceed max size, save current and start new
+                    if len(potential_subchunk) > max_chunk_size and current_subchunk:
+                        chunks.append(current_subchunk.strip())
+                        current_subchunk = clause
+                    else:
+                        current_subchunk = potential_subchunk
+                
+                # Add any remaining content
+                if current_subchunk.strip():
+                    # If remaining is still too long, split by words
+                    if len(current_subchunk) > max_chunk_size:
+                        words = current_subchunk.split()
+                        word_chunk = ""
+                        for word in words:
+                            potential_word_chunk = word_chunk + " " + word if word_chunk else word
+                            if len(potential_word_chunk) > max_chunk_size and word_chunk:
+                                chunks.append(word_chunk.strip())
+                                word_chunk = word
+                            else:
+                                word_chunk = potential_word_chunk
+                        if word_chunk.strip():
+                            chunks.append(word_chunk.strip())
+                    else:
+                        chunks.append(current_subchunk.strip())
+                
+                # Handle any text after the last clause match
+                last_match_end = clause_matches[-1].end()
+                remaining = sentence[last_match_end:].strip()
+                if remaining:
+                    if len(remaining) > max_chunk_size:
+                        # Split remaining by words
+                        words = remaining.split()
+                        word_chunk = ""
+                        for word in words:
+                            potential_word_chunk = word_chunk + " " + word if word_chunk else word
+                            if len(potential_word_chunk) > max_chunk_size and word_chunk:
+                                chunks.append(word_chunk.strip())
+                                word_chunk = word
+                            else:
+                                word_chunk = potential_word_chunk
+                        if word_chunk.strip():
+                            chunks.append(word_chunk.strip())
+                    else:
+                        chunks.append(remaining)
             else:
-                current_chunk = potential_chunk
-        if current_chunk.strip():
-            chunks.append(current_chunk.strip())
+                # No clauses found, split by words as fallback
+                words = sentence.split()
+                word_chunk = ""
+                for word in words:
+                    potential_word_chunk = word_chunk + " " + word if word_chunk else word
+                    if len(potential_word_chunk) > max_chunk_size and word_chunk:
+                        chunks.append(word_chunk.strip())
+                        word_chunk = word
+                    else:
+                        word_chunk = potential_word_chunk
+                if word_chunk.strip():
+                    chunks.append(word_chunk.strip())
     
-    return chunks if chunks else [text]  # Ensure we always return at least one chunk
+    # Filter out empty chunks and ensure minimum size
+    # Very short chunks will be handled by the merging logic in synthesize_text
+    filtered_chunks = [chunk.strip() for chunk in chunks if chunk.strip()]
+    
+    # Final safety check: if we somehow ended up with no chunks, return the original text
+    return filtered_chunks if filtered_chunks else [text]
 
 def read_text_file(file_path):
     """
