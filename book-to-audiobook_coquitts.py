@@ -27,27 +27,59 @@ NLTK_SETUP_MESSAGE = None
 
 try:
     import nltk
-    # Check if punkt tokenizer is available
+    
+    # Check if punkt tokenizer is available (try both punkt and punkt_tab for compatibility)
+    punkt_available = False
+    punkt_tab_available = False
+    
     try:
         nltk.data.find('tokenizers/punkt')
-        NLTK_AVAILABLE = True
+        punkt_available = True
     except LookupError:
-        # Download punkt tokenizer if not available
+        pass
+    
+    try:
+        nltk.data.find('tokenizers/punkt_tab')
+        punkt_tab_available = True
+    except LookupError:
+        pass
+    
+    # If neither is available, download them
+    if not punkt_available or not punkt_tab_available:
         try:
-            print("NLTK punkt tokenizer not found. Downloading...")
-            nltk.download('punkt', quiet=False)
-            # Verify it was downloaded successfully
+            if not punkt_available:
+                print("NLTK punkt tokenizer not found. Downloading...")
+                nltk.download('punkt', quiet=False)
+            if not punkt_tab_available:
+                print("NLTK punkt_tab tokenizer not found. Downloading...")
+                nltk.download('punkt_tab', quiet=False)
+            
+            # Verify downloads
+            try:
+                nltk.data.find('tokenizers/punkt_tab')
+                punkt_tab_available = True
+            except LookupError:
+                pass
             try:
                 nltk.data.find('tokenizers/punkt')
-                NLTK_AVAILABLE = True
-                print("NLTK punkt tokenizer downloaded successfully.")
+                punkt_available = True
             except LookupError:
-                NLTK_SETUP_MESSAGE = "Warning: NLTK punkt tokenizer download may have failed. Using regex fallback for sentence splitting."
+                pass
+            
+            if punkt_tab_available or punkt_available:
+                NLTK_AVAILABLE = True
+                print("NLTK tokenizers downloaded successfully.")
+            else:
+                NLTK_SETUP_MESSAGE = "Warning: NLTK tokenizer download may have failed. Using regex fallback for sentence splitting."
                 print(NLTK_SETUP_MESSAGE)
         except Exception as e:
-            NLTK_SETUP_MESSAGE = f"Warning: Could not download NLTK punkt tokenizer ({e}). Using regex fallback for sentence splitting."
+            NLTK_SETUP_MESSAGE = f"Warning: Could not download NLTK tokenizers ({e}). Using regex fallback for sentence splitting."
             print(NLTK_SETUP_MESSAGE)
             NLTK_AVAILABLE = False
+    else:
+        # Both are available
+        NLTK_AVAILABLE = True
+        
 except ImportError:
     NLTK_SETUP_MESSAGE = "NLTK not installed. Using regex fallback for sentence splitting. Install with: pip install nltk"
 except Exception as e:

@@ -17,26 +17,56 @@ except ImportError:
     print("  Install with: pip install nltk")
     sys.exit(1)
 
-# Test 2: Check if punkt tokenizer is available
+# Test 2: Check if punkt tokenizers are available (both punkt and punkt_tab for newer NLTK)
+punkt_available = False
+punkt_tab_available = False
+
 try:
     nltk.data.find('tokenizers/punkt')
+    punkt_available = True
     print("[OK] NLTK punkt tokenizer is available")
 except LookupError:
     print("[WARNING] NLTK punkt tokenizer is not found")
-    print("  Attempting to download...")
+
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+    punkt_tab_available = True
+    print("[OK] NLTK punkt_tab tokenizer is available")
+except LookupError:
+    print("[WARNING] NLTK punkt_tab tokenizer is not found (required for newer NLTK versions)")
+
+# Download missing tokenizers
+if not punkt_available or not punkt_tab_available:
+    print("  Attempting to download missing tokenizers...")
     try:
-        nltk.download('punkt', quiet=False)
-        # Verify it was downloaded
+        if not punkt_available:
+            nltk.download('punkt', quiet=False)
+        if not punkt_tab_available:
+            nltk.download('punkt_tab', quiet=False)
+        
+        # Verify downloads
+        punkt_available = False
+        punkt_tab_available = False
         try:
             nltk.data.find('tokenizers/punkt')
-            print("[OK] NLTK punkt tokenizer downloaded successfully")
+            punkt_available = True
         except LookupError:
+            pass
+        try:
+            nltk.data.find('tokenizers/punkt_tab')
+            punkt_tab_available = True
+        except LookupError:
+            pass
+        
+        if punkt_tab_available or punkt_available:
+            print("[OK] NLTK tokenizers downloaded successfully")
+        else:
             print("[ERROR] Download may have failed. Please try manually:")
-            print("  python -c \"import nltk; nltk.download('punkt')\"")
+            print("  python -c \"import nltk; nltk.download('punkt_tab'); nltk.download('punkt')\"")
             sys.exit(1)
     except Exception as e:
-        print(f"[ERROR] Could not download punkt tokenizer: {e}")
-        print("  Try manually: python -c \"import nltk; nltk.download('punkt')\"")
+        print(f"[ERROR] Could not download tokenizers: {e}")
+        print("  Try manually: python -c \"import nltk; nltk.download('punkt_tab'); nltk.download('punkt')\"")
         sys.exit(1)
 
 # Test 3: Test sentence tokenization
