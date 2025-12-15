@@ -186,11 +186,18 @@ def normalize_for_tts(text):
     dash_pattern = re.compile(r'[\u2010\u2011\u2012\u2013\u2014\u2015]')
     text = dash_pattern.sub('-', text)
     
+    # Remove IPA combining characters (Unicode combining diacritical marks)
+    # These are not supported by TTS models and cause vocabulary errors
+    # Remove combining characters but keep base characters
+    combining_pattern = re.compile(r'[\u0300-\u036F\u1AB0-\u1AFF\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]')
+    text = combining_pattern.sub('', text)
+    
     return text
 
 def load_pronunciations(pronunciations_file):
     """
     Load pronunciation mappings from a JSON file.
+    Removes IPA combining characters from pronunciation values to prevent TTS errors.
     
     Args:
         pronunciations_file: Path to JSON file with pronunciation mappings
@@ -206,8 +213,20 @@ def load_pronunciations(pronunciations_file):
             print(f"Warning: Pronunciation file '{pronunciations_file}' does not contain a valid dictionary.")
             return None
         
-        print(f"Loaded {len(pronunciations)} pronunciation mappings from '{pronunciations_file}'")
-        return pronunciations
+        # Remove IPA combining characters from pronunciation values
+        # These characters cause TTS vocabulary errors
+        combining_pattern = re.compile(r'[\u0300-\u036F\u1AB0-\u1AFF\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]')
+        cleaned_pronunciations = {}
+        for key, value in pronunciations.items():
+            if isinstance(value, str):
+                # Remove combining characters from the pronunciation value
+                cleaned_value = combining_pattern.sub('', value)
+                cleaned_pronunciations[key] = cleaned_value
+            else:
+                cleaned_pronunciations[key] = value
+        
+        print(f"Loaded {len(cleaned_pronunciations)} pronunciation mappings from '{pronunciations_file}'")
+        return cleaned_pronunciations
     except FileNotFoundError:
         print(f"Error: Pronunciation file '{pronunciations_file}' not found.")
         return None
@@ -265,6 +284,10 @@ def preprocess_text(text, is_short_input=False, pronunciations=None):
     # Step 2: Apply pronunciation replacements after normalization
     if pronunciations:
         text = apply_pronunciations(text, pronunciations)
+        # Remove IPA combining characters that may have been introduced by pronunciations
+        # These are Unicode combining diacritical marks (U+0300-U+036F) that TTS models don't support
+        # Remove combining characters but keep the base characters
+        text = re.sub(r'[\u0300-\u036F\u1AB0-\u1AFF\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]', '', text)
     
     # Step 3: Remove all asterisks (they're not in TTS vocabulary)
     # First, handle multiple asterisks (scene breaks) - convert to paragraph breaks
@@ -278,6 +301,11 @@ def preprocess_text(text, is_short_input=False, pronunciations=None):
     
     # Step 5: Normalize multiple newlines (keep max 2)
     text = re.sub(r'\n{3,}', '\n\n', text)
+    
+    # Step 5.5: Final pass to remove any remaining combining characters
+    # This ensures all IPA combining characters are removed before TTS processing
+    combining_pattern = re.compile(r'[\u0300-\u036F\u1AB0-\u1AFF\u1DC0-\u1DFF\u20D0-\u20FF\uFE20-\uFE2F]')
+    text = combining_pattern.sub('', text)
     
     text = text.strip()
     
@@ -465,7 +493,7 @@ def play_audio(file_path):
         print(f"Error playing audio: {e}")
         return False
 
-def synthesize_text_chunk(tts, text, chunk_path):
+def synthesize_text_chunk(tts, text, chunk_path, speaker=None, speaker_wav=None):
     """
     Synthesize a single chunk of text.
     
@@ -473,6 +501,8 @@ def synthesize_text_chunk(tts, text, chunk_path):
         tts: Initialized TTS model
         text: Text chunk to synthesize
         chunk_path: Path to save the chunk audio file
+        speaker: Optional speaker name for multi-speaker models
+        speaker_wav: Optional path to reference audio file for multi-speaker models
         
     Returns:
         True if successful, False otherwise
@@ -499,11 +529,23 @@ def synthesize_text_chunk(tts, text, chunk_path):
         if alphanumeric_count < 20:
             print(f"  Warning: Chunk has little content ({alphanumeric_count} alphanumeric chars), attempting anyway...")
         
-        tts.tts_to_file(text=text, file_path=chunk_path)
+        # Build kwargs for tts_to_file
+        kwargs = {"text": text, "file_path": chunk_path}
+        if speaker:
+            kwargs["speaker"] = speaker
+        if speaker_wav:
+            kwargs["speaker_wav"] = speaker_wav
+        
+        tts.tts_to_file(**kwargs)
         return True
     except Exception as e:
         error_msg = str(e).lower()
         print(f"  Error synthesizing chunk: {e}")
+        
+        # Multi-speaker model errors
+        if "multi-speaker" in error_msg or "speaker" in error_msg and ("need" in error_msg or "pass" in error_msg or "require" in error_msg):
+            print(f"  Note: This appears to be a multi-speaker model error.")
+            print(f"  Use --speaker to specify a speaker name, or --speaker-wav for reference audio.")
         
         # Kernel size errors indicate insufficient tokenizable content
         if "kernel size" in error_msg:
@@ -514,7 +556,7 @@ def synthesize_text_chunk(tts, text, chunk_path):
         
         return False
 
-def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None):
+def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None, speaker=None, speaker_wav=None):
     """
     Synthesize text to speech, handling long texts by chunking.
     
@@ -525,6 +567,8 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         chunk_size: Maximum characters per chunk (default: 5000)
         is_short_input: If True, indicates this is a short direct text input
         pronunciations: Optional dictionary of pronunciation mappings to apply
+        speaker: Optional speaker name for multi-speaker models
+        speaker_wav: Optional path to reference audio file for multi-speaker models
     """
     try:
         # Preprocess text (with special handling for short inputs and pronunciations)
@@ -541,6 +585,44 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             print(f"Loading default model: {default_model}")
             tts = TTS(model_name=default_model, progress_bar=True)
         
+        # Check if model is multi-speaker and handle speaker selection
+        # Try to detect speakers from various possible attributes
+        available_speakers = None
+        try:
+            if hasattr(tts, 'speakers') and tts.speakers is not None:
+                available_speakers = list(tts.speakers) if tts.speakers else None
+            elif hasattr(tts, 'speaker_manager') and tts.speaker_manager is not None:
+                if hasattr(tts.speaker_manager, 'speaker_names'):
+                    available_speakers = list(tts.speaker_manager.speaker_names)
+                elif hasattr(tts.speaker_manager, 'speakers'):
+                    available_speakers = list(tts.speaker_manager.speakers)
+        except Exception:
+            pass  # If we can't detect speakers, we'll handle it via error messages
+        
+        is_multi_speaker = available_speakers is not None and len(available_speakers) > 0
+        
+        if is_multi_speaker:
+            if not speaker and not speaker_wav:
+                # Try to use first available speaker as default
+                speaker = available_speakers[0]
+                print(f"Multi-speaker model detected. Using default speaker: {speaker}")
+                print(f"  Available speakers: {', '.join(available_speakers[:10])}{'...' if len(available_speakers) > 10 else ''}")
+                print(f"  (Use --speaker to specify a different speaker)")
+            elif speaker:
+                # Validate speaker exists
+                if speaker not in available_speakers:
+                    print(f"Warning: Speaker '{speaker}' not found in model.")
+                    print(f"  Available speakers: {', '.join(available_speakers[:10])}{'...' if len(available_speakers) > 10 else ''}")
+                    print(f"  Using first available speaker: {available_speakers[0]}")
+                    speaker = available_speakers[0]
+                else:
+                    print(f"Using speaker: {speaker}")
+            elif speaker_wav:
+                if not os.path.exists(speaker_wav):
+                    print(f"Error: Reference audio file '{speaker_wav}' not found.")
+                    return False
+                print(f"Using reference audio: {speaker_wav}")
+        
         # Show text info
         print(f"Text length: {len(text)} characters")
         
@@ -550,7 +632,12 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         if len(chunks) == 1:
             # Single chunk - process directly
             print(f"Synthesizing text...")
-            tts.tts_to_file(text=text, file_path=output_path)
+            kwargs = {"text": text, "file_path": output_path}
+            if speaker:
+                kwargs["speaker"] = speaker
+            if speaker_wav:
+                kwargs["speaker_wav"] = speaker_wav
+            tts.tts_to_file(**kwargs)
             
             # Validate audio duration to detect infinite loops
             is_valid, duration, max_expected = validate_audio_duration(output_path, len(text))
@@ -649,7 +736,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                 print(f"  Processing chunk {i}/{len(merged_chunks)} ({word_count} words, {len(chunk)} chars)...")
                 
                 # Chunks are already preprocessed, so use them directly
-                if synthesize_text_chunk(tts, chunk, str(chunk_path)):
+                if synthesize_text_chunk(tts, chunk, str(chunk_path), speaker=speaker, speaker_wav=speaker_wav):
                     chunk_files_dict[i] = chunk_path
                 else:
                     print(f"  [ERROR] Failed to process chunk {i}")
@@ -683,7 +770,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                             word_count = len(words)
                             print(f"    Retrying chunk {failed_idx} merged with {len(merged_indices)-1} next chunk(s) ({word_count} words, {len(merged_retry)} chars)...")
                             
-                            if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
+                            if synthesize_text_chunk(tts, merged_retry, str(retry_path), speaker=speaker, speaker_wav=speaker_wav):
                                 retry_attempts[failed_idx] = retry_path
                                 print(f"    [OK] Retry successful for chunk {failed_idx}")
                                 processed_indices.update(merged_indices)
@@ -709,7 +796,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                             word_count = len(words)
                             print(f"    Retrying chunk {failed_idx} merged with {len(merged_indices)-1} previous chunk(s) ({word_count} words, {len(merged_retry)} chars)...")
                             
-                            if synthesize_text_chunk(tts, merged_retry, str(retry_path)):
+                            if synthesize_text_chunk(tts, merged_retry, str(retry_path), speaker=speaker, speaker_wav=speaker_wav):
                                 retry_attempts[failed_idx] = retry_path
                                 print(f"    [OK] Retry successful for chunk {failed_idx}")
                                 processed_indices.update(merged_indices)
@@ -791,6 +878,12 @@ Examples:
   
   # Use a specific model:
   python book-to-audiobook_coquitts.py --text "Hello world" --model tts_models/en/ljspeech/tacotron2-DDC
+  
+  # Use a multi-speaker model with speaker selection:
+  python book-to-audiobook_coquitts.py input.txt -m tts_models/en/vctk/vits --speaker p225
+  
+  # Use a multi-speaker model with reference audio:
+  python book-to-audiobook_coquitts.py input.txt -m tts_models/en/vctk/vits --speaker-wav reference.wav
         """
     )
     
@@ -833,6 +926,16 @@ Examples:
         '--pronunciations', '-pr',
         type=str,
         help='Path to JSON file with pronunciation mappings (keys: original text, values: pronunciation)'
+    )
+    parser.add_argument(
+        '--speaker', '-s',
+        type=str,
+        help='Speaker name for multi-speaker models (e.g., "p225" for VCTK models)'
+    )
+    parser.add_argument(
+        '--speaker-wav',
+        type=str,
+        help='Path to reference audio file for multi-speaker models (alternative to --speaker)'
     )
     
     args = parser.parse_args()
@@ -911,7 +1014,9 @@ Examples:
         model_name=args.model,
         chunk_size=args.chunk_size,
         is_short_input=is_short,
-        pronunciations=pronunciations
+        pronunciations=pronunciations,
+        speaker=args.speaker,
+        speaker_wav=args.speaker_wav
     )
     
     if success:
