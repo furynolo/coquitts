@@ -22,20 +22,36 @@ except ImportError:
     sys.exit(1)
 
 # Try to import NLTK for better sentence tokenization
+NLTK_AVAILABLE = False
+NLTK_SETUP_MESSAGE = None
+
 try:
     import nltk
+    # Check if punkt tokenizer is available
     try:
         nltk.data.find('tokenizers/punkt')
+        NLTK_AVAILABLE = True
     except LookupError:
         # Download punkt tokenizer if not available
         try:
-            nltk.download('punkt', quiet=True)
-        except Exception:
-            pass
-    NLTK_AVAILABLE = True
+            print("NLTK punkt tokenizer not found. Downloading...")
+            nltk.download('punkt', quiet=False)
+            # Verify it was downloaded successfully
+            try:
+                nltk.data.find('tokenizers/punkt')
+                NLTK_AVAILABLE = True
+                print("NLTK punkt tokenizer downloaded successfully.")
+            except LookupError:
+                NLTK_SETUP_MESSAGE = "Warning: NLTK punkt tokenizer download may have failed. Using regex fallback for sentence splitting."
+                print(NLTK_SETUP_MESSAGE)
+        except Exception as e:
+            NLTK_SETUP_MESSAGE = f"Warning: Could not download NLTK punkt tokenizer ({e}). Using regex fallback for sentence splitting."
+            print(NLTK_SETUP_MESSAGE)
+            NLTK_AVAILABLE = False
 except ImportError:
-    NLTK_AVAILABLE = False
-except Exception:
+    NLTK_SETUP_MESSAGE = "NLTK not installed. Using regex fallback for sentence splitting. Install with: pip install nltk"
+except Exception as e:
+    NLTK_SETUP_MESSAGE = f"Warning: NLTK setup error ({e}). Using regex fallback for sentence splitting."
     NLTK_AVAILABLE = False
 
 try:
@@ -1059,6 +1075,13 @@ Examples:
     args = parser.parse_args()
     
     print("Book to Audiobook Converter (CoquiTTS)\n" + "="*50)
+    
+    # Show NLTK status
+    if NLTK_AVAILABLE:
+        print("NLTK: Available (using advanced sentence tokenization)")
+    elif NLTK_SETUP_MESSAGE:
+        print(f"NLTK: {NLTK_SETUP_MESSAGE}")
+    print()  # Blank line for readability
     
     # Determine input source
     text = None
