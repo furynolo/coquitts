@@ -121,14 +121,16 @@ if not PLAYBACK_AVAILABLE:
     except ImportError:
         pass
 
-def generate_unique_filename(base_name, output_dir=None):
+def generate_unique_filename(base_name, output_dir=None, model=None, speaker=None):
     """
     Generate a unique output filename with incrementing number and timestamp.
-    Format: base_name_N_YYYYMMDD-HHMMSS.wav
+    Format: base_name[_model][_speaker]_N_YYYYMMDD-HHMMSS.wav
     
     Args:
         base_name: Base name for the file (without extension)
         output_dir: Optional output directory (default: output-audio/)
+        model: Optional model name to include in filename
+        speaker: Optional speaker name to include in filename
         
     Returns:
         Path to unique output audio file
@@ -141,15 +143,44 @@ def generate_unique_filename(base_name, output_dir=None):
     # Create output directory if it doesn't exist
     output_path.mkdir(parents=True, exist_ok=True)
     
+    # Sanitize model name for filesystem (replace slashes, colons, etc. with underscores)
+    safe_model = None
+    if model:
+        # Replace filesystem-unsafe characters with underscores
+        safe_model = re.sub(r'[^\w\s-]', '_', model).strip().replace(' ', '_')
+        # Replace multiple underscores with single underscore
+        safe_model = re.sub(r'_+', '_', safe_model)
+        # Limit length to avoid very long filenames
+        if len(safe_model) > 50:
+            # Use last part of model path if it's too long
+            parts = safe_model.split('_')
+            safe_model = '_'.join(parts[-3:]) if len(parts) > 3 else safe_model[:50]
+    
+    # Sanitize speaker name for filesystem
+    safe_speaker = None
+    if speaker:
+        safe_speaker = re.sub(r'[^\w\s-]', '_', speaker).strip().replace(' ', '_')
+        safe_speaker = re.sub(r'_+', '_', safe_speaker)
+    
     # Generate timestamp
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     
-    # Find the next available number by checking existing files
-    # Pattern: base_name_N_YYYYMMDD-HHMMSS.wav
-    pattern = re.compile(rf"^{re.escape(base_name)}_(\d+)_.*\.wav$")
-    existing_numbers = []
+    # Build filename pattern for matching existing files
+    # Pattern: base_name[_model][_speaker]_N_YYYYMMDD-HHMMSS.wav
+    # We match files with the same base_name, model, and speaker (if provided)
+    pattern_parts = [re.escape(base_name)]
+    if safe_model:
+        pattern_parts.append(re.escape(safe_model))
+    if safe_speaker:
+        pattern_parts.append(re.escape(safe_speaker))
+    pattern_parts.append(r'_(\d+)_')  # Number
+    pattern_parts.append(r'.*\.wav$')  # Timestamp and extension
+    pattern = re.compile('^' + '_'.join(pattern_parts))
     
-    for file in output_path.glob(f"{base_name}_*.wav"):
+    existing_numbers = []
+    # Search for files matching the base pattern
+    search_pattern = f"{base_name}_*.wav"
+    for file in output_path.glob(search_pattern):
         match = pattern.match(file.name)
         if match:
             existing_numbers.append(int(match.group(1)))
@@ -158,18 +189,28 @@ def generate_unique_filename(base_name, output_dir=None):
     next_number = max(existing_numbers) + 1 if existing_numbers else 1
     
     # Generate unique filename
-    output_file = output_path / f"{base_name}_{next_number}_{timestamp}.wav"
+    filename_parts = [base_name]
+    if safe_model:
+        filename_parts.append(safe_model)
+    if safe_speaker:
+        filename_parts.append(safe_speaker)
+    filename_parts.append(str(next_number))
+    filename_parts.append(timestamp)
+    
+    output_file = output_path / f"{'_'.join(filename_parts)}.wav"
     
     return str(output_file)
 
-def get_output_filename(input_file, output_dir=None):
+def get_output_filename(input_file, output_dir=None, model=None, speaker=None):
     """
     Generate output filename based on input filename.
-    Now includes incrementing number and timestamp.
+    Now includes incrementing number, timestamp, model, and speaker (if applicable).
     
     Args:
         input_file: Path to input text file
         output_dir: Optional output directory (default: output-audio/)
+        model: Optional model name to include in filename
+        speaker: Optional speaker name to include in filename
         
     Returns:
         Path to unique output audio file
@@ -177,7 +218,7 @@ def get_output_filename(input_file, output_dir=None):
     input_path = Path(input_file)
     input_stem = input_path.stem  # filename without extension
     
-    return generate_unique_filename(input_stem, output_dir)
+    return generate_unique_filename(input_stem, output_dir, model=model, speaker=speaker)
 
 def normalize_for_tts(text):
     """
@@ -1151,6 +1192,14 @@ Examples:
             parser.print_help()
             sys.exit(1)
     
+    # Determine speaker identifier for filename
+    # If speaker_wav is provided, use a short identifier based on the filename
+    speaker_for_filename = args.speaker
+    if args.speaker_wav and not speaker_for_filename:
+        # Extract a short identifier from the speaker_wav filename
+        speaker_path = Path(args.speaker_wav)
+        speaker_for_filename = f"ref_{speaker_path.stem[:20]}"  # Limit length
+    
     # Generate output filename
     if args.output:
         output_file = args.output
@@ -1161,9 +1210,9 @@ Examples:
         # If safe_name is empty after sanitization, use a default
         if not safe_name:
             safe_name = "text_output"
-        output_file = generate_unique_filename(safe_name)
+        output_file = generate_unique_filename(safe_name, model=args.model, speaker=speaker_for_filename)
     else:
-        output_file = get_output_filename(input_source)
+        output_file = get_output_filename(input_source, model=args.model, speaker=speaker_for_filename)
     
     print(f"Output file: {output_file}\n")
     
