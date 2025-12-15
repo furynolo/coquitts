@@ -21,6 +21,23 @@ except ImportError:
     print("Error: CoquiTTS is not installed. Please run: pip install -r requirements.txt")
     sys.exit(1)
 
+# Try to import NLTK for better sentence tokenization
+try:
+    import nltk
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        # Download punkt tokenizer if not available
+        try:
+            nltk.download('punkt', quiet=True)
+        except Exception:
+            pass
+    NLTK_AVAILABLE = True
+except ImportError:
+    NLTK_AVAILABLE = False
+except Exception:
+    NLTK_AVAILABLE = False
+
 try:
     from pydub import AudioSegment
     PYDUB_AVAILABLE = True
@@ -326,6 +343,7 @@ def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
     """
     Split text into chunks for processing.
     Always splits at sentence boundaries to ensure natural breaks.
+    Uses NLTK sentence tokenizer if available for better accuracy, otherwise falls back to regex.
     
     Args:
         text: Text to split
@@ -339,17 +357,35 @@ def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
     if len(text) <= max_chunk_size:
         return [text]
     
-    # Split text into sentences
-    # Pattern matches: sentence text + sentence ending punctuation + optional whitespace
-    # This preserves the punctuation and spacing
-    sentence_pattern = r'([^.!?]+[.!?]+(?:\s+|$))'
-    sentence_matches = re.finditer(sentence_pattern, text)
-    
+    # Split text into sentences using the best available method
     sentences = []
-    for match in sentence_matches:
-        sentence = match.group(1).strip()
-        if sentence:  # Only add non-empty sentences
-            sentences.append(sentence)
+    use_nltk = False
+    
+    if NLTK_AVAILABLE:
+        try:
+            from nltk.tokenize import sent_tokenize
+            # Use NLTK's sentence tokenizer for better accuracy
+            # It handles abbreviations, decimals, ellipses, etc. correctly
+            sentences = sent_tokenize(text)
+            # Filter out empty sentences and strip whitespace
+            sentences = [s.strip() for s in sentences if s.strip()]
+            use_nltk = True
+        except Exception as e:
+            # If NLTK fails for any reason, fall back to regex
+            print(f"  Warning: NLTK sentence tokenization failed ({e}), using regex fallback")
+            use_nltk = False
+    
+    # Fallback to regex-based sentence splitting if NLTK not available or failed
+    if not sentences and not use_nltk:
+        # Improved regex pattern: matches sentence text + sentence ending punctuation + optional whitespace
+        # This preserves the punctuation and spacing
+        sentence_pattern = r'([^.!?]+[.!?]+(?:\s+|$))'
+        sentence_matches = re.finditer(sentence_pattern, text)
+        
+        for match in sentence_matches:
+            sentence = match.group(1).strip()
+            if sentence:  # Only add non-empty sentences
+                sentences.append(sentence)
     
     # If no sentences found (unlikely but possible), fall back to paragraph splitting
     if not sentences:
