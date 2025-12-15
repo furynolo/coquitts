@@ -909,13 +909,14 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             # Verbose output for single chunk
             if verbose:
                 chunk_info = get_chunk_verbose_info(text, text, chunk_index=1, total_chunks=1)
-                print(f"  [VERBOSE] Single chunk details:")
-                print(f"    First 4 words: \"{chunk_info['first_words']}\"")
-                print(f"    Last 4 words: \"{chunk_info['last_words']}\"")
-                if chunk_info['word_start'] and chunk_info['word_end']:
-                    print(f"    Word range: {chunk_info['word_start']}-{chunk_info['word_end']} (of {len([w for w in text.split() if w.strip()])} total words)")
-                print(f"    Character range: 1-{len(text)} (of {len(text)} total chars)")
-                print(f"    Chunk size: {chunk_info['word_count']} words, {chunk_info['char_count']} characters")
+                total_words = len([w for w in text.split() if w.strip()])
+                word_range_str = f"Words {chunk_info['word_start']}-{chunk_info['word_end']} ({total_words} total)" if chunk_info['word_start'] and chunk_info['word_end'] else ""
+                char_range_str = f"Characters: 1-{len(text)} ({len(text)} total)"
+                range_str = ", ".join(filter(None, [word_range_str, char_range_str]))
+                print(f"  [VERBOSE] Single chunk details ({chunk_info['word_count']} words, {chunk_info['char_count']} characters):")
+                print(f"    \"{chunk_info['first_words']}\" ... \"{chunk_info['last_words']}\"")
+                if range_str:
+                    print(f"    {range_str}")
             
             kwargs = {"text": text, "file_path": output_path}
             if speaker:
@@ -1023,14 +1024,14 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                 # Verbose output
                 if verbose:
                     chunk_info = get_chunk_verbose_info(chunk, text, chunk_index=i, total_chunks=len(merged_chunks))
-                    print(f"    [VERBOSE] Chunk {i}/{len(merged_chunks)} details:")
-                    print(f"      First 4 words: \"{chunk_info['first_words']}\"")
-                    print(f"      Last 4 words: \"{chunk_info['last_words']}\"")
-                    if chunk_info['word_start'] and chunk_info['word_end']:
-                        print(f"      Word range: {chunk_info['word_start']}-{chunk_info['word_end']} (of {len([w for w in text.split() if w.strip()])} total words)")
-                    if chunk_info['char_start'] and chunk_info['char_end']:
-                        print(f"      Character range: {chunk_info['char_start']}-{chunk_info['char_end']} (of {len(text)} total chars)")
-                    print(f"      Chunk size: {chunk_info['word_count']} words, {chunk_info['char_count']} characters")
+                    total_words = len([w for w in text.split() if w.strip()])
+                    word_range_str = f"Words {chunk_info['word_start']}-{chunk_info['word_end']} ({total_words} total)" if chunk_info['word_start'] and chunk_info['word_end'] else ""
+                    char_range_str = f"Characters: {chunk_info['char_start']}-{chunk_info['char_end']} ({len(text)} total)" if chunk_info['char_start'] and chunk_info['char_end'] else ""
+                    range_str = ", ".join(filter(None, [word_range_str, char_range_str]))
+                    print(f"    [VERBOSE] Chunk {i}/{len(merged_chunks)} details ({chunk_info['word_count']} words, {chunk_info['char_count']} characters):")
+                    print(f"      \"{chunk_info['first_words']}\" ... \"{chunk_info['last_words']}\"")
+                    if range_str:
+                        print(f"      {range_str}")
                 
                 # Chunks are already preprocessed, so use them directly
                 if synthesize_text_chunk(tts, chunk, str(chunk_path), speaker=speaker, speaker_wav=speaker_wav):
@@ -1070,13 +1071,14 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                             # Verbose output for retry
                             if verbose:
                                 chunk_info = get_chunk_verbose_info(merged_retry, text, chunk_index=failed_idx, total_chunks=len(merged_chunks))
-                                print(f"      [VERBOSE] Retry chunk details:")
-                                print(f"        First 4 words: \"{chunk_info['first_words']}\"")
-                                print(f"        Last 4 words: \"{chunk_info['last_words']}\"")
-                                if chunk_info['word_start'] and chunk_info['word_end']:
-                                    print(f"        Word range: {chunk_info['word_start']}-{chunk_info['word_end']} (of {len([w for w in text.split() if w.strip()])} total words)")
-                                if chunk_info['char_start'] and chunk_info['char_end']:
-                                    print(f"        Character range: {chunk_info['char_start']}-{chunk_info['char_end']} (of {len(text)} total chars)")
+                                total_words = len([w for w in text.split() if w.strip()])
+                                word_range_str = f"Words {chunk_info['word_start']}-{chunk_info['word_end']} ({total_words} total)" if chunk_info['word_start'] and chunk_info['word_end'] else ""
+                                char_range_str = f"Characters: {chunk_info['char_start']}-{chunk_info['char_end']} ({len(text)} total)" if chunk_info['char_start'] and chunk_info['char_end'] else ""
+                                range_str = ", ".join(filter(None, [word_range_str, char_range_str]))
+                                print(f"      [VERBOSE] Retry chunk {failed_idx} details ({chunk_info['word_count']} words, {chunk_info['char_count']} characters):")
+                                print(f"        \"{chunk_info['first_words']}\" ... \"{chunk_info['last_words']}\"")
+                                if range_str:
+                                    print(f"        {range_str}")
                                 print(f"        Merged chunks: {sorted(merged_indices)}")
                             
                             if synthesize_text_chunk(tts, merged_retry, str(retry_path), speaker=speaker, speaker_wav=speaker_wav):
@@ -1108,13 +1110,14 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                             # Verbose output for backward merge retry
                             if verbose:
                                 chunk_info = get_chunk_verbose_info(merged_retry, text, chunk_index=failed_idx, total_chunks=len(merged_chunks))
-                                print(f"      [VERBOSE] Retry chunk details (backward merge):")
-                                print(f"        First 4 words: \"{chunk_info['first_words']}\"")
-                                print(f"        Last 4 words: \"{chunk_info['last_words']}\"")
-                                if chunk_info['word_start'] and chunk_info['word_end']:
-                                    print(f"        Word range: {chunk_info['word_start']}-{chunk_info['word_end']} (of {len([w for w in text.split() if w.strip()])} total words)")
-                                if chunk_info['char_start'] and chunk_info['char_end']:
-                                    print(f"        Character range: {chunk_info['char_start']}-{chunk_info['char_end']} (of {len(text)} total chars)")
+                                total_words = len([w for w in text.split() if w.strip()])
+                                word_range_str = f"Words {chunk_info['word_start']}-{chunk_info['word_end']} ({total_words} total)" if chunk_info['word_start'] and chunk_info['word_end'] else ""
+                                char_range_str = f"Characters: {chunk_info['char_start']}-{chunk_info['char_end']} ({len(text)} total)" if chunk_info['char_start'] and chunk_info['char_end'] else ""
+                                range_str = ", ".join(filter(None, [word_range_str, char_range_str]))
+                                print(f"      [VERBOSE] Retry chunk {failed_idx} details (backward merge) ({chunk_info['word_count']} words, {chunk_info['char_count']} characters):")
+                                print(f"        \"{chunk_info['first_words']}\" ... \"{chunk_info['last_words']}\"")
+                                if range_str:
+                                    print(f"        {range_str}")
                                 print(f"        Merged chunks: {sorted(merged_indices)}")
                             
                             if synthesize_text_chunk(tts, merged_retry, str(retry_path), speaker=speaker, speaker_wav=speaker_wav):
