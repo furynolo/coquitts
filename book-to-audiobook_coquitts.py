@@ -342,18 +342,20 @@ def preprocess_text(text, is_short_input=False, pronunciations=None):
 def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
     """
     Split text into chunks for processing.
-    Each chunk is a single sentence to ensure natural breaks and pauses in speech.
+    Each chunk starts as a single sentence to ensure natural breaks and pauses in speech.
     Uses NLTK sentence tokenizer if available for better accuracy, otherwise falls back to regex.
     If a sentence exceeds max_chunk_size, it will be split further by clauses (commas, semicolons)
     or word boundaries as a last resort.
+    Small chunks (below min_chunk_size) are automatically merged with subsequent sentences
+    until they meet the minimum size requirement (without exceeding max_chunk_size).
     
     Args:
         text: Text to split
         max_chunk_size: Maximum characters per chunk (for sentences that exceed this, they'll be split further)
-        min_chunk_size: Minimum characters per chunk (to avoid kernel errors, used for validation)
+        min_chunk_size: Minimum characters per chunk (chunks smaller than this will be merged with next sentences)
         
     Returns:
-        List of text chunks, where each chunk is typically a single sentence
+        List of text chunks, where each chunk is typically a single sentence or merged sentences
     """
     # If text is short enough, return as single chunk
     if len(text) <= max_chunk_size:
@@ -486,12 +488,42 @@ def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
                 if word_chunk.strip():
                     chunks.append(word_chunk.strip())
     
-    # Filter out empty chunks and ensure minimum size
-    # Very short chunks will be handled by the merging logic in synthesize_text
+    # Filter out empty chunks
     filtered_chunks = [chunk.strip() for chunk in chunks if chunk.strip()]
     
+    # Merge small chunks with next chunks until they meet minimum size
+    merged_chunks = []
+    i = 0
+    while i < len(filtered_chunks):
+        current_chunk = filtered_chunks[i]
+        
+        # If chunk is too small, merge with subsequent chunks
+        if len(current_chunk) < min_chunk_size:
+            merged = current_chunk
+            j = i + 1
+            
+            # Keep merging with next chunks until we meet minimum size
+            # But don't exceed max_chunk_size
+            while j < len(filtered_chunks) and len(merged) < min_chunk_size:
+                next_chunk = filtered_chunks[j]
+                potential_merge = merged + " " + next_chunk
+                
+                # If merging would exceed max size, stop merging
+                if len(potential_merge) > max_chunk_size:
+                    break
+                
+                merged = potential_merge
+                j += 1
+            
+            merged_chunks.append(merged.strip())
+            i = j  # Move to the next unprocessed chunk
+        else:
+            # Chunk is large enough, use as-is
+            merged_chunks.append(current_chunk)
+            i += 1
+    
     # Final safety check: if we somehow ended up with no chunks, return the original text
-    return filtered_chunks if filtered_chunks else [text]
+    return merged_chunks if merged_chunks else [text]
 
 def read_text_file(file_path):
     """
