@@ -308,6 +308,37 @@ def normalize_for_tts(text):
     
     return text
 
+def load_character_voice_mapping(mapping_file):
+    """
+    Load character-to-voice mappings from a JSON file.
+    
+    Args:
+        mapping_file: Path to JSON file with character-to-voice mappings
+        Format: {"CharacterName": "speaker_id", ...}
+        
+    Returns:
+        Dictionary with character-to-voice mappings, or None if file cannot be loaded
+    """
+    try:
+        with open(mapping_file, 'r', encoding='utf-8') as f:
+            mapping = json.load(f)
+        
+        if not isinstance(mapping, dict):
+            print(f"Warning: Character voice mapping file '{mapping_file}' does not contain a valid dictionary.")
+            return None
+        
+        print(f"Loaded {len(mapping)} character-to-voice mappings from '{mapping_file}'")
+        return mapping
+    except FileNotFoundError:
+        print(f"Error: Character voice mapping file '{mapping_file}' not found.")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON in character voice mapping file '{mapping_file}': {e}")
+        return None
+    except Exception as e:
+        print(f"Error loading character voice mapping file '{mapping_file}': {e}")
+        return None
+
 def load_pronunciations(pronunciations_file):
     """
     Load pronunciation mappings from a JSON file.
@@ -626,10 +657,11 @@ def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
 class Segment:
     """Represents a text segment (narration or dialogue)."""
     type: str  # "narration" or "dialogue"
-    speaker: str  # Speaker name (e.g., "NARRATOR", "Alleria", "UNKNOWN")
+    speaker: str  # Speaker name (e.g., "NARRATOR", "Alleria", "UNKNOWN") - post-pronunciation
     text: str  # The actual text content
     start_pos: int = 0  # Character position in original text
     end_pos: int = 0  # Character position in original text
+    original_speaker: str = None  # Original speaker name before pronunciation mappings
 
 class DialogueSegmenter:
     """Segments text into narration and dialogue blocks with speaker attribution."""
@@ -1588,13 +1620,14 @@ class DialogueSegmenter:
 class SpeakerAssigner:
     """Assigns TTS speaker voices to detected characters."""
     
-    def __init__(self, available_speakers: List[str], narrator_speaker: Optional[str] = None):
+    def __init__(self, available_speakers: List[str], narrator_speaker: Optional[str] = None, character_voice_mapping: Optional[Dict[str, str]] = None):
         """
         Initialize speaker assigner.
         
         Args:
             available_speakers: List of available TTS speaker IDs
-            narrator_speaker: Optional narrator speaker ID (defaults to first speaker)
+            narrator_speaker: Optional narrator speaker ID (defaults to p225 if available)
+            character_voice_mapping: Optional dictionary mapping character names (pre-pronunciation) to speaker IDs
         """
         self.available_speakers = available_speakers
         # Default narrator to p225 if available, otherwise first speaker
@@ -1607,6 +1640,9 @@ class SpeakerAssigner:
         
         # Character name -> TTS speaker mapping
         self.character_map: Dict[str, str] = {}
+        
+        # Character-to-voice mapping from file (uses original/pre-pronunciation names)
+        self.character_voice_mapping = character_voice_mapping or {}
         
         # Track which speakers are used (excluding narrator)
         self.used_speakers = set()
@@ -1678,15 +1714,22 @@ class SpeakerAssigner:
             Dictionary mapping character names to TTS speaker IDs
         """
         # Collect unique character names (excluding NARRATOR and UNKNOWN)
+        # Use original_speaker (pre-pronunciation) if available, otherwise use speaker
         # Normalize names to merge variants
         character_names = set()
-        name_mapping = {}  # Map original names to normalized names
+        name_mapping = {}  # Map post-pronunciation names to normalized names
+        original_name_mapping = {}  # Map normalized names to original (pre-pronunciation) names
         
         for segment in segments:
             if segment.type == "dialogue" and segment.speaker not in ("NARRATOR", "UNKNOWN"):
+                # Use original_speaker if available (pre-pronunciation), otherwise use speaker
+                original_name = segment.original_speaker if segment.original_speaker else segment.speaker
                 normalized = self._normalize_name(segment.speaker)
                 character_names.add(normalized)
                 name_mapping[segment.speaker] = normalized
+                # Store original name for this normalized name
+                if normalized not in original_name_mapping:
+                    original_name_mapping[normalized] = original_name
         
         # Additional merging: if one name ends with another name, merge them
         # (e.g., "High Councilor Vareg" ends with "Vareg")
@@ -1728,23 +1771,58 @@ class SpeakerAssigner:
         # Sort character names for deterministic assignment
         sorted_characters = sorted(character_names, key=str.lower)
         
-        # Assign speakers deterministically
+        # Assign speakers - check character_voice_mapping first (uses original/pre-pronunciation names)
         for char_name in sorted_characters:
             if char_name not in self.character_map:
-                if self.speaker_index < len(self.speaker_pool):
-                    speaker = self.speaker_pool[self.speaker_index]
-                    self.character_map[char_name] = speaker
-                    self.used_speakers.add(speaker)
-                    self.speaker_index += 1
+                # Get original name for this character (pre-pronunciation)
+                original_name = original_name_mapping.get(char_name, char_name)
+                
+                # Check if there's a manual mapping for this character (use original name)
+                mapped_speaker = None
+                # Try exact match first
+                if original_name in self.character_voice_mapping:
+                    mapped_speaker = self.character_voice_mapping[original_name]
                 else:
-                    # Reuse speakers in round-robin fashion
-                    speaker = self.speaker_pool[self.speaker_index % len(self.speaker_pool)]
-                    self.character_map[char_name] = speaker
-                    if len(character_names) > len(self.speaker_pool):
+                    # Try normalized version
+                    normalized_original = self._normalize_name(original_name)
+                    if normalized_original in self.character_voice_mapping:
+                        mapped_speaker = self.character_voice_mapping[normalized_original]
+                    else:
+                        # Try case-insensitive match
+                        for mapping_name, mapping_speaker_id in self.character_voice_mapping.items():
+                            if mapping_name.lower() == original_name.lower() or mapping_name.lower() == normalized_original.lower():
+                                mapped_speaker = mapping_speaker_id
+                                break
+                
+                if mapped_speaker:
+                    # Use the mapped speaker if it's available
+                    if mapped_speaker in self.available_speakers:
+                        self.character_map[char_name] = mapped_speaker
+                        self.used_speakers.add(mapped_speaker)
+                    else:
                         self.warnings.append(
-                            f"More characters ({len(character_names)}) than available speakers "
-                            f"({len(self.speaker_pool)}). Reusing speakers."
+                            f"Character '{char_name}' (original: '{original_name}') mapped to speaker '{mapped_speaker}' "
+                            f"which is not available. Using auto-assignment instead."
                         )
+                        # Fall through to auto-assignment
+                        mapped_speaker = None
+                
+                # Auto-assign if no mapping found or mapping was invalid
+                if not mapped_speaker:
+                    if self.speaker_index < len(self.speaker_pool):
+                        speaker = self.speaker_pool[self.speaker_index]
+                        self.character_map[char_name] = speaker
+                        self.used_speakers.add(speaker)
+                        self.speaker_index += 1
+                    else:
+                        # Reuse speakers in round-robin fashion
+                        speaker = self.speaker_pool[self.speaker_index % len(self.speaker_pool)]
+                        self.character_map[char_name] = speaker
+                        if len(character_names) > len(self.speaker_pool):
+                            self.warnings.append(
+                                f"More characters ({len(character_names)}) than available speakers "
+                                f"({len(self.speaker_pool)}). Reusing speakers."
+                            )
         
         # Handle UNKNOWN - assign to narrator speaker (p225 by default)
         if any(s.speaker == "UNKNOWN" for s in segments if s.type == "dialogue"):
@@ -2081,7 +2159,7 @@ def _synthesize_with_auto_speaker(tts, segments: List[Segment], assigner: Speake
         print(f"Error during auto speaker synthesis: {e}")
         return False
 
-def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None, speaker=None, speaker_wav=None, verbose=False, auto_speaker=False):
+def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None, speaker=None, speaker_wav=None, verbose=False, auto_speaker=False, character_voice_mapping=None):
     """
     Synthesize text to speech, handling long texts by chunking.
     
@@ -2096,6 +2174,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         speaker_wav: Optional path to reference audio file for multi-speaker models
         verbose: If True, output detailed debugging information for each chunk
         auto_speaker: If True, enable automatic speaker detection and dialogue routing
+        character_voice_mapping: Optional dictionary mapping character names (pre-pronunciation) to speaker IDs
     """
     try:
         # Preprocess text (with special handling for short inputs and pronunciations)
@@ -2140,9 +2219,45 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             
             print("Auto speaker mode enabled - detecting dialogue and assigning voices...")
             
-            # Segment text into narration and dialogue
+            # Segment ORIGINAL text first (before pronunciations) to get original character names
+            segmenter_original = DialogueSegmenter(verbose=False)  # Don't duplicate verbose output
+            original_segments = segmenter_original.segment_text(original_text)
+            
+            # Extract original character names
+            original_character_names = {}
+            for seg in original_segments:
+                if seg.type == "dialogue" and seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                    # Store original name
+                    original_character_names[seg.speaker] = seg.speaker
+            
+            # Now segment the preprocessed text (with pronunciations) for actual synthesis
             segmenter = DialogueSegmenter(verbose=verbose)
             segments = segmenter.segment_text(text)
+            
+            # Map original character names to post-pronunciation segments
+            # Match segments by position to find corresponding original names
+            original_seg_by_pos = {(seg.start_pos, seg.end_pos): seg for seg in original_segments}
+            for seg in segments:
+                if seg.type == "dialogue" and seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                    # Try to find matching original segment by position
+                    # Allow some tolerance for position changes due to pronunciation length differences
+                    best_match = None
+                    best_distance = float('inf')
+                    for orig_seg in original_segments:
+                        if orig_seg.type == "dialogue" and orig_seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                            # Calculate position distance
+                            pos_distance = abs(seg.start_pos - orig_seg.start_pos) + abs(seg.end_pos - orig_seg.end_pos)
+                            if pos_distance < best_distance:
+                                best_distance = pos_distance
+                                best_match = orig_seg
+                    
+                    if best_match and best_distance < 100:  # Reasonable tolerance
+                        seg.original_speaker = best_match.speaker
+                    else:
+                        # Fallback: use post-pronunciation name
+                        seg.original_speaker = seg.speaker
+                else:
+                    seg.original_speaker = seg.speaker
             
             if verbose:
                 print(f"\n[VERBOSE] Dialogue Segmentation:")
@@ -2154,8 +2269,15 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                 print()
             
             # Assign speakers
-            assigner = SpeakerAssigner(available_speakers)
+            assigner = SpeakerAssigner(available_speakers, character_voice_mapping=character_voice_mapping)
             character_map = assigner.assign_speakers(segments)
+            
+            # Build mapping of normalized names to original names for display
+            original_name_map = {}
+            for seg in segments:
+                if seg.type == "dialogue" and seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                    if seg.speaker not in original_name_map:
+                        original_name_map[seg.speaker] = seg.original_speaker if seg.original_speaker else seg.speaker
             
             # Print speaker assignment summary
             print(f"\nSpeaker Assignment:")
@@ -2165,7 +2287,11 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                 print(f"\n  Character -> Voice Mapping:")
                 for char_name, speaker_id in sorted(character_map.items()):
                     if char_name != 'UNKNOWN':
-                        print(f"    {char_name} -> {speaker_id}")
+                        original_name = original_name_map.get(char_name, char_name)
+                        if original_name != char_name:
+                            print(f"    {original_name} (as \"{char_name}\") -> {speaker_id}")
+                        else:
+                            print(f"    {char_name} -> {speaker_id}")
                 if 'UNKNOWN' in character_map:
                     print(f"    UNKNOWN -> {character_map['UNKNOWN']}")
             if segmenter.unknown_count > 0:
@@ -2506,7 +2632,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         print("\nTip: Try specifying a different model or check available models with scripts/list_models.py")
         return False
 
-def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciations=None, auto_speaker=False, verbose=False):
+def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciations=None, auto_speaker=False, verbose=False, character_voice_mapping=None):
     """
     Identify text structure (chunks, speakers, dialogue) without synthesizing.
     
@@ -2517,6 +2643,7 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
         pronunciations: Optional pronunciation mappings
         auto_speaker: If True, perform speaker detection and assignment
         verbose: If True, output detailed debugging information
+        character_voice_mapping: Optional dictionary mapping character names (pre-pronunciation) to speaker IDs
         
     Returns:
         Dictionary with identification results
@@ -2570,11 +2697,36 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
                 results['error'] = "No speakers available"
                 return results
             
-            # Segment text (verbose mode for identification)
+            # Segment ORIGINAL text first (before pronunciations) to get original character names
             if verbose:
                 print("\n[VERBOSE] Starting dialogue segmentation...")
+            segmenter_original = DialogueSegmenter(verbose=False)
+            original_segments = segmenter_original.segment_text(original_text)
+            
+            # Now segment the preprocessed text (with pronunciations) for display
             segmenter = DialogueSegmenter(verbose=verbose)
             segments = segmenter.segment_text(text)
+            
+            # Map original character names to post-pronunciation segments
+            original_seg_by_pos = {(seg.start_pos, seg.end_pos): seg for seg in original_segments}
+            for seg in segments:
+                if seg.type == "dialogue" and seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                    # Try to find matching original segment by position
+                    best_match = None
+                    best_distance = float('inf')
+                    for orig_seg in original_segments:
+                        if orig_seg.type == "dialogue" and orig_seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                            pos_distance = abs(seg.start_pos - orig_seg.start_pos) + abs(seg.end_pos - orig_seg.end_pos)
+                            if pos_distance < best_distance:
+                                best_distance = pos_distance
+                                best_match = orig_seg
+                    
+                    if best_match and best_distance < 100:
+                        seg.original_speaker = best_match.speaker
+                    else:
+                        seg.original_speaker = seg.speaker
+                else:
+                    seg.original_speaker = seg.speaker
             
             if verbose:
                 print(f"\n[VERBOSE] Segmentation complete:")
@@ -2584,19 +2736,27 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
                 print(f"  Dialogue segments: {dialogue_count}")
                 print(f"  Narration segments: {narration_count}")
                 print()
-            results['segments'] = [{'type': s.type, 'speaker': s.speaker, 'text': s.text[:50] + '...' if len(s.text) > 50 else s.text} 
+            results['segments'] = [{'type': s.type, 'speaker': s.speaker, 'original_speaker': s.original_speaker if s.original_speaker else s.speaker, 'text': s.text[:50] + '...' if len(s.text) > 50 else s.text} 
                                    for s in segments]
             results['unknown_dialogue_count'] = segmenter.unknown_count
             
             # Assign speakers
-            assigner = SpeakerAssigner(available_speakers)
+            assigner = SpeakerAssigner(available_speakers, character_voice_mapping=character_voice_mapping)
             character_map = assigner.assign_speakers(segments)
+            
+            # Build mapping of normalized names to original names for display
+            original_name_map = {}
+            for seg in segments:
+                if seg.type == "dialogue" and seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                    if seg.speaker not in original_name_map:
+                        original_name_map[seg.speaker] = seg.original_speaker if seg.original_speaker else seg.speaker
             
             # Build speaker mapping (include narrator)
             results['speakers'] = {
                 'NARRATOR': assigner.narrator_speaker,
                 **character_map
             }
+            results['original_name_map'] = original_name_map  # Store original names for display
             results['warnings'] = assigner.warnings
             
         except Exception as e:
@@ -2683,6 +2843,11 @@ Examples:
         '--pronunciations', '-pr',
         type=str,
         help='Path to JSON file with pronunciation mappings (keys: original text, values: pronunciation)'
+    )
+    parser.add_argument(
+        '--character-voice-mapping', '-cvm',
+        type=str,
+        help='Path to JSON file with character-to-voice mappings (keys: character name pre-pronunciation, values: speaker ID)'
     )
     parser.add_argument(
         '--speaker', '-s',
@@ -2806,6 +2971,14 @@ Examples:
             print("Warning: Could not load pronunciations file. Continuing without pronunciation replacements.")
         print()  # Add blank line for readability
     
+    # Load character-to-voice mapping if provided
+    character_voice_mapping = None
+    if args.character_voice_mapping:
+        character_voice_mapping = load_character_voice_mapping(args.character_voice_mapping)
+        if character_voice_mapping is None:
+            print("Warning: Could not load character voice mapping file. Continuing without custom voice assignments.")
+        print()  # Add blank line for readability
+    
     # Handle identification-only mode
     if args.identification_only:
         print("="*50)
@@ -2818,7 +2991,8 @@ Examples:
             chunk_size=args.chunk_size,
             pronunciations=pronunciations,
             auto_speaker=auto_speaker_mode,
-            verbose=args.verbose
+            verbose=args.verbose,
+            character_voice_mapping=character_voice_mapping
         )
         
         print(f"Text Analysis Results:")
@@ -2843,9 +3017,14 @@ Examples:
                     print(f"  Narrator voice: {results['speakers'].get('NARRATOR', 'N/A')}")
                     print(f"  Characters detected: {len([k for k in results['speakers'].keys() if k != 'NARRATOR'])}")
                     print("\n  Character -> Voice Mapping:")
+                    original_name_map = results.get('original_name_map', {})
                     for char_name, speaker_id in sorted(results['speakers'].items()):
                         if char_name != 'NARRATOR':
-                            print(f"    {char_name} -> {speaker_id}")
+                            original_name = original_name_map.get(char_name, char_name)
+                            if original_name != char_name:
+                                print(f"    {original_name} (as \"{char_name}\") -> {speaker_id}")
+                            else:
+                                print(f"    {char_name} -> {speaker_id}")
                     if results.get('unknown_dialogue_count', 0) > 0:
                         print(f"\n  Warning: {results['unknown_dialogue_count']} dialogue segments with unknown speaker")
                     if results.get('warnings'):
@@ -2873,7 +3052,8 @@ Examples:
         speaker=manual_speaker if not auto_speaker_mode else None,
         speaker_wav=args.speaker_wav,
         verbose=args.verbose,
-        auto_speaker=auto_speaker_mode
+        auto_speaker=auto_speaker_mode,
+        character_voice_mapping=character_voice_mapping
     )
     
     if success:
