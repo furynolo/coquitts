@@ -15,6 +15,9 @@ import shutil
 from pathlib import Path
 import platform
 from datetime import datetime
+from dataclasses import dataclass
+from typing import List, Dict, Optional, Tuple
+from collections import OrderedDict
 
 try:
     from TTS.api import TTS
@@ -619,6 +622,263 @@ def split_text_into_chunks(text, max_chunk_size=5000, min_chunk_size=100):
     # Final safety check: if we somehow ended up with no chunks, return the original text
     return merged_chunks if merged_chunks else [text]
 
+@dataclass
+class Segment:
+    """Represents a text segment (narration or dialogue)."""
+    type: str  # "narration" or "dialogue"
+    speaker: str  # Speaker name (e.g., "NARRATOR", "Alleria", "UNKNOWN")
+    text: str  # The actual text content
+    start_pos: int = 0  # Character position in original text
+    end_pos: int = 0  # Character position in original text
+
+class DialogueSegmenter:
+    """Segments text into narration and dialogue blocks with speaker attribution."""
+    
+    # Common speech verbs for speaker attribution
+    SPEECH_VERBS = {
+        'say', 'said', 'says', 'saying',
+        'ask', 'asked', 'asks', 'asking',
+        'reply', 'replied', 'replies', 'replying',
+        'whisper', 'whispered', 'whispers', 'whispering',
+        'shout', 'shouted', 'shouts', 'shouting',
+        'mutter', 'muttered', 'mutters', 'muttering',
+        'cry', 'cried', 'cries', 'crying',
+        'call', 'called', 'calls', 'calling',
+        'exclaim', 'exclaimed', 'exclaims', 'exclaiming',
+        'declare', 'declared', 'declares', 'declaring',
+        'announce', 'announced', 'announces', 'announcing',
+        'state', 'stated', 'states', 'stating',
+        'tell', 'told', 'tells', 'telling',
+        'speak', 'spoke', 'speaks', 'speaking',
+        'answer', 'answered', 'answers', 'answering',
+        'respond', 'responded', 'responds', 'responding',
+    }
+    
+    def __init__(self):
+        self.unknown_count = 0
+    
+    def segment_text(self, text: str) -> List[Segment]:
+        """
+        Segment text into narration and dialogue blocks.
+        
+        Args:
+            text: Input text to segment
+            
+        Returns:
+            List of Segment objects
+        """
+        segments = []
+        self.unknown_count = 0
+        
+        # Pattern to match quoted dialogue (handles both straight and curly quotes)
+        # Matches: "text" or "text" or "text"
+        quote_pattern = re.compile(r'["""]([^"""]*)["""]', re.DOTALL)
+        
+        last_end = 0
+        
+        for match in quote_pattern.finditer(text):
+            # Add narration before this quote
+            narration_start = last_end
+            narration_end = match.start()
+            if narration_end > narration_start:
+                narration_text = text[narration_start:narration_end].strip()
+                if narration_text:
+                    segments.append(Segment(
+                        type="narration",
+                        speaker="NARRATOR",
+                        text=narration_text,
+                        start_pos=narration_start,
+                        end_pos=narration_end
+                    ))
+            
+            # Extract dialogue
+            dialogue_text = match.group(1).strip()
+            if dialogue_text:
+                # Try to attribute speaker
+                speaker = self._attribute_speaker(text, match.start(), match.end())
+                segments.append(Segment(
+                    type="dialogue",
+                    speaker=speaker,
+                    text=dialogue_text,
+                    start_pos=match.start(),
+                    end_pos=match.end()
+                ))
+            
+            last_end = match.end()
+        
+        # Add remaining narration after last quote
+        if last_end < len(text):
+            narration_text = text[last_end:].strip()
+            if narration_text:
+                segments.append(Segment(
+                    type="narration",
+                    speaker="NARRATOR",
+                    text=narration_text,
+                    start_pos=last_end,
+                    end_pos=len(text)
+                ))
+        
+        # If no quotes found, treat entire text as narration
+        if not segments:
+            segments.append(Segment(
+                type="narration",
+                speaker="NARRATOR",
+                text=text.strip(),
+                start_pos=0,
+                end_pos=len(text)
+            ))
+        
+        return segments
+    
+    def _attribute_speaker(self, text: str, quote_start: int, quote_end: int) -> str:
+        """
+        Attempt to attribute dialogue to a speaker by looking for name patterns near the quote.
+        
+        Args:
+            text: Full text
+            quote_start: Start position of quote
+            quote_end: End position of quote
+            
+        Returns:
+            Speaker name or "UNKNOWN"
+        """
+        # Look in a window around the quote (120 chars before and after)
+        window_size = 120
+        before_context = text[max(0, quote_start - window_size):quote_start]
+        after_context = text[quote_end:min(len(text), quote_end + window_size)]
+        
+        # Try to find speaker name before quote
+        speaker = self._find_speaker_before(before_context)
+        if speaker:
+            return speaker
+        
+        # Try to find speaker name after quote
+        speaker = self._find_speaker_after(after_context)
+        if speaker:
+            return speaker
+        
+        # No speaker found
+        self.unknown_count += 1
+        return "UNKNOWN"
+    
+    def _find_speaker_before(self, text: str) -> Optional[str]:
+        """Find speaker name in text before a quote."""
+        # Look for patterns like: Name said, Name, said, Name said:
+        # Match up to 4 words as a name, followed by speech verb
+        name_pattern = r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})\s+(' + '|'.join(self.SPEECH_VERBS) + r')(?:[,:;]|\s+$)'
+        match = re.search(name_pattern, text, re.IGNORECASE)
+        if match:
+            name = match.group(1).strip()
+            # Validate it looks like a proper name (starts with capital, mostly alphabetic)
+            if name and name[0].isupper() and all(c.isalnum() or c in " '-" for c in name):
+                return name
+        return None
+    
+    def _find_speaker_after(self, text: str) -> Optional[str]:
+        """Find speaker name in text after a quote."""
+        # Look for patterns like: said Name, said Name,
+        speech_verb_pattern = r'\b(' + '|'.join(self.SPEECH_VERBS) + r')\s+([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})(?:[,:;]|\s+|$)'
+        match = re.search(speech_verb_pattern, text, re.IGNORECASE)
+        if match:
+            name = match.group(2).strip()
+            # Validate it looks like a proper name
+            if name and name[0].isupper() and all(c.isalnum() or c in " '-" for c in name):
+                return name
+        return None
+
+class SpeakerAssigner:
+    """Assigns TTS speaker voices to detected characters."""
+    
+    def __init__(self, available_speakers: List[str], narrator_speaker: Optional[str] = None):
+        """
+        Initialize speaker assigner.
+        
+        Args:
+            available_speakers: List of available TTS speaker IDs
+            narrator_speaker: Optional narrator speaker ID (defaults to first speaker)
+        """
+        self.available_speakers = available_speakers
+        self.narrator_speaker = narrator_speaker or (available_speakers[0] if available_speakers else None)
+        
+        # Character name -> TTS speaker mapping
+        self.character_map: Dict[str, str] = {}
+        
+        # Track which speakers are used (excluding narrator)
+        self.used_speakers = set()
+        if self.narrator_speaker:
+            self.used_speakers.add(self.narrator_speaker)
+        
+        # Get pool of available speakers (excluding narrator)
+        self.speaker_pool = [s for s in available_speakers if s != self.narrator_speaker]
+        if not self.speaker_pool:
+            # If only one speaker, use it for everything
+            self.speaker_pool = available_speakers
+        
+        self.speaker_index = 0
+        self.warnings = []
+    
+    def assign_speakers(self, segments: List[Segment]) -> Dict[str, str]:
+        """
+        Assign TTS speakers to all unique characters in segments.
+        
+        Args:
+            segments: List of text segments
+            
+        Returns:
+            Dictionary mapping character names to TTS speaker IDs
+        """
+        # Collect unique character names (excluding NARRATOR and UNKNOWN)
+        character_names = set()
+        for segment in segments:
+            if segment.type == "dialogue" and segment.speaker not in ("NARRATOR", "UNKNOWN"):
+                character_names.add(segment.speaker)
+        
+        # Sort character names for deterministic assignment
+        sorted_characters = sorted(character_names, key=str.lower)
+        
+        # Assign speakers deterministically
+        for char_name in sorted_characters:
+            if char_name not in self.character_map:
+                if self.speaker_index < len(self.speaker_pool):
+                    speaker = self.speaker_pool[self.speaker_index]
+                    self.character_map[char_name] = speaker
+                    self.used_speakers.add(speaker)
+                    self.speaker_index += 1
+                else:
+                    # Reuse speakers in round-robin fashion
+                    speaker = self.speaker_pool[self.speaker_index % len(self.speaker_pool)]
+                    self.character_map[char_name] = speaker
+                    if len(character_names) > len(self.speaker_pool):
+                        self.warnings.append(
+                            f"More characters ({len(character_names)}) than available speakers "
+                            f"({len(self.speaker_pool)}). Reusing speakers."
+                        )
+        
+        # Handle UNKNOWN - assign to a single speaker (not narrator if possible)
+        if any(s.speaker == "UNKNOWN" for s in segments if s.type == "dialogue"):
+            if self.speaker_pool:
+                self.character_map["UNKNOWN"] = self.speaker_pool[0]
+            else:
+                self.character_map["UNKNOWN"] = self.narrator_speaker
+        
+        return self.character_map
+    
+    def get_speaker_for_segment(self, segment: Segment) -> str:
+        """
+        Get the TTS speaker ID for a given segment.
+        
+        Args:
+            segment: Text segment
+            
+        Returns:
+            TTS speaker ID
+        """
+        if segment.type == "narration":
+            return self.narrator_speaker or self.available_speakers[0]
+        else:
+            # Dialogue
+            return self.character_map.get(segment.speaker, self.narrator_speaker or self.available_speakers[0])
+
 def read_text_file(file_path):
     """
     Read text from a file.
@@ -833,7 +1093,106 @@ def synthesize_text_chunk(tts, text, chunk_path, speaker=None, speaker_wav=None)
         
         return False
 
-def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None, speaker=None, speaker_wav=None, verbose=False):
+def _synthesize_with_auto_speaker(tts, segments: List[Segment], assigner: SpeakerAssigner, output_path: str, verbose: bool = False) -> bool:
+    """
+    Synthesize text with automatic speaker routing for dialogue segments.
+    
+    Args:
+        tts: Initialized TTS model
+        segments: List of text segments (narration/dialogue)
+        assigner: SpeakerAssigner instance with character mappings
+        output_path: Path to save the output audio file
+        verbose: If True, output detailed debugging information
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        output_dir = Path(output_path).parent
+        output_stem = Path(output_path).stem
+        
+        # Create temporary directory for segment files
+        temp_segment_dir = output_dir / f".temp_segments_{output_stem}"
+        temp_segment_dir.mkdir(parents=True, exist_ok=True)
+        
+        segment_files = []
+        
+        print(f"Synthesizing {len(segments)} segments with auto speaker routing...\n")
+        
+        for i, segment in enumerate(segments, 1):
+            segment_speaker = assigner.get_speaker_for_segment(segment)
+            segment_path = temp_segment_dir / f"segment_{i:04d}.wav"
+            
+            segment_type_label = "NARRATION" if segment.type == "narration" else f"DIALOGUE ({segment.speaker})"
+            
+            if verbose:
+                preview = segment.text[:50] + "..." if len(segment.text) > 50 else segment.text
+                print(f"  Segment {i}/{len(segments)} [{segment_type_label}] → {segment_speaker}")
+                print(f"    Preview: {preview}")
+            else:
+                print(f"  Segment {i}/{len(segments)} [{segment_type_label}] → {segment_speaker}")
+            
+            # Synthesize segment
+            try:
+                kwargs = {"text": segment.text, "file_path": str(segment_path)}
+                kwargs["speaker"] = segment_speaker
+                tts.tts_to_file(**kwargs)
+                segment_files.append(segment_path)
+            except Exception as e:
+                print(f"    [ERROR] Failed to synthesize segment {i}: {e}")
+                # Continue with other segments
+                continue
+        
+        if not segment_files:
+            print("[ERROR] All segments failed to synthesize.")
+            try:
+                shutil.rmtree(temp_segment_dir)
+            except Exception:
+                pass
+            return False
+        
+        # Combine all segment audio files
+        if PYDUB_AVAILABLE and len(segment_files) > 1:
+            print(f"\nCombining {len(segment_files)} audio segments...")
+            combined = AudioSegment.empty()
+            
+            for segment_file in segment_files:
+                audio = AudioSegment.from_wav(str(segment_file))
+                combined += audio
+                # Add small pause between segments (shorter than between chunks)
+                combined += AudioSegment.silent(duration=200)  # 200ms pause
+            
+            combined.export(output_path, format="wav")
+            print(f"[OK] Combined audio saved to: {output_path}")
+            
+            # Clean up temporary directory
+            try:
+                shutil.rmtree(temp_segment_dir)
+                print(f"  Cleaned up temporary directory: {temp_segment_dir.name}")
+            except Exception as e:
+                print(f"  Warning: Could not clean up temporary directory: {e}")
+        elif len(segment_files) == 1:
+            # Only one segment, just rename it
+            segment_files[0].rename(output_path)
+            print(f"[OK] Audio saved to: {output_path}")
+            
+            # Clean up temporary directory
+            try:
+                shutil.rmtree(temp_segment_dir)
+                print(f"  Cleaned up temporary directory: {temp_segment_dir.name}")
+            except Exception as e:
+                print(f"  Warning: Could not clean up temporary directory: {e}")
+        else:
+            print(f"[OK] Processed {len(segment_files)} segments (not combined - install pydub to combine)")
+            print(f"  Segment files saved in: {temp_segment_dir}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error during auto speaker synthesis: {e}")
+        return False
+
+def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_short_input=False, pronunciations=None, speaker=None, speaker_wav=None, verbose=False, auto_speaker=False):
     """
     Synthesize text to speech, handling long texts by chunking.
     
@@ -847,6 +1206,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         speaker: Optional speaker name for multi-speaker models
         speaker_wav: Optional path to reference audio file for multi-speaker models
         verbose: If True, output detailed debugging information for each chunk
+        auto_speaker: If True, enable automatic speaker detection and dialogue routing
     """
     try:
         # Preprocess text (with special handling for short inputs and pronunciations)
@@ -879,7 +1239,45 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         
         is_multi_speaker = available_speakers is not None and len(available_speakers) > 0
         
-        if is_multi_speaker:
+        # Handle auto speaker mode
+        segmenter = None
+        assigner = None
+        segments = None
+        
+        if auto_speaker:
+            if not is_multi_speaker:
+                print("Error: Auto speaker mode requires a multi-speaker model.")
+                return False
+            
+            print("Auto speaker mode enabled - detecting dialogue and assigning voices...")
+            
+            # Segment text into narration and dialogue
+            segmenter = DialogueSegmenter()
+            segments = segmenter.segment_text(text)
+            
+            # Assign speakers
+            assigner = SpeakerAssigner(available_speakers)
+            character_map = assigner.assign_speakers(segments)
+            
+            # Print speaker assignment summary
+            print(f"\nSpeaker Assignment:")
+            print(f"  Narrator voice: {assigner.narrator_speaker}")
+            print(f"  Characters detected: {len([k for k in character_map.keys() if k != 'UNKNOWN'])}")
+            if character_map:
+                print(f"\n  Character → Voice Mapping:")
+                for char_name, speaker_id in sorted(character_map.items()):
+                    if char_name != 'UNKNOWN':
+                        print(f"    {char_name} → {speaker_id}")
+                if 'UNKNOWN' in character_map:
+                    print(f"    UNKNOWN → {character_map['UNKNOWN']}")
+            if segmenter.unknown_count > 0:
+                print(f"\n  Warning: {segmenter.unknown_count} dialogue segments with unknown speaker")
+            if assigner.warnings:
+                for warning in assigner.warnings:
+                    print(f"  Warning: {warning}")
+            print()
+        
+        elif is_multi_speaker:
             if not speaker and not speaker_wav:
                 # Try to use first available speaker as default
                 speaker = available_speakers[0]
@@ -903,6 +1301,10 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         
         # Show text info
         print(f"Text length: {len(text)} characters")
+        
+        # If auto speaker mode, synthesize by segments; otherwise use chunking
+        if auto_speaker and segments:
+            return _synthesize_with_auto_speaker(tts, segments, assigner, output_path, verbose)
         
         # Split text into chunks if necessary
         chunks = split_text_into_chunks(text, max_chunk_size=chunk_size)
@@ -1206,6 +1608,93 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         print("\nTip: Try specifying a different model or check available models with scripts/list_models.py")
         return False
 
+def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciations=None, auto_speaker=False):
+    """
+    Identify text structure (chunks, speakers, dialogue) without synthesizing.
+    
+    Args:
+        text: Text to analyze
+        model_name: Optional model name (needed to get available speakers)
+        chunk_size: Maximum characters per chunk
+        pronunciations: Optional pronunciation mappings
+        auto_speaker: If True, perform speaker detection and assignment
+        
+    Returns:
+        Dictionary with identification results
+    """
+    results = {
+        'chunks': [],
+        'total_chunks': 0,
+        'total_characters': len(text),
+        'total_words': len([w for w in text.split() if w.strip()]),
+        'speakers': {},
+        'segments': [],
+        'unknown_dialogue_count': 0
+    }
+    
+    # Preprocess text
+    original_text = text
+    text = preprocess_text(text, is_short_input=False, pronunciations=pronunciations)
+    
+    # Split into chunks
+    chunks = split_text_into_chunks(text, max_chunk_size=chunk_size)
+    results['total_chunks'] = len(chunks)
+    results['chunks'] = [{'index': i+1, 'text': chunk[:100] + '...' if len(chunk) > 100 else chunk, 
+                          'length': len(chunk), 'word_count': len([w for w in chunk.split() if w.strip()])} 
+                         for i, chunk in enumerate(chunks)]
+    
+    # If auto_speaker is enabled, perform dialogue segmentation and speaker assignment
+    if auto_speaker:
+        # Initialize TTS model to get available speakers
+        try:
+            if model_name:
+                tts = TTS(model_name=model_name, progress_bar=False)
+            else:
+                default_model = "tts_models/en/ljspeech/tacotron2-DDC"
+                tts = TTS(model_name=default_model, progress_bar=False)
+            
+            # Get available speakers
+            available_speakers = None
+            try:
+                if hasattr(tts, 'speakers') and tts.speakers is not None:
+                    available_speakers = list(tts.speakers) if tts.speakers else None
+                elif hasattr(tts, 'speaker_manager') and tts.speaker_manager is not None:
+                    if hasattr(tts.speaker_manager, 'speaker_names'):
+                        available_speakers = list(tts.speaker_manager.speaker_names)
+                    elif hasattr(tts.speaker_manager, 'speakers'):
+                        available_speakers = list(tts.speaker_manager.speakers)
+            except Exception:
+                pass
+            
+            if not available_speakers or len(available_speakers) == 0:
+                print("Warning: No speakers available in model. Auto speaker mode requires a multi-speaker model.")
+                results['error'] = "No speakers available"
+                return results
+            
+            # Segment text
+            segmenter = DialogueSegmenter()
+            segments = segmenter.segment_text(text)
+            results['segments'] = [{'type': s.type, 'speaker': s.speaker, 'text': s.text[:50] + '...' if len(s.text) > 50 else s.text} 
+                                   for s in segments]
+            results['unknown_dialogue_count'] = segmenter.unknown_count
+            
+            # Assign speakers
+            assigner = SpeakerAssigner(available_speakers)
+            character_map = assigner.assign_speakers(segments)
+            
+            # Build speaker mapping (include narrator)
+            results['speakers'] = {
+                'NARRATOR': assigner.narrator_speaker,
+                **character_map
+            }
+            results['warnings'] = assigner.warnings
+            
+        except Exception as e:
+            results['error'] = str(e)
+            print(f"Error during identification: {e}")
+    
+    return results
+
 def main():
     """Main function for book to audiobook conversion."""
     parser = argparse.ArgumentParser(
@@ -1233,6 +1722,15 @@ Examples:
   
   # Use a multi-speaker model with reference audio:
   python book-to-audiobook_coquitts.py input.txt -m tts_models/en/vctk/vits --speaker-wav reference.wav
+  
+  # Use automatic speaker detection and dialogue routing:
+  python book-to-audiobook_coquitts.py input.txt -m tts_models/en/vctk/vits --auto-speaker
+  
+  # Or use --speaker auto:
+  python book-to-audiobook_coquitts.py input.txt -m tts_models/en/vctk/vits --speaker auto
+  
+  # Identify text structure without synthesizing:
+  python book-to-audiobook_coquitts.py input.txt -m tts_models/en/vctk/vits --identification-only --auto-speaker
         """
     )
     
@@ -1279,7 +1777,12 @@ Examples:
     parser.add_argument(
         '--speaker', '-s',
         type=str,
-        help='Speaker name for multi-speaker models (e.g., "p225" for VCTK models)'
+        help='Speaker name for multi-speaker models (e.g., "p225" for VCTK models, or "auto" for automatic speaker detection)'
+    )
+    parser.add_argument(
+        '--auto-speaker', '-a',
+        action='store_true',
+        help='Enable automatic speaker detection and dialogue routing (equivalent to --speaker auto)'
     )
     parser.add_argument(
         '--speaker-wav',
@@ -1291,8 +1794,27 @@ Examples:
         action='store_true',
         help='Enable verbose output with detailed debugging information for each chunk'
     )
+    parser.add_argument(
+        '--identification-only', '-i',
+        action='store_true',
+        help='Only identify chunks and speakers without synthesizing audio (useful for planning)'
+    )
     
     args = parser.parse_args()
+    
+    # Determine auto speaker mode
+    # Precedence: --auto-speaker wins over --speaker unless --speaker is "auto"
+    auto_speaker_mode = False
+    manual_speaker = None
+    
+    if args.auto_speaker:
+        auto_speaker_mode = True
+        if args.speaker and args.speaker.lower() != "auto":
+            print(f"Info: --auto-speaker enabled, overriding --speaker {args.speaker}")
+    elif args.speaker and args.speaker.lower() == "auto":
+        auto_speaker_mode = True
+    elif args.speaker:
+        manual_speaker = args.speaker
     
     print("Book to Audiobook Converter (CoquiTTS)\n" + "="*50)
     
@@ -1341,7 +1863,7 @@ Examples:
     
     # Determine speaker identifier for filename
     # If speaker_wav is provided, use a short identifier based on the filename
-    speaker_for_filename = args.speaker
+    speaker_for_filename = manual_speaker if not auto_speaker_mode else "auto"
     if args.speaker_wav and not speaker_for_filename:
         # Extract a short identifier from the speaker_wav filename
         speaker_path = Path(args.speaker_wav)
@@ -1374,6 +1896,59 @@ Examples:
             print("Warning: Could not load pronunciations file. Continuing without pronunciation replacements.")
         print()  # Add blank line for readability
     
+    # Handle identification-only mode
+    if args.identification_only:
+        print("="*50)
+        print("IDENTIFICATION MODE - Analyzing text structure only")
+        print("="*50 + "\n")
+        
+        results = identify_text_structure(
+            text,
+            model_name=args.model,
+            chunk_size=args.chunk_size,
+            pronunciations=pronunciations,
+            auto_speaker=auto_speaker_mode
+        )
+        
+        print(f"Text Analysis Results:")
+        print(f"  Total characters: {results['total_characters']}")
+        print(f"  Total words: {results['total_words']}")
+        print(f"  Total chunks: {results['total_chunks']}\n")
+        
+        if results['total_chunks'] > 0:
+            print("Chunk Summary:")
+            for chunk_info in results['chunks']:
+                print(f"  Chunk {chunk_info['index']}: {chunk_info['word_count']} words, {chunk_info['length']} characters")
+                if args.verbose:
+                    print(f"    Preview: {chunk_info['text']}")
+            print()
+        
+        if auto_speaker_mode:
+            if 'error' in results:
+                print(f"Error during speaker identification: {results['error']}")
+            else:
+                print("Speaker Detection Results:")
+                if results['speakers']:
+                    print(f"  Narrator voice: {results['speakers'].get('NARRATOR', 'N/A')}")
+                    print(f"  Characters detected: {len([k for k in results['speakers'].keys() if k != 'NARRATOR'])}")
+                    print("\n  Character → Voice Mapping:")
+                    for char_name, speaker_id in sorted(results['speakers'].items()):
+                        if char_name != 'NARRATOR':
+                            print(f"    {char_name} → {speaker_id}")
+                    if results.get('unknown_dialogue_count', 0) > 0:
+                        print(f"\n  Warning: {results['unknown_dialogue_count']} dialogue segments with unknown speaker")
+                    if results.get('warnings'):
+                        for warning in results['warnings']:
+                            print(f"  Warning: {warning}")
+                else:
+                    print("  No speakers detected (may need a multi-speaker model)")
+        else:
+            print("Auto speaker mode not enabled. Use --auto-speaker or --speaker auto to enable.")
+        
+        print("\n" + "="*50)
+        print("Identification complete. No audio was synthesized.")
+        sys.exit(0)
+    
     # Synthesize text to speech
     # Mark as short input if text was provided directly (likely a single word/phrase)
     is_short = args.text is not None
@@ -1384,9 +1959,10 @@ Examples:
         chunk_size=args.chunk_size,
         is_short_input=is_short,
         pronunciations=pronunciations,
-        speaker=args.speaker,
+        speaker=manual_speaker if not auto_speaker_mode else None,
         speaker_wav=args.speaker_wav,
-        verbose=args.verbose
+        verbose=args.verbose,
+        auto_speaker=auto_speaker_mode
     )
     
     if success:
