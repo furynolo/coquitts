@@ -635,6 +635,7 @@ class DialogueSegmenter:
     """Segments text into narration and dialogue blocks with speaker attribution."""
     
     # Common speech verbs for speaker attribution
+    # Expanded list including more variations and less common verbs
     SPEECH_VERBS = {
         'say', 'said', 'says', 'saying',
         'ask', 'asked', 'asks', 'asking',
@@ -652,10 +653,117 @@ class DialogueSegmenter:
         'speak', 'spoke', 'speaks', 'speaking',
         'answer', 'answered', 'answers', 'answering',
         'respond', 'responded', 'responds', 'responding',
+        'bellow', 'bellowed', 'bellows', 'bellowing',
+        'thunder', 'thundered', 'thunders', 'thundering',
+        'growl', 'growled', 'growls', 'growling',
+        'snarl', 'snarled', 'snarls', 'snarling',
+        'roar', 'roared', 'roars', 'roaring',
+        'yell', 'yelled', 'yells', 'yelling',
+        'scream', 'screamed', 'screams', 'screaming',
+        'murmur', 'murmured', 'murmurs', 'murmuring',
+        'mumble', 'mumbled', 'mumbles', 'mumbling',
+        'stammer', 'stammered', 'stammers', 'stammering',
+        'stutter', 'stuttered', 'stutters', 'stuttering',
+        'gasp', 'gasped', 'gasps', 'gasping',
+        'sigh', 'sighed', 'sighs', 'sighing',
+        'hiss', 'hissed', 'hisses', 'hissing',
+        'snap', 'snapped', 'snaps', 'snapping',
+        'bark', 'barked', 'barks', 'barking',
+        'command', 'commanded', 'commands', 'commanding',
+        'order', 'ordered', 'orders', 'ordering',
+        'demand', 'demanded', 'demands', 'demanding',
+        'insist', 'insisted', 'insists', 'insisting',
+        'argue', 'argued', 'argues', 'arguing',
+        'protest', 'protested', 'protests', 'protesting',
+        'object', 'objected', 'objects', 'objecting',
+        'agree', 'agreed', 'agrees', 'agreeing',
+        'admit', 'admitted', 'admits', 'admitting',
+        'confess', 'confessed', 'confesses', 'confessing',
+        'claim', 'claimed', 'claims', 'claiming',
+        'suggest', 'suggested', 'suggests', 'suggesting',
+        'propose', 'proposed', 'proposes', 'proposing',
+        'offer', 'offered', 'offers', 'offering',
+        'promise', 'promised', 'promises', 'promising',
+        'warn', 'warned', 'warns', 'warning',
+        'threaten', 'threatened', 'threatens', 'threatening',
+        'beg', 'begged', 'begs', 'begging',
+        'plead', 'pleaded', 'pleads', 'pleading',
+        'urge', 'urged', 'urges', 'urging',
+        'encourage', 'encouraged', 'encourages', 'encouraging',
+        'advise', 'advised', 'advises', 'advising',
+        'explain', 'explained', 'explains', 'explaining',
+        'describe', 'described', 'describes', 'describing',
+        'mention', 'mentioned', 'mentions', 'mentioning',
+        'note', 'noted', 'notes', 'noting',
+        'observe', 'observed', 'observes', 'observing',
+        'comment', 'commented', 'comments', 'commenting',
+        'remark', 'remarked', 'remarks', 'remarking',
+        'add', 'added', 'adds', 'adding',
+        'continue', 'continued', 'continues', 'continuing',
+        'conclude', 'concluded', 'concludes', 'concluding',
+        'finish', 'finished', 'finishes', 'finishing',
+        'interrupt', 'interrupted', 'interrupts', 'interrupting',
+        'concede', 'conceded', 'concedes', 'conceding',
+        'acknowledge', 'acknowledged', 'acknowledges', 'acknowledging',
+        'confirm', 'confirmed', 'confirms', 'confirming',
+        'deny', 'denied', 'denies', 'denying',
+        'refuse', 'refused', 'refuses', 'refusing',
+        'accept', 'accepted', 'accepts', 'accepting',
+        'admit', 'admitted', 'admits', 'admitting',
     }
     
-    def __init__(self):
+    def __init__(self, verbose: bool = False):
         self.unknown_count = 0
+        self.verbose = verbose
+        self._nltk_pos_available = False
+        
+        # Try to use NLTK for POS tagging if available
+        if NLTK_AVAILABLE:
+            try:
+                from nltk import pos_tag, word_tokenize
+                # Try to download required data
+                # Try both old and new tagger names for compatibility
+                tagger_available = False
+                try:
+                    nltk.data.find('taggers/averaged_perceptron_tagger')
+                    tagger_available = True
+                except LookupError:
+                    try:
+                        nltk.data.find('taggers/averaged_perceptron_tagger_eng')
+                        tagger_available = True
+                    except LookupError:
+                        pass
+                
+                if not tagger_available:
+                    try:
+                        nltk.download('averaged_perceptron_tagger', quiet=True)
+                        tagger_available = True
+                    except Exception:
+                        try:
+                            nltk.download('averaged_perceptron_tagger_eng', quiet=True)
+                            tagger_available = True
+                        except Exception:
+                            pass
+                
+                # Verify punkt is available
+                try:
+                    nltk.data.find('tokenizers/punkt')
+                except LookupError:
+                    try:
+                        nltk.download('punkt', quiet=True)
+                    except Exception:
+                        pass
+                
+                if tagger_available:
+                    self._nltk_pos_available = True
+                    self._pos_tag = pos_tag
+                    self._word_tokenize = word_tokenize
+                else:
+                    self._nltk_pos_available = False
+            except Exception as e:
+                if self.verbose:
+                    print(f"    [NLTK SETUP] Could not initialize NLTK POS tagging: {e}")
+                self._nltk_pos_available = False
     
     def segment_text(self, text: str) -> List[Segment]:
         """
@@ -695,7 +803,7 @@ class DialogueSegmenter:
             dialogue_text = match.group(1).strip()
             if dialogue_text:
                 # Try to attribute speaker
-                speaker = self._attribute_speaker(text, match.start(), match.end())
+                speaker = self._attribute_speaker(text, match.start(), match.end(), dialogue_text)
                 segments.append(Segment(
                     type="dialogue",
                     speaker=speaker,
@@ -730,7 +838,7 @@ class DialogueSegmenter:
         
         return segments
     
-    def _attribute_speaker(self, text: str, quote_start: int, quote_end: int) -> str:
+    def _attribute_speaker(self, text: str, quote_start: int, quote_end: int, dialogue_text: str = "") -> str:
         """
         Attempt to attribute dialogue to a speaker by looking for name patterns near the quote.
         
@@ -738,53 +846,349 @@ class DialogueSegmenter:
             text: Full text
             quote_start: Start position of quote
             quote_end: End position of quote
+            dialogue_text: The dialogue text itself (for verbose output)
             
         Returns:
             Speaker name or "UNKNOWN"
         """
-        # Look in a window around the quote (120 chars before and after)
+        # Look in a window around the quote (120 chars before and after for most patterns)
+        # Use larger window for pronoun resolution (300 chars)
         window_size = 120
+        pronoun_window_size = 300
         before_context = text[max(0, quote_start - window_size):quote_start]
+        before_context_for_pronouns = text[max(0, quote_start - pronoun_window_size):quote_start]
         after_context = text[quote_end:min(len(text), quote_end + window_size)]
         
-        # Try to find speaker name before quote
-        speaker = self._find_speaker_before(before_context)
+        if self.verbose:
+            preview = dialogue_text[:50] + "..." if len(dialogue_text) > 50 else dialogue_text
+            print(f"    [VERBOSE] Attributing dialogue: \"{preview}\"")
+            print(f"      Before context: {before_context[-60:] if len(before_context) > 60 else before_context}")
+            print(f"      After context: {after_context[:60] if len(after_context) > 60 else after_context}")
+        
+        # Try to find speaker name before quote (use larger context for pronoun resolution)
+        speaker = self._find_speaker_before(before_context_for_pronouns)
         if speaker:
+            if self.verbose:
+                print(f"      [FOUND] Speaker before quote: {speaker}")
             return speaker
         
         # Try to find speaker name after quote
         speaker = self._find_speaker_after(after_context)
         if speaker:
+            if self.verbose:
+                print(f"      [FOUND] Speaker after quote: {speaker}")
             return speaker
         
+        # Try to find speaker name in the dialogue itself (e.g., "I will give anything, Vareg")
+        speaker = self._find_speaker_in_dialogue(dialogue_text)
+        if speaker:
+            if self.verbose:
+                print(f"      [FOUND] Speaker in dialogue: {speaker}")
+            return speaker
+        
+        # Try NLTK-based detection if available
+        if self._nltk_pos_available:
+            speaker = self._find_speaker_with_nltk(before_context, after_context)
+            if speaker:
+                if self.verbose:
+                    print(f"      [FOUND] Speaker via NLTK: {speaker}")
+                return speaker
+        
         # No speaker found
+        if self.verbose:
+            print(f"      [NOT FOUND] No speaker detected - using UNKNOWN")
         self.unknown_count += 1
         return "UNKNOWN"
     
     def _find_speaker_before(self, text: str) -> Optional[str]:
         """Find speaker name in text before a quote."""
-        # Look for patterns like: Name said, Name, said, Name said:
-        # Match up to 4 words as a name, followed by speech verb
-        name_pattern = r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})\s+(' + '|'.join(self.SPEECH_VERBS) + r')(?:[,:;]|\s+$)'
+        if self.verbose:
+            print(f"      [PATTERN] Trying patterns in text before quote...")
+        
+        # Pattern 1: Name said, Name, said, Name said:
+        # Match up to 4 words as a name, followed by speech verb (with optional comma)
+        name_pattern = r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})(?:[,:]?\s+)(' + '|'.join(self.SPEECH_VERBS) + r')(?:[,:;]|\s+|$)'
         match = re.search(name_pattern, text, re.IGNORECASE)
         if match:
             name = match.group(1).strip()
-            # Validate it looks like a proper name (starts with capital, mostly alphabetic)
-            if name and name[0].isupper() and all(c.isalnum() or c in " '-" for c in name):
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found: {name} {match.group(2)}")
                 return name
+        
+        # Pattern 2: Name said [additional text] (e.g., "Mar'gok said, waving him off")
+        # This allows text after the speech verb
+        name_pattern2 = r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})(?:[,:]?\s+)(' + '|'.join(self.SPEECH_VERBS) + r')(?:[,:;]|\s+[^.!?]*)'
+        match = re.search(name_pattern2, text, re.IGNORECASE)
+        if match:
+            name = match.group(1).strip()
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found (with trailing text): {name} {match.group(2)}")
+                return name
+        
+        # Pattern 3: Handle pronouns (he/she/they) by finding last mentioned name
+        # Look for "he said", "she said", etc. and try to find the last proper noun before it
+        pronoun_pattern = r'\b(he|she|they|it)\s+(' + '|'.join(self.SPEECH_VERBS) + r')(?:[,:;]|\s+|$)'
+        pronoun_match = re.search(pronoun_pattern, text, re.IGNORECASE)
+        if pronoun_match:
+            # Look backwards for the last proper noun (name)
+            # Search in reverse order to find the most recent name
+            before_pronoun = text[:pronoun_match.start()]
+            # Find all capitalized word sequences that look like names
+            name_matches = list(re.finditer(r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})\b', before_pronoun))
+            if name_matches:
+                # Get the last (most recent) match
+                name_match = name_matches[-1]
+                name = name_match.group(1).strip()
+                if self._validate_name(name):
+                    if self.verbose:
+                        print(f"      [PATTERN MATCH] Found via pronoun resolution: {name} (from '{pronoun_match.group(1)} {pronoun_match.group(2)}')")
+                    return name
+        
+        if self.verbose:
+            print(f"      [PATTERN] No matches found in before context")
         return None
     
     def _find_speaker_after(self, text: str) -> Optional[str]:
         """Find speaker name in text after a quote."""
-        # Look for patterns like: said Name, said Name,
-        speech_verb_pattern = r'\b(' + '|'.join(self.SPEECH_VERBS) + r')\s+([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})(?:[,:;]|\s+|$)'
+        if self.verbose:
+            print(f"      [PATTERN] Trying patterns in text after quote...")
+        
+        # Pattern 1: said Name, said Name.
+        speech_verb_pattern = r'\b(' + '|'.join(self.SPEECH_VERBS) + r')(?:[,:]?\s+)([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})(?:[,:;]|\s+|\.|$)'
         match = re.search(speech_verb_pattern, text, re.IGNORECASE)
         if match:
             name = match.group(2).strip()
-            # Validate it looks like a proper name
-            if name and name[0].isupper() and all(c.isalnum() or c in " '-" for c in name):
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found: {match.group(1)} {name}")
                 return name
+        
+        # Pattern 2: said Name [additional text] (e.g., "said Name, pointing at...")
+        speech_verb_pattern2 = r'\b(' + '|'.join(self.SPEECH_VERBS) + r')(?:[,:]?\s+)([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})(?:[,:;]|\s+[^.!?]*)'
+        match = re.search(speech_verb_pattern2, text, re.IGNORECASE)
+        if match:
+            name = match.group(2).strip()
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found (with trailing text): {match.group(1)} {name}")
+                return name
+        
+        if self.verbose:
+            print(f"      [PATTERN] No matches found in after context")
         return None
+    
+    def _find_speaker_with_nltk(self, before_context: str, after_context: str) -> Optional[str]:
+        """
+        Use NLTK POS tagging to identify proper nouns (names) near speech verbs.
+        
+        Args:
+            before_context: Text before the quote
+            after_context: Text after the quote
+            
+        Returns:
+            Speaker name if found, None otherwise
+        """
+        if not self._nltk_pos_available:
+            return None
+        
+        try:
+            # Combine contexts for analysis
+            combined_context = (before_context + " " + after_context).strip()
+            if not combined_context:
+                return None
+            
+            # Tokenize and tag
+            tokens = self._word_tokenize(combined_context)
+            pos_tags = self._pos_tag(tokens)
+            
+            # Look for patterns: Proper noun (NNP) followed by verb (VB/VBD/VBZ/VBG)
+            # or verb followed by proper noun
+            for i in range(len(pos_tags) - 1):
+                word1, pos1 = pos_tags[i]
+                word2, pos2 = pos_tags[i + 1] if i + 1 < len(pos_tags) else ('', '')
+                
+                # Pattern 1: NNP (proper noun) followed by verb
+                if pos1.startswith('NNP') and pos2.startswith('VB'):
+                    # Check if word2 is a speech verb (case-insensitive)
+                    if word2.lower() in self.SPEECH_VERBS:
+                        # Extract the name (may be multi-word)
+                        name_parts = [word1]
+                        # Look backwards for more proper nouns
+                        for j in range(i - 1, max(-1, i - 4), -1):
+                            if j >= 0 and pos_tags[j][1].startswith('NNP'):
+                                name_parts.insert(0, pos_tags[j][0])
+                            else:
+                                break
+                        name = ' '.join(name_parts)
+                        if self._validate_name(name):
+                            if self.verbose:
+                                print(f"      [NLTK] Found pattern: {name} {word2} (NNP + VB)")
+                            return name
+                
+                # Pattern 2: Verb followed by NNP (proper noun)
+                if pos1.startswith('VB') and pos2.startswith('NNP'):
+                    # Check if word1 is a speech verb
+                    if word1.lower() in self.SPEECH_VERBS:
+                        # Extract the name (may be multi-word)
+                        name_parts = [word2]
+                        # Look forwards for more proper nouns
+                        for j in range(i + 2, min(len(pos_tags), i + 5)):
+                            if j < len(pos_tags) and pos_tags[j][1].startswith('NNP'):
+                                name_parts.append(pos_tags[j][0])
+                            else:
+                                break
+                        name = ' '.join(name_parts)
+                        if self._validate_name(name):
+                            if self.verbose:
+                                print(f"      [NLTK] Found pattern: {word1} {name} (VB + NNP)")
+                            return name
+            
+            # Also look for any proper nouns near speech verbs (within 3 words)
+            speech_verb_indices = [i for i, (word, pos) in enumerate(pos_tags) 
+                                  if word.lower() in self.SPEECH_VERBS]
+            
+            for verb_idx in speech_verb_indices:
+                # Check 3 words before and after the verb
+                for offset in range(-3, 4):
+                    if offset == 0:
+                        continue
+                    check_idx = verb_idx + offset
+                    if 0 <= check_idx < len(pos_tags):
+                        word, pos = pos_tags[check_idx]
+                        if pos.startswith('NNP') and self._validate_name(word):
+                            if self.verbose:
+                                print(f"      [NLTK] Found proper noun near speech verb: {word} (offset {offset} from '{pos_tags[verb_idx][0]}')")
+                            return word
+            
+        except Exception as e:
+            if self.verbose:
+                print(f"      [NLTK ERROR] {e}")
+        
+        return None
+    
+    def _find_speaker_in_dialogue(self, dialogue_text: str) -> Optional[str]:
+        """
+        Try to find speaker name mentioned within the dialogue itself.
+        Patterns like: "I will give anything, Vareg" or "Vareg, I will give anything"
+        """
+        if not dialogue_text or len(dialogue_text) < 5:
+            return None
+        
+        if self.verbose:
+            print(f"      [PATTERN] Checking dialogue text for speaker mentions...")
+        
+        # Pattern 1: Name at the end (e.g., "I will give anything, Vareg")
+        # Look for comma or period followed by a name-like word at the end
+        end_name_pattern = r'[,.]\s*([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})\s*[.)]?$'
+        match = re.search(end_name_pattern, dialogue_text)
+        if match:
+            name = match.group(1).strip()
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found name at end of dialogue: {name}")
+                return name
+        
+        # Pattern 2: Name at the beginning (e.g., "Vareg, I will give anything")
+        start_name_pattern = r'^([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})[,:]?\s+[A-Z]'
+        match = re.search(start_name_pattern, dialogue_text)
+        if match:
+            name = match.group(1).strip()
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found name at start of dialogue: {name}")
+                return name
+        
+        # Pattern 3: Parenthetical mention (e.g., "(I will give anything, Vareg)")
+        paren_pattern = r'\([^)]*([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})[^)]*\)'
+        match = re.search(paren_pattern, dialogue_text)
+        if match:
+            name = match.group(1).strip()
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found name in parentheses: {name}")
+                return name
+        
+        if self.verbose:
+            print(f"      [PATTERN] No speaker found in dialogue text")
+        return None
+    
+    def _validate_name(self, name: str) -> bool:
+        """Validate that a string looks like a proper name."""
+        if not name or len(name) < 2:
+            return False
+        
+        # Must start with capital letter
+        if not name[0].isupper():
+            return False
+        
+        # Should be mostly alphabetic (allow apostrophes, hyphens, spaces)
+        if not all(c.isalnum() or c in " '-" for c in name):
+            return False
+        
+        # Should have at least one letter
+        if not any(c.isalpha() for c in name):
+            return False
+        
+        words = name.split()
+        if not words:
+            return False
+        
+        # Reject if it contains punctuation that suggests it's a sentence fragment
+        # (allow apostrophes and hyphens which are common in names)
+        if any(c in name for c in ',;:!?.'):
+            return False
+        
+        # Reject if it starts with common sentence starters
+        common_starters = {
+            'the', 'a', 'an', 'and', 'or', 'but', 'if', 'when', 'where', 'why', 'how',
+            'what', 'who', 'which', 'that', 'this', 'these', 'those', 'some', 'any',
+            'all', 'each', 'every', 'no', 'not', 'yes', 'so', 'then', 'now', 'here',
+            'there', 'once', 'twice', 'first', 'last', 'next', 'previous', 'other',
+            'another', 'many', 'much', 'more', 'most', 'less', 'few', 'little',
+            'both', 'either', 'neither', 'such', 'same', 'different', 'various',
+            'several', 'certain', 'particular', 'general', 'specific',
+        }
+        
+        if words[0].lower() in common_starters:
+            return False
+        
+        # Reject if it contains common determiners/articles in the middle
+        # (e.g., "He resisted the" should not be a name)
+        common_middle = {'the', 'a', 'an', 'and', 'or', 'but', 'if', 'when', 'where',
+                        'why', 'how', 'what', 'who', 'which', 'that', 'this', 'these',
+                        'those', 'some', 'any', 'all', 'each', 'every', 'no', 'not',
+                        'yes', 'so', 'then', 'now', 'here', 'there', 'once', 'twice',
+                        'first', 'last', 'next', 'previous', 'other', 'another', 'many',
+                        'much', 'more', 'most', 'less', 'few', 'little', 'both',
+                        'either', 'neither', 'such', 'same', 'different', 'various',
+                        'several', 'certain', 'particular', 'general', 'specific',
+                        'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have',
+                        'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'done',
+                        'will', 'would', 'could', 'should', 'may', 'might', 'must',
+                        'can', 'cannot', 'resisted', 'resists', 'resist', 'resisting',
+                        'let', 'lets', 'letting', 'had', 'has', 'have', 'having',
+                        'heads', 'head', 'heading', 'headed',
+        }
+        
+        # Check if any middle word is a common word (not the first or last)
+        if len(words) > 2:
+            for word in words[1:-1]:
+                if word.lower() in common_middle:
+                    return False
+        
+        # Names should typically be 1-4 words, and each word should be capitalized
+        if len(words) > 4:
+            return False
+        
+        # All words should start with capital (except for particles like "de", "van", etc.)
+        # For now, require first word to be capitalized, others can be lowercase
+        # (to handle names like "de la Cruz" or "van der Berg")
+        if not words[0][0].isupper():
+            return False
+        
+        return True
 
 class SpeakerAssigner:
     """Assigns TTS speaker voices to detected characters."""
@@ -1127,10 +1531,10 @@ def _synthesize_with_auto_speaker(tts, segments: List[Segment], assigner: Speake
             
             if verbose:
                 preview = segment.text[:50] + "..." if len(segment.text) > 50 else segment.text
-                print(f"  Segment {i}/{len(segments)} [{segment_type_label}] → {segment_speaker}")
+                print(f"  Segment {i}/{len(segments)} [{segment_type_label}] -> {segment_speaker}")
                 print(f"    Preview: {preview}")
             else:
-                print(f"  Segment {i}/{len(segments)} [{segment_type_label}] → {segment_speaker}")
+                print(f"  Segment {i}/{len(segments)} [{segment_type_label}] -> {segment_speaker}")
             
             # Synthesize segment
             try:
@@ -1252,8 +1656,17 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             print("Auto speaker mode enabled - detecting dialogue and assigning voices...")
             
             # Segment text into narration and dialogue
-            segmenter = DialogueSegmenter()
+            segmenter = DialogueSegmenter(verbose=verbose)
             segments = segmenter.segment_text(text)
+            
+            if verbose:
+                print(f"\n[VERBOSE] Dialogue Segmentation:")
+                print(f"  Total segments: {len(segments)}")
+                dialogue_count = sum(1 for s in segments if s.type == "dialogue")
+                narration_count = sum(1 for s in segments if s.type == "narration")
+                print(f"  Dialogue segments: {dialogue_count}")
+                print(f"  Narration segments: {narration_count}")
+                print()
             
             # Assign speakers
             assigner = SpeakerAssigner(available_speakers)
@@ -1264,12 +1677,12 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             print(f"  Narrator voice: {assigner.narrator_speaker}")
             print(f"  Characters detected: {len([k for k in character_map.keys() if k != 'UNKNOWN'])}")
             if character_map:
-                print(f"\n  Character → Voice Mapping:")
+                print(f"\n  Character -> Voice Mapping:")
                 for char_name, speaker_id in sorted(character_map.items()):
                     if char_name != 'UNKNOWN':
-                        print(f"    {char_name} → {speaker_id}")
+                        print(f"    {char_name} -> {speaker_id}")
                 if 'UNKNOWN' in character_map:
-                    print(f"    UNKNOWN → {character_map['UNKNOWN']}")
+                    print(f"    UNKNOWN -> {character_map['UNKNOWN']}")
             if segmenter.unknown_count > 0:
                 print(f"\n  Warning: {segmenter.unknown_count} dialogue segments with unknown speaker")
             if assigner.warnings:
@@ -1608,7 +2021,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         print("\nTip: Try specifying a different model or check available models with scripts/list_models.py")
         return False
 
-def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciations=None, auto_speaker=False):
+def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciations=None, auto_speaker=False, verbose=False):
     """
     Identify text structure (chunks, speakers, dialogue) without synthesizing.
     
@@ -1618,6 +2031,7 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
         chunk_size: Maximum characters per chunk
         pronunciations: Optional pronunciation mappings
         auto_speaker: If True, perform speaker detection and assignment
+        verbose: If True, output detailed debugging information
         
     Returns:
         Dictionary with identification results
@@ -1671,9 +2085,20 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
                 results['error'] = "No speakers available"
                 return results
             
-            # Segment text
-            segmenter = DialogueSegmenter()
+            # Segment text (verbose mode for identification)
+            if verbose:
+                print("\n[VERBOSE] Starting dialogue segmentation...")
+            segmenter = DialogueSegmenter(verbose=verbose)
             segments = segmenter.segment_text(text)
+            
+            if verbose:
+                print(f"\n[VERBOSE] Segmentation complete:")
+                print(f"  Total segments: {len(segments)}")
+                dialogue_count = sum(1 for s in segments if s.type == "dialogue")
+                narration_count = sum(1 for s in segments if s.type == "narration")
+                print(f"  Dialogue segments: {dialogue_count}")
+                print(f"  Narration segments: {narration_count}")
+                print()
             results['segments'] = [{'type': s.type, 'speaker': s.speaker, 'text': s.text[:50] + '...' if len(s.text) > 50 else s.text} 
                                    for s in segments]
             results['unknown_dialogue_count'] = segmenter.unknown_count
@@ -1907,7 +2332,8 @@ Examples:
             model_name=args.model,
             chunk_size=args.chunk_size,
             pronunciations=pronunciations,
-            auto_speaker=auto_speaker_mode
+            auto_speaker=auto_speaker_mode,
+            verbose=args.verbose
         )
         
         print(f"Text Analysis Results:")
@@ -1931,10 +2357,10 @@ Examples:
                 if results['speakers']:
                     print(f"  Narrator voice: {results['speakers'].get('NARRATOR', 'N/A')}")
                     print(f"  Characters detected: {len([k for k in results['speakers'].keys() if k != 'NARRATOR'])}")
-                    print("\n  Character → Voice Mapping:")
+                    print("\n  Character -> Voice Mapping:")
                     for char_name, speaker_id in sorted(results['speakers'].items()):
                         if char_name != 'NARRATOR':
-                            print(f"    {char_name} → {speaker_id}")
+                            print(f"    {char_name} -> {speaker_id}")
                     if results.get('unknown_dialogue_count', 0) > 0:
                         print(f"\n  Warning: {results['unknown_dialogue_count']} dialogue segments with unknown speaker")
                     if results.get('warnings'):
