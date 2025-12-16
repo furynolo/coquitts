@@ -906,17 +906,46 @@ class DialogueSegmenter:
         """
         text_lower = text.lower().strip()
         
-        # Very short quotes are often dialogue tags
-        if len(text) < 15:
-            # Check for common dialogue tag patterns (e.g., "he said", "she whispered")
-            if re.match(r'^(he|she|they|it|the|a|an)\s+\w+\s+(said|whispered|shouted|replied|asked|muttered|growled|snarled|roared|yelled|screamed|spoke|continued|interrupted|added|concluded|finished|agreed|nodded|shook|laughed|smiled|frowned|sighed|gasped|hissed|snapped|barked|commanded|ordered|demanded|insisted|argued|protested|objected|admitted|confessed|claimed|suggested|proposed|offered|promised|warned|threatened|begged|pleaded|urged|encouraged|advised|explained|described|mentioned|noted|observed|commented|remarked|conceded|acknowledged|confirmed|denied|refused|accepted|admitted|sneered|growled|snarled|roared|yelled|screamed|muttered|whispered|shouted|replied|asked|spoke|continued|interrupted|added|concluded|finished|agreed|nodded|shook|laughed|smiled|frowned|sighed|gasped|hissed|snapped|barked|commanded|ordered|demanded|insisted|argued|protested|objected|admitted|confessed|claimed|suggested|proposed|offered|promised|warned|threatened|begged|pleaded|urged|encouraged|advised|explained|described|mentioned|noted|observed|commented|remarked|conceded|acknowledged|confirmed|denied|refused|accepted|admitted)', text_lower):
+        # Parenthetical thoughts (e.g., "(Bladefist. There could be no doubt.)")
+        if text.strip().startswith('(') and text.strip().endswith(')'):
+            return True
+        
+        # Very short quotes are often dialogue tags or single words/phrases
+        if len(text) < 20:
+            # Single words or very short phrases that are likely not dialogue
+            if len(text.split()) <= 2 and not any(c in text for c in '!?'):
+                # Check if it's just a title or single word
+                if text.strip() in ['Imperator,', 'Imperator', 'And,', 'And', 'Yes?', 'Yes', 'convinced.', 'convinced']:
+                    return True
+            
+            # Check for common dialogue tag patterns (e.g., "he said", "she whispered", "he saluted")
+            dialogue_tag_pattern = r'^(he|she|they|it|the|a|an)\s+\w+\s+(said|whispered|shouted|replied|asked|muttered|growled|snarled|roared|yelled|screamed|spoke|continued|interrupted|added|concluded|finished|agreed|nodded|shook|laughed|smiled|frowned|sighed|gasped|hissed|snapped|barked|commanded|ordered|demanded|insisted|argued|protested|objected|admitted|confessed|claimed|suggested|proposed|offered|promised|warned|threatened|begged|pleaded|urged|encouraged|advised|explained|described|mentioned|noted|observed|commented|remarked|conceded|acknowledged|confirmed|denied|refused|accepted|admitted|sneered|saluted|responded|snorted|seemed|held|did|was|were|is|are|flatly|with|pointing|looking|walking|turning|moving)'
+            if re.match(dialogue_tag_pattern, text_lower):
+                return True
+            # Check for patterns like "he saluted", "Mar'gok snorted", "Ko'ragh seemed confused", "he said flatly", "the imperator said with a flourish"
+            if re.match(r'^[A-Z][a-zA-Z\'-]+\s+(snorted|saluted|seemed|held|did|was|were|is|are|looked|glanced|stared|gazed|watched|saw|heard|felt|touched|reached|grabbed|turned|walked|ran|stood|sat|moved|went|came|arrived|left|entered|exited|opened|closed|started|stopped|began|ended|continued|paused|waited|hurried|rushed)', text_lower):
+                return True
+            # Check for patterns like "he said flatly", "the imperator said with a flourish"
+            if re.search(r'\b(he|she|they|it|the|a|an|imperator|warchief|councilor|councillor)\s+\w+\s+(said|whispered|shouted|replied|asked|muttered|growled|snarled|roared|yelled|screamed|spoke|continued|interrupted|added|concluded|finished|agreed|nodded|shook|laughed|smiled|frowned|sighed|gasped|hissed|snapped|barked|commanded|ordered|demanded|insisted|argued|protested|objected|admitted|confessed|claimed|suggested|proposed|offered|promised|warned|threatened|begged|pleaded|urged|encouraged|advised|explained|described|mentioned|noted|observed|commented|remarked|conceded|acknowledged|confirmed|denied|refused|accepted|admitted)\s+(flatly|with|pointing|looking|walking|turning|moving|reaching|grabbing|holding|pushing|pulling|throwing|dropping|picking|putting|placing|opening|closing|starting|stopping|beginning|ending|continuing|pausing|waiting|hurrying|rushing)', text_lower):
                 return True
         
         # Check for narration patterns (e.g., "Because he had to, Mar'gok leaned down")
         narration_patterns = [
             r'^(because|when|while|as|after|before|during|since|until|if|unless|although|though|even|despite)',
             r'^(the|a|an)\s+\w+\s+(did not|does not|will not|would not|could not|should not|may not|might not|must not|cannot|was not|were not|is not|are not|had not|has not|have not)',
-            r'^(he|she|they|it|the|a|an)\s+\w+\s+(leaned|turned|walked|ran|stood|sat|looked|glanced|stared|gazed|watched|saw|heard|felt|touched|reached|grabbed|held|pushed|pulled|threw|dropped|picked|put|placed|moved|went|came|arrived|left|entered|exited|opened|closed|started|stopped|began|ended|continued|paused|waited|hurried|rushed|hit|struck|punched|kicked|slapped|squeezed|twisted|bent|straightened|raised|lowered|lifted|fell|jumped|hopped|stepped|sprinted|dashed|strolled|marched|trudged|limped|crawled|climbed|descended|ascended|flew|soared|dove|swam|floated|sank|rose|plunged|leaped|bounded|sprang|lunged|charged|attacked|shoved|yanked|tugged|dragged|hauled|carried|brought|took|seized|snatched|caught|gripped|clutched|crushed|smashed|slammed|bashed|pounded|hammered|beat|stomped|squashed|flattened|squished|compressed|compacted|packed|stuffed|filled|emptied|poured|spilled|dripped|tumbled|rolled|spun|rotated|stretched|extended|retracted|saluted|responded)',
+            r'^(he|she|they|it|the|a|an)\s+\w+\s+(leaned|turned|walked|ran|stood|sat|looked|glanced|stared|gazed|watched|saw|heard|felt|touched|reached|grabbed|held|pushed|pulled|threw|dropped|picked|put|placed|moved|went|came|arrived|left|entered|exited|opened|closed|started|stopped|began|ended|continued|paused|waited|hurried|rushed|hit|struck|punched|kicked|slapped|squeezed|twisted|bent|straightened|raised|lowered|lifted|fell|jumped|hopped|stepped|sprinted|dashed|strolled|marched|trudged|limped|crawled|climbed|descended|ascended|flew|soared|dove|swam|floated|sank|rose|plunged|leaped|bounded|sprang|lunged|charged|attacked|shoved|yanked|tugged|dragged|hauled|carried|brought|took|seized|snatched|caught|gripped|clutched|crushed|smashed|slammed|bashed|pounded|hammered|beat|stomped|squashed|flattened|squished|compressed|compacted|packed|stuffed|filled|emptied|poured|spilled|dripped|tumbled|rolled|spun|rotated|stretched|extended|retracted|saluted|responded|snorted|seemed|held|beamed|stamped|raised|lowered)',
+            # Patterns like "All feet stamped; fists were raised."
+            r'^(all|some|many|few|several|most|both|each|every)\s+\w+\s+(stamped|raised|lowered|moved|went|came|did|was|were|is|are)',
+            # Patterns like "It would have seemed..."
+            r'^(it|this|that|these|those)\s+(would|could|should|might|may|will|can)\s+(have|be|seem|appear|look)',
+            # Patterns like "He looked at Ko'ragh. The breaker beamed back."
+            r'^(he|she|they|it|the|a|an)\s+\w+\s+(looked|glanced|stared|gazed|watched|saw|heard|felt|touched|reached|grabbed|held|pushed|pulled|threw|dropped|picked|put|placed|moved|went|came|arrived|left|entered|exited|opened|closed|started|stopped|began|ended|continued|paused|waited|hurried|rushed|hit|struck|punched|kicked|slapped|squeezed|twisted|bent|straightened|raised|lowered|lifted|fell|jumped|hopped|stepped|sprinted|dashed|strolled|marched|trudged|limped|crawled|climbed|descended|ascended|flew|soared|dove|swam|floated|sank|rose|plunged|leaped|bounded|sprang|lunged|charged|attacked|shoved|yanked|tugged|dragged|hauled|carried|brought|took|seized|snatched|caught|gripped|clutched|crushed|smashed|slammed|bashed|pounded|hammered|beat|stomped|squashed|flattened|squished|compressed|compacted|packed|stuffed|filled|emptied|poured|spilled|dripped|tumbled|rolled|spun|rotated|stretched|extended|retracted|saluted|responded|snorted|seemed|held|beamed)',
+            # Patterns like "Mar'gok did not raise his hand"
+            r'^[A-Z][a-zA-Z\'-]+\s+(did not|does not|will not|would not|could not|should not|may not|might not|must not|cannot|was not|were not|is not|are not|had not|has not|have not)',
+            # Patterns like "A weighty grunt was Growmash's only response"
+            r'^(a|an|the)\s+\w+\s+\w+\s+(was|were|is|are)\s+[A-Z][a-zA-Z\'-]+\'s',
+            # Patterns like "The warchief was walking around the artifact"
+            r'^(the|a|an)\s+\w+\s+(was|were|is|are)\s+(walking|running|standing|sitting|looking|glancing|staring|gazing|watching|seeing|hearing|feeling|touching|reaching|grabbing|holding|pushing|pulling|throwing|dropping|picking|putting|placing|moving|going|coming|arriving|leaving|entering|exiting|opening|closing|starting|stopping|beginning|ending|continuing|pausing|waiting|hurrying|rushing|hitting|striking|punching|kicking|slapping|squeezing|twisting|bending|straightening|raising|lowering|lifting|falling|jumping|hopping|stepping|sprinting|dashing|strolling|marching|trudging|limping|crawling|climbing|descending|ascending|flying|soaring|diving|swimming|floating|sinking|rising|plunging|leaping|bounding|springing|lunging|charging|attacking|shoving|yanking|tugging|dragging|hauling|carrying|bringing|taking|seizing|snatching|catching|gripping|clutching|crushing|smashing|slamming|bashing|pounding|hammering|beating|stomping|squashing|flattening|squishing|compressing|compacting|packing|stuffing|filling|emptying|pouring|spilling|dripping|tumbling|rolling|spinning|rotating|stretching|extending|retracting|saluting|responding|snorting|seeming|holding|beaming|squinting)',
         ]
         
         for pattern in narration_patterns:
@@ -924,7 +953,14 @@ class DialogueSegmenter:
                 return True
         
         # Very long quotes without dialogue markers are often narration
+        # Also check for very long quotes (like the 4932 char one)
+        if len(text) > 500:
+            return True
         if len(text) > 200 and not any(marker in text for marker in ['!', '?']):
+            return True
+        
+        # Check for patterns like "he said, pointing at..." (dialogue tags with actions)
+        if re.search(r',\s*(pointing|looking|walking|turning|moving|reaching|grabbing|holding|pushing|pulling|throwing|dropping|picking|putting|placing|opening|closing|starting|stopping|beginning|ending|continuing|pausing|waiting|hurrying|rushing|hitting|striking|punching|kicking|slapping|squeezing|twisting|bending|straightening|raising|lowering|lifting|falling|jumping|hopping|stepping|sprinting|dashing|strolling|marching|trudging|limping|crawling|climbing|descending|ascending|flying|soaring|diving|swimming|floating|sinking|rising|plunging|leaping|bounding|springing|lunging|charging|attacking|shoving|yanking|tugging|dragging|hauling|carrying|bringing|taking|seizing|snatching|catching|gripping|clutching|crushing|smashing|slamming|bashing|pounding|hammering|beating|stomping|squashing|flattening|squishing|compressing|compacting|packing|stuffing|filling|emptying|pouring|spilling|dripping|tumbling|rolling|spinning|rotating|stretching|extending|retracting|saluting|responding|snorting|seeming|holding|beaming)', text_lower):
             return True
         
         return False
@@ -943,12 +979,13 @@ class DialogueSegmenter:
             Speaker name or "UNKNOWN"
         """
         # Look in a window around the quote (120 chars before and after for most patterns)
-        # Use larger window for pronoun resolution (300 chars)
+        # Use larger window for pronoun resolution and general detection (500 chars)
         window_size = 120
-        pronoun_window_size = 300
+        pronoun_window_size = 500  # Increased from 300 to catch speakers mentioned further away
         before_context = text[max(0, quote_start - window_size):quote_start]
         before_context_for_pronouns = text[max(0, quote_start - pronoun_window_size):quote_start]
         after_context = text[quote_end:min(len(text), quote_end + window_size)]
+        after_context_extended = text[quote_end:min(len(text), quote_end + pronoun_window_size)]  # Extended after context
         
         if self.verbose:
             preview = dialogue_text[:50] + "..." if len(dialogue_text) > 50 else dialogue_text
@@ -963,8 +1000,8 @@ class DialogueSegmenter:
                 print(f"      [FOUND] Speaker before quote: {speaker}")
             return speaker
         
-        # Try to find speaker name after quote
-        speaker = self._find_speaker_after(after_context)
+        # Try to find speaker name after quote (use extended context for better detection)
+        speaker = self._find_speaker_after(after_context_extended)
         if speaker:
             if self.verbose:
                 print(f"      [FOUND] Speaker after quote: {speaker}")
@@ -1059,6 +1096,24 @@ class DialogueSegmenter:
                 if self._validate_name(name):
                     if self.verbose:
                         print(f"      [PATTERN MATCH] Found via pronoun resolution: {name} (from '{pronoun_match.group(1)} {pronoun_match.group(2)}')")
+                    return name
+        
+        # Pattern 4: Look for "He said nothing about..." or "He did not..." patterns
+        # These often have the speaker mentioned earlier in a larger context
+        pronoun_action_pattern = r'\b(he|she|they|it)\s+(said|did|does|will|would|could|should|may|might|must|can)\s+(nothing|not|no|never)'
+        pronoun_action_match = re.search(pronoun_action_pattern, text, re.IGNORECASE)
+        if pronoun_action_match:
+            # Look backwards for the last proper noun (name) - use larger window
+            before_pronoun = text[:pronoun_action_match.start()]
+            # Find all capitalized word sequences that look like names
+            name_matches = list(re.finditer(r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})\b', before_pronoun))
+            if name_matches:
+                # Get the last (most recent) match
+                name_match = name_matches[-1]
+                name = name_match.group(1).strip()
+                if self._validate_name(name):
+                    if self.verbose:
+                        print(f"      [PATTERN MATCH] Found via pronoun action resolution: {name} (from '{pronoun_action_match.group(1)} {pronoun_action_match.group(2)} {pronoun_action_match.group(3)}')")
                     return name
         
         if self.verbose:
@@ -1242,6 +1297,62 @@ class DialogueSegmenter:
                     print(f"      [PATTERN MATCH] Found name in parentheses: {name}")
                 return name
         
+        # Pattern 4: Possessive patterns (e.g., "A weighty grunt was Growmash's only response")
+        # Look for patterns like "X's response", "X's voice", "X's only", etc.
+        possessive_pattern = r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})\'s\s+(only|response|voice|reply|answer|words|statement|comment|remark|question|demand|request|order|command|threat|warning|promise|offer|suggestion|proposal|claim|admission|confession|denial|refusal|acceptance|agreement|disagreement|nod|shake|laugh|smile|frown|sigh|gasp|hiss|snap|bark|grunt|growl|snarl|roar|yell|scream|mutter|whisper|shout|reply|ask|speak|continue|interrupt|add|conclude|finish|agree|disagree)'
+        match = re.search(possessive_pattern, dialogue_text, re.IGNORECASE)
+        if match:
+            name = match.group(1).strip()
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found name in possessive pattern: {name}")
+                return name
+        
+        # Pattern 5: "X was/were/is/are..." patterns (e.g., "Growmash was walking", "Mar'gok is ready")
+        # But only if it's not at the very start (which might be narration)
+        was_pattern = r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})\s+(was|were|is|are|did|does|will|would|could|should|may|might|must|can)\s+'
+        match = re.search(was_pattern, dialogue_text)
+        if match:
+            # Only use this if it's not the first few words (likely narration)
+            if match.start() > 10:  # Not at the very beginning
+                name = match.group(1).strip()
+                if self._validate_name(name):
+                    if self.verbose:
+                        print(f"      [PATTERN MATCH] Found name in 'was/is' pattern: {name}")
+                    return name
+        
+        # Pattern 6: Look for any capitalized name-like words in the dialogue (as a last resort)
+        # This is less reliable but can catch cases like "He said nothing about their armies, territories, mutual defense. Let Growmash ask..."
+        # Be more strict - only look for multi-word names or names that appear in specific contexts
+        # Skip single-word matches unless they're clearly names (e.g., after "Let", "Tell", etc.)
+        all_names = re.findall(r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})\b', dialogue_text)
+        for name in all_names:
+            if self._validate_name(name):
+                # For single-word names, only accept if they appear in specific contexts
+                # (e.g., "Let Growmash ask", "Tell Vareg", etc.)
+                if len(name.split()) == 1:
+                    # Check if it appears after common verbs that introduce names
+                    name_lower = name.lower()
+                    # Skip if it's in our comprehensive rejection list
+                    if name_lower in ['bile', 'by', 'call', 'crawl', 'escape', 'even', 'idiot', 'join', 
+                                     'let', 'perhaps', 'pick', 'pride', 'satisfied', 'sour', 'speak', 
+                                     'teach', 'tell', 'terribly', 'trust', 'very', 'wait', 'we\'ve', 
+                                     'weve', 'while', 'and', 'or', 'but', 'if', 'when', 'where', 'why', 
+                                     'how', 'what', 'who', 'which', 'that', 'this', 'these', 'those']:
+                        continue
+                    # Only accept if it appears after verbs like "let", "tell", "ask", etc.
+                    name_pos = dialogue_text.find(name)
+                    if name_pos > 0:
+                        before_name = dialogue_text[:name_pos].lower()
+                        # Check if it's after a verb that introduces a name
+                        if not re.search(r'\b(let|tell|ask|call|name|know|see|meet|find|help|show|give|send|bring|take)\s+$', before_name[-20:]):
+                            # Skip single-word names that don't appear in name-introducing contexts
+                            continue
+                
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found potential name in dialogue: {name}")
+                return name
+        
         if self.verbose:
             print(f"      [PATTERN] No speaker found in dialogue text")
         return None
@@ -1297,11 +1408,74 @@ class DialogueSegmenter:
             return False
         
         # Reject single-word pronouns and common words
+        # Expanded list to include common words that are often capitalized but aren't names
         single_word_rejects = {
+            # Pronouns
             'do', 'he', 'she', 'it', 'we', 'they', 'you', 'i', 'me', 'him', 'her',
             'us', 'them', 'this', 'that', 'these', 'those', 'who', 'what', 'which',
             'where', 'when', 'why', 'how', 'their', 'his', 'hers', 'ours', 'yours',
-            'theirs', 'my', 'your', 'our', 'its', 'whose', 'whom', 'whose',
+            'theirs', 'my', 'your', 'our', 'its', 'whose', 'whom',
+            # Common verbs (often capitalized at sentence start)
+            'bile', 'by', 'call', 'crawl', 'escape', 'even', 'idiot', 'join', 'let', 'perhaps',
+            'pick', 'pride', 'satisfied', 'sour', 'speak', 'teach', 'tell', 'terribly', 'trust',
+            'very', 'wait', 'while', 'we\'ve', 'weve',
+            # More common verbs
+            'ask', 'answer', 'reply', 'say', 'said', 'tell', 'told', 'speak', 'spoke', 'talk',
+            'walk', 'run', 'go', 'come', 'see', 'look', 'watch', 'hear', 'listen', 'feel',
+            'think', 'know', 'understand', 'believe', 'hope', 'wish', 'want', 'need', 'try',
+            'give', 'take', 'get', 'put', 'set', 'make', 'do', 'did', 'done', 'have', 'has',
+            'had', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can',
+            'begin', 'start', 'stop', 'end', 'finish', 'continue', 'keep', 'stay', 'leave',
+            'return', 'turn', 'move', 'stand', 'sit', 'lie', 'lay', 'fall', 'rise', 'raise',
+            'lower', 'lift', 'drop', 'throw', 'catch', 'grab', 'hold', 'push', 'pull',
+            'open', 'close', 'break', 'fix', 'build', 'destroy', 'create', 'make', 'find',
+            'lose', 'win', 'lose', 'fight', 'attack', 'defend', 'protect', 'save', 'kill',
+            'die', 'live', 'survive', 'escape', 'hide', 'seek', 'search', 'find', 'lose',
+            # Common adjectives/adverbs
+            'good', 'bad', 'great', 'small', 'large', 'big', 'little', 'huge', 'tiny',
+            'long', 'short', 'tall', 'wide', 'narrow', 'thick', 'thin', 'heavy', 'light',
+            'fast', 'slow', 'quick', 'quickly', 'slowly', 'soon', 'late', 'early',
+            'old', 'new', 'young', 'ancient', 'modern', 'ancient', 'recent', 'old',
+            'hot', 'cold', 'warm', 'cool', 'freezing', 'burning', 'warm', 'cool',
+            'bright', 'dark', 'light', 'heavy', 'strong', 'weak', 'powerful', 'helpless',
+            'happy', 'sad', 'angry', 'calm', 'excited', 'bored', 'tired', 'energetic',
+            'beautiful', 'ugly', 'pretty', 'handsome', 'attractive', 'repulsive',
+            'smart', 'stupid', 'clever', 'foolish', 'wise', 'foolish', 'brilliant', 'dumb',
+            'rich', 'poor', 'wealthy', 'poverty', 'expensive', 'cheap', 'free', 'costly',
+            'easy', 'hard', 'difficult', 'simple', 'complex', 'complicated', 'easy',
+            'safe', 'dangerous', 'risky', 'secure', 'unsafe', 'protected', 'vulnerable',
+            'true', 'false', 'real', 'fake', 'genuine', 'artificial', 'natural', 'man-made',
+            'right', 'wrong', 'correct', 'incorrect', 'accurate', 'inaccurate', 'precise',
+            'full', 'empty', 'complete', 'incomplete', 'finished', 'unfinished', 'done',
+            'ready', 'prepared', 'unprepared', 'ready', 'set', 'go',
+            # Common nouns (often capitalized)
+            'time', 'day', 'night', 'morning', 'afternoon', 'evening', 'dawn', 'dusk',
+            'year', 'month', 'week', 'hour', 'minute', 'second', 'moment', 'instant',
+            'place', 'location', 'position', 'spot', 'area', 'region', 'zone', 'territory',
+            'way', 'path', 'road', 'street', 'avenue', 'lane', 'route', 'direction',
+            'thing', 'object', 'item', 'piece', 'part', 'section', 'portion', 'fragment',
+            'person', 'people', 'human', 'man', 'woman', 'child', 'adult', 'elder',
+            'group', 'team', 'crew', 'gang', 'band', 'party', 'crowd', 'mob',
+            'house', 'home', 'building', 'structure', 'tower', 'castle', 'palace', 'mansion',
+            'room', 'chamber', 'hall', 'corridor', 'passage', 'door', 'window', 'wall',
+            'weapon', 'sword', 'knife', 'axe', 'bow', 'arrow', 'spear', 'shield',
+            'armor', 'helmet', 'boot', 'glove', 'gauntlet', 'plate', 'mail', 'leather',
+            # Common interjections/exclamations
+            'ah', 'oh', 'ooh', 'aah', 'wow', 'whoa', 'hey', 'hi', 'hello', 'goodbye',
+            'yes', 'no', 'maybe', 'perhaps', 'sure', 'okay', 'ok', 'alright', 'right',
+            'well', 'hmm', 'um', 'uh', 'er', 'huh', 'what', 'why', 'how', 'when',
+            # Common conjunctions/prepositions
+            'and', 'or', 'but', 'nor', 'for', 'so', 'yet', 'because', 'since', 'although',
+            'though', 'while', 'whereas', 'if', 'unless', 'until', 'till', 'before', 'after',
+            'during', 'through', 'throughout', 'across', 'over', 'under', 'above', 'below',
+            'beside', 'besides', 'between', 'among', 'amongst', 'within', 'without',
+            'inside', 'outside', 'into', 'onto', 'upon', 'toward', 'towards', 'against',
+            'with', 'without', 'by', 'from', 'to', 'of', 'in', 'on', 'at', 'for',
+            'about', 'around', 'round', 'near', 'far', 'away', 'off', 'out', 'up', 'down',
+            # Time-related
+            'today', 'tomorrow', 'yesterday', 'now', 'then', 'soon', 'later', 'earlier',
+            'recently', 'lately', 'always', 'never', 'often', 'sometimes', 'usually',
+            'frequently', 'rarely', 'seldom', 'occasionally', 'constantly', 'continuously',
         }
         if len(words) == 1 and words[0].lower() in single_word_rejects:
             return False
@@ -1376,6 +1550,39 @@ class DialogueSegmenter:
         if not words[0][0].isupper():
             return False
         
+        # For single-word names, be extra strict - reject if it's a common English word
+        # Single-word names are less common in fiction, so we should be cautious
+        if len(words) == 1:
+            word_lower = words[0].lower()
+            # Reject if it's a very short word (likely not a name)
+            if len(word_lower) <= 2:
+                return False
+            # Reject if it's a common verb form (past tense, present tense, etc.)
+            common_verb_forms = {
+                'called', 'calls', 'calling', 'crawled', 'crawls', 'crawling',
+                'escaped', 'escapes', 'escaping', 'joined', 'joins', 'joining',
+                'picked', 'picks', 'picking', 'spoke', 'speaks', 'speaking',
+                'taught', 'teaches', 'teaching', 'told', 'tells', 'telling',
+                'waited', 'waits', 'waiting', 'trusted', 'trusts', 'trusting',
+                'satisfied', 'satisfies', 'satisfying', 'prided', 'prides', 'priding',
+            }
+            if word_lower in common_verb_forms:
+                return False
+            # Reject if it's a common adjective/adverb
+            common_adjectives = {
+                'even', 'very', 'sour', 'terribly', 'perhaps', 'while', 'bile',
+                'pride', 'satisfied', 'idiot', 'escape', 'crawl', 'call', 'join',
+                'pick', 'speak', 'teach', 'tell', 'trust', 'wait', 'let', 'by',
+            }
+            if word_lower in common_adjectives:
+                return False
+            # Reject if it looks like a common word pattern (ends in -ly, -ed, -ing, etc.)
+            if word_lower.endswith(('ly', 'ed', 'ing', 'er', 'est', 'tion', 'sion')):
+                # But allow if it's a known name pattern (like "Kelly", "Ed", "King")
+                known_name_endings = {'ly', 'ed', 'ing', 'er', 'est'}  # These can be names
+                if word_lower.endswith(('tion', 'sion')):  # These are almost never names
+                    return False
+        
         return True
 
 class SpeakerAssigner:
@@ -1412,6 +1619,7 @@ class SpeakerAssigner:
     def _normalize_name(self, name: str) -> str:
         """
         Normalize character names to merge variants (e.g., "Growmash Hellscream" = "Growmash" = "Hellscream").
+        Also handles titles like "High Councilor Vareg" = "Vareg".
         
         Args:
             name: Character name to normalize
@@ -1426,7 +1634,6 @@ class SpeakerAssigner:
             'growmash': 'Growmash',
             'growmash hellscream': 'Growmash',
             'hellscream': 'Growmash',
-            'growmash hellscream': 'Growmash',
             'warchief hellscream': 'Growmash',
         }
         
@@ -1439,6 +1646,17 @@ class SpeakerAssigner:
         for variant, canonical in name_variants.items():
             if variant in name_lower:
                 return canonical
+        
+        # Extract the last word as the base name (handles "High Councilor Vareg" -> "Vareg")
+        # This helps merge names with titles
+        words = name.split()
+        if len(words) > 1:
+            last_word = words[-1]
+            # Check if the last word matches any known single-word name
+            for variant, canonical in name_variants.items():
+                variant_words = variant.split()
+                if len(variant_words) == 1 and variant_words[0] == last_word.lower():
+                    return canonical
         
         # If no variant found, return original (capitalized properly)
         return name
@@ -1463,6 +1681,38 @@ class SpeakerAssigner:
                 normalized = self._normalize_name(segment.speaker)
                 character_names.add(normalized)
                 name_mapping[segment.speaker] = normalized
+        
+        # Additional merging: if one name ends with another name, merge them
+        # (e.g., "High Councilor Vareg" ends with "Vareg")
+        # Group names by their last word (base name)
+        base_name_groups = {}
+        for name in character_names:
+            words = name.split()
+            if words:
+                base = words[-1].lower()  # Last word is typically the surname/base name
+                if base not in base_name_groups:
+                    base_name_groups[base] = []
+                base_name_groups[base].append(name)
+        
+        # For each group, choose the shortest name as canonical (prefer single-word names)
+        additional_merges = {}
+        for base, names in base_name_groups.items():
+            if len(names) > 1:
+                # Sort by length, then alphabetically
+                names_sorted = sorted(names, key=lambda x: (len(x), x.lower()))
+                canonical = names_sorted[0]  # Shortest name
+                for name in names_sorted[1:]:
+                    additional_merges[name] = canonical
+        
+        # Apply additional merges
+        for name, canonical in additional_merges.items():
+            if name in character_names:
+                character_names.remove(name)
+                character_names.add(canonical)
+                # Update name_mapping for all names that mapped to 'name'
+                for orig_name, norm_name in list(name_mapping.items()):
+                    if norm_name == name:
+                        name_mapping[orig_name] = canonical
         
         # Update segments with normalized names
         for segment in segments:
