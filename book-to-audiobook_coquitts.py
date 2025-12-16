@@ -720,44 +720,87 @@ class DialogueSegmenter:
         # Try to use NLTK for POS tagging if available
         if NLTK_AVAILABLE:
             try:
-                from nltk import pos_tag, word_tokenize
+                from nltk import word_tokenize
+                from nltk.tag import pos_tag
+                from nltk.data import find as nltk_find
+                
                 # Try to download required data
-                # Try both old and new tagger names for compatibility
+                # The standard NLTK POS tagger resource is 'averaged_perceptron_tagger'
                 tagger_available = False
                 try:
-                    nltk.data.find('taggers/averaged_perceptron_tagger')
+                    nltk_find('taggers/averaged_perceptron_tagger')
                     tagger_available = True
                 except LookupError:
+                    # Try to download it
                     try:
-                        nltk.data.find('taggers/averaged_perceptron_tagger_eng')
-                        tagger_available = True
-                    except LookupError:
-                        pass
-                
-                if not tagger_available:
-                    try:
-                        nltk.download('averaged_perceptron_tagger', quiet=True)
-                        tagger_available = True
-                    except Exception:
+                        if self.verbose:
+                            print("    [NLTK] Downloading averaged_perceptron_tagger...")
+                        nltk.download('averaged_perceptron_tagger', quiet=not self.verbose)
+                        # Verify it was downloaded
                         try:
-                            nltk.download('averaged_perceptron_tagger_eng', quiet=True)
+                            nltk_find('taggers/averaged_perceptron_tagger')
                             tagger_available = True
-                        except Exception:
-                            pass
+                            if self.verbose:
+                                print("    [NLTK] averaged_perceptron_tagger downloaded successfully")
+                        except LookupError:
+                            if self.verbose:
+                                print("    [NLTK] Warning: averaged_perceptron_tagger download may have failed")
+                    except Exception as e:
+                        if self.verbose:
+                            print(f"    [NLTK] Error downloading averaged_perceptron_tagger: {e}")
                 
                 # Verify punkt is available
+                punkt_available = False
                 try:
-                    nltk.data.find('tokenizers/punkt')
+                    nltk_find('tokenizers/punkt')
+                    punkt_available = True
                 except LookupError:
                     try:
                         nltk.download('punkt', quiet=True)
+                        try:
+                            nltk_find('tokenizers/punkt')
+                            punkt_available = True
+                        except LookupError:
+                            pass
                     except Exception:
                         pass
                 
-                if tagger_available:
-                    self._nltk_pos_available = True
-                    self._pos_tag = pos_tag
-                    self._word_tokenize = word_tokenize
+                # Test that NLTK actually works by trying to tag a simple sentence
+                if tagger_available and punkt_available:
+                    try:
+                        test_tokens = word_tokenize("Test sentence.")
+                        test_tags = pos_tag(test_tokens)
+                        # If we get here, NLTK is working
+                        self._nltk_pos_available = True
+                        self._pos_tag = pos_tag
+                        self._word_tokenize = word_tokenize
+                        if self.verbose:
+                            print(f"    [NLTK SETUP] NLTK POS tagging initialized successfully")
+                    except LookupError as lookup_error:
+                        # If we get a LookupError, it means the tagger resource wasn't found
+                        # This can happen if NLTK is looking for a different resource name
+                        if self.verbose:
+                            print(f"    [NLTK SETUP] Tagger resource not found: {lookup_error}")
+                            print(f"    [NLTK SETUP] Attempting to download required resources...")
+                        # Try downloading the tagger again
+                        try:
+                            nltk.download('averaged_perceptron_tagger', quiet=False)
+                            # Try the test again
+                            test_tokens = word_tokenize("Test sentence.")
+                            test_tags = pos_tag(test_tokens)
+                            self._nltk_pos_available = True
+                            self._pos_tag = pos_tag
+                            self._word_tokenize = word_tokenize
+                            if self.verbose:
+                                print(f"    [NLTK SETUP] NLTK POS tagging initialized successfully after download")
+                        except Exception as retry_error:
+                            if self.verbose:
+                                print(f"    [NLTK SETUP] NLTK initialization failed after retry: {retry_error}")
+                            self._nltk_pos_available = False
+                    except Exception as test_error:
+                        if self.verbose:
+                            print(f"    [NLTK SETUP] NLTK resources found but test failed: {test_error}")
+                        self._nltk_pos_available = False
                 else:
                     self._nltk_pos_available = False
             except Exception as e:
@@ -802,15 +845,26 @@ class DialogueSegmenter:
             # Extract dialogue
             dialogue_text = match.group(1).strip()
             if dialogue_text:
-                # Try to attribute speaker
-                speaker = self._attribute_speaker(text, match.start(), match.end(), dialogue_text)
-                segments.append(Segment(
-                    type="dialogue",
-                    speaker=speaker,
-                    text=dialogue_text,
-                    start_pos=match.start(),
-                    end_pos=match.end()
-                ))
+                # Check if this is actually narration (not dialogue)
+                if self._is_narration_not_dialogue(dialogue_text):
+                    # Treat as narration instead
+                    segments.append(Segment(
+                        type="narration",
+                        speaker="NARRATOR",
+                        text=dialogue_text,
+                        start_pos=match.start(),
+                        end_pos=match.end()
+                    ))
+                else:
+                    # Try to attribute speaker
+                    speaker = self._attribute_speaker(text, match.start(), match.end(), dialogue_text)
+                    segments.append(Segment(
+                        type="dialogue",
+                        speaker=speaker,
+                        text=dialogue_text,
+                        start_pos=match.start(),
+                        end_pos=match.end()
+                    ))
             
             last_end = match.end()
         
@@ -837,6 +891,43 @@ class DialogueSegmenter:
             ))
         
         return segments
+    
+    def _is_narration_not_dialogue(self, text: str) -> bool:
+        """
+        Check if quoted text is actually narration (not dialogue).
+        
+        Many books put narration or dialogue tags in quotes, which we should treat as narration.
+        
+        Args:
+            text: The quoted text to check
+            
+        Returns:
+            True if this should be treated as narration, False if it's dialogue
+        """
+        text_lower = text.lower().strip()
+        
+        # Very short quotes are often dialogue tags
+        if len(text) < 15:
+            # Check for common dialogue tag patterns (e.g., "he said", "she whispered")
+            if re.match(r'^(he|she|they|it|the|a|an)\s+\w+\s+(said|whispered|shouted|replied|asked|muttered|growled|snarled|roared|yelled|screamed|spoke|continued|interrupted|added|concluded|finished|agreed|nodded|shook|laughed|smiled|frowned|sighed|gasped|hissed|snapped|barked|commanded|ordered|demanded|insisted|argued|protested|objected|admitted|confessed|claimed|suggested|proposed|offered|promised|warned|threatened|begged|pleaded|urged|encouraged|advised|explained|described|mentioned|noted|observed|commented|remarked|conceded|acknowledged|confirmed|denied|refused|accepted|admitted|sneered|growled|snarled|roared|yelled|screamed|muttered|whispered|shouted|replied|asked|spoke|continued|interrupted|added|concluded|finished|agreed|nodded|shook|laughed|smiled|frowned|sighed|gasped|hissed|snapped|barked|commanded|ordered|demanded|insisted|argued|protested|objected|admitted|confessed|claimed|suggested|proposed|offered|promised|warned|threatened|begged|pleaded|urged|encouraged|advised|explained|described|mentioned|noted|observed|commented|remarked|conceded|acknowledged|confirmed|denied|refused|accepted|admitted)', text_lower):
+                return True
+        
+        # Check for narration patterns (e.g., "Because he had to, Mar'gok leaned down")
+        narration_patterns = [
+            r'^(because|when|while|as|after|before|during|since|until|if|unless|although|though|even|despite)',
+            r'^(the|a|an)\s+\w+\s+(did not|does not|will not|would not|could not|should not|may not|might not|must not|cannot|was not|were not|is not|are not|had not|has not|have not)',
+            r'^(he|she|they|it|the|a|an)\s+\w+\s+(leaned|turned|walked|ran|stood|sat|looked|glanced|stared|gazed|watched|saw|heard|felt|touched|reached|grabbed|held|pushed|pulled|threw|dropped|picked|put|placed|moved|went|came|arrived|left|entered|exited|opened|closed|started|stopped|began|ended|continued|paused|waited|hurried|rushed|hit|struck|punched|kicked|slapped|squeezed|twisted|bent|straightened|raised|lowered|lifted|fell|jumped|hopped|stepped|sprinted|dashed|strolled|marched|trudged|limped|crawled|climbed|descended|ascended|flew|soared|dove|swam|floated|sank|rose|plunged|leaped|bounded|sprang|lunged|charged|attacked|shoved|yanked|tugged|dragged|hauled|carried|brought|took|seized|snatched|caught|gripped|clutched|crushed|smashed|slammed|bashed|pounded|hammered|beat|stomped|squashed|flattened|squished|compressed|compacted|packed|stuffed|filled|emptied|poured|spilled|dripped|tumbled|rolled|spun|rotated|stretched|extended|retracted|saluted|responded)',
+        ]
+        
+        for pattern in narration_patterns:
+            if re.match(pattern, text_lower):
+                return True
+        
+        # Very long quotes without dialogue markers are often narration
+        if len(text) > 200 and not any(marker in text for marker in ['!', '?']):
+            return True
+        
+        return False
     
     def _attribute_speaker(self, text: str, quote_start: int, quote_end: int, dialogue_text: str = "") -> str:
         """
@@ -894,9 +985,33 @@ class DialogueSegmenter:
                     print(f"      [FOUND] Speaker via NLTK: {speaker}")
                 return speaker
         
-        # No speaker found
+        # No speaker found - provide detailed debug output
         if self.verbose:
             print(f"      [NOT FOUND] No speaker detected - using UNKNOWN")
+            print(f"      [DEBUG] Full dialogue text ({len(dialogue_text)} chars): \"{dialogue_text[:200]}{'...' if len(dialogue_text) > 200 else ''}\"")
+            print(f"      [DEBUG] Before context (last 300 chars): \"{before_context[-300:] if len(before_context) > 300 else before_context}\"")
+            print(f"      [DEBUG] After context (first 300 chars): \"{after_context[:300] if len(after_context) > 300 else after_context}\"")
+            print(f"      [DEBUG] Detection methods attempted:")
+            print(f"        - Pattern matching before quote: Tried, no valid name found")
+            print(f"        - Pattern matching after quote: Tried, no valid name found")
+            print(f"        - Pattern matching in dialogue: Tried, no valid name found")
+            if self._nltk_pos_available:
+                print(f"        - NLTK POS tagging: Tried, no valid name found")
+            else:
+                print(f"        - NLTK POS tagging: Not available")
+            
+            # Show potential matches that were rejected
+            print(f"      [DEBUG] Potential issues:")
+            # Check if dialogue looks like narration (no quotes, very long, etc.)
+            if len(dialogue_text) > 500:
+                print(f"        - Dialogue text is very long ({len(dialogue_text)} chars) - might be narration")
+            if not any(c in dialogue_text for c in '!?.'):
+                print(f"        - Dialogue text lacks sentence-ending punctuation - might be narration")
+            # Check if there are names in context that weren't detected
+            import re
+            potential_names = re.findall(r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})\b', before_context[-100:] + after_context[:100])
+            if potential_names:
+                print(f"        - Found potential names in context (may have been rejected): {', '.join(set(potential_names[:5]))}")
         self.unknown_count += 1
         return "UNKNOWN"
     
@@ -1000,8 +1115,25 @@ class DialogueSegmenter:
                 return None
             
             # Tokenize and tag
-            tokens = self._word_tokenize(combined_context)
-            pos_tags = self._pos_tag(tokens)
+            # Suppress stderr temporarily to avoid NLTK LookupError messages
+            # (NLTK prints verbose error messages before raising LookupError)
+            import sys
+            import io
+            old_stderr = sys.stderr
+            stderr_buffer = io.StringIO()
+            sys.stderr = stderr_buffer
+            try:
+                tokens = self._word_tokenize(combined_context)
+                pos_tags = self._pos_tag(tokens)
+            except LookupError:
+                # NLTK resource not found - this is expected if resources aren't available
+                # Restore stderr and return None silently
+                sys.stderr = old_stderr
+                return None
+            finally:
+                # Restore stderr (only if we didn't return early)
+                if sys.stderr is stderr_buffer:
+                    sys.stderr = old_stderr
             
             # Look for patterns: Proper noun (NNP) followed by verb (VB/VBD/VBZ/VBG)
             # or verb followed by proper noun
@@ -1140,6 +1272,40 @@ class DialogueSegmenter:
         if any(c in name for c in ',;:!?.'):
             return False
         
+        # Reject possessive forms (e.g., "Mar'gok's", "John's")
+        if name.endswith("'s") or name.endswith("'s "):
+            return False
+        
+        # Reject patterns like "X's Y" (e.g., "Mar'gok's heads", "John's hand")
+        # This catches possessive + noun combinations
+        if "'s " in name or " 's " in name:
+            return False
+        
+        # Reject known non-person entities (organizations, places, etc.)
+        non_person_entities = {
+            'iron horde', 'highmaul', 'shattered hand', 'warsong', 'draenor', 'draenoor',
+            'highmaul clan', 'iron horde', 'grommashar', 'nuh-grand', 'bladefist',
+            'warchief', 'imperator', 'councilor', 'councillor', 'high councilor',
+        }
+        name_lower = name.lower()
+        if name_lower in non_person_entities:
+            return False
+        
+        # Reject if it contains common organization/place indicators
+        org_indicators = {'horde', 'clan', 'army', 'legion', 'empire', 'kingdom', 'city', 'town'}
+        if any(word.lower() in org_indicators for word in words):
+            return False
+        
+        # Reject single-word pronouns and common words
+        single_word_rejects = {
+            'do', 'he', 'she', 'it', 'we', 'they', 'you', 'i', 'me', 'him', 'her',
+            'us', 'them', 'this', 'that', 'these', 'those', 'who', 'what', 'which',
+            'where', 'when', 'why', 'how', 'their', 'his', 'hers', 'ours', 'yours',
+            'theirs', 'my', 'your', 'our', 'its', 'whose', 'whom', 'whose',
+        }
+        if len(words) == 1 and words[0].lower() in single_word_rejects:
+            return False
+        
         # Reject if it starts with common sentence starters
         common_starters = {
             'the', 'a', 'an', 'and', 'or', 'but', 'if', 'when', 'where', 'why', 'how',
@@ -1169,7 +1335,8 @@ class DialogueSegmenter:
                         'will', 'would', 'could', 'should', 'may', 'might', 'must',
                         'can', 'cannot', 'resisted', 'resists', 'resist', 'resisting',
                         'let', 'lets', 'letting', 'had', 'has', 'have', 'having',
-                        'heads', 'head', 'heading', 'headed',
+                        'heads', 'head', 'heading', 'headed', 'was', 'were', 'is',
+                        'are', 'you', 'your', 'yours',
         }
         
         # Check if any middle word is a common word (not the first or last)
@@ -1177,6 +1344,27 @@ class DialogueSegmenter:
             for word in words[1:-1]:
                 if word.lower() in common_middle:
                     return False
+        
+        # Reject if it ends with common verbs/auxiliaries (e.g., "Growmash was", "Do you")
+        common_endings = {
+            'was', 'were', 'is', 'are', 'be', 'been', 'being', 'have', 'has', 'had',
+            'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might',
+            'must', 'can', 'cannot', 'you', 'your', 'yours', 'he', 'she', 'it', 'we',
+            'they', 'them', 'him', 'her', 'us', 'me', 'i',
+        }
+        if len(words) > 1 and words[-1].lower() in common_endings:
+            return False
+        
+        # Reject titles when used alone (without a name)
+        titles_alone = {
+            'imperator', 'emperor', 'king', 'queen', 'prince', 'princess', 'duke',
+            'duchess', 'lord', 'lady', 'sir', 'madam', 'miss', 'mister', 'mr',
+            'mrs', 'ms', 'dr', 'doctor', 'professor', 'captain', 'general', 'colonel',
+            'major', 'sergeant', 'lieutenant', 'warchief', 'chieftain', 'highlord',
+            'highlady', 'councilor', 'councillor',
+        }
+        if len(words) == 1 and words[0].lower() in titles_alone:
+            return False
         
         # Names should typically be 1-4 words, and each word should be capitalized
         if len(words) > 4:
@@ -1221,6 +1409,40 @@ class SpeakerAssigner:
         self.speaker_index = 0
         self.warnings = []
     
+    def _normalize_name(self, name: str) -> str:
+        """
+        Normalize character names to merge variants (e.g., "Growmash Hellscream" = "Growmash" = "Hellscream").
+        
+        Args:
+            name: Character name to normalize
+            
+        Returns:
+            Normalized name (canonical form)
+        """
+        name_lower = name.lower()
+        
+        # Known name variants - map to canonical form
+        name_variants = {
+            'growmash': 'Growmash',
+            'growmash hellscream': 'Growmash',
+            'hellscream': 'Growmash',
+            'growmash hellscream': 'Growmash',
+            'warchief hellscream': 'Growmash',
+        }
+        
+        # Check if this name is a variant of a known name
+        for variant, canonical in name_variants.items():
+            if name_lower == variant or name_lower.endswith(' ' + variant) or name_lower.startswith(variant + ' '):
+                return canonical
+        
+        # Check if this name contains another known name (e.g., "Growmash Hellscream" contains "Growmash")
+        for variant, canonical in name_variants.items():
+            if variant in name_lower:
+                return canonical
+        
+        # If no variant found, return original (capitalized properly)
+        return name
+    
     def assign_speakers(self, segments: List[Segment]) -> Dict[str, str]:
         """
         Assign TTS speakers to all unique characters in segments.
@@ -1232,10 +1454,20 @@ class SpeakerAssigner:
             Dictionary mapping character names to TTS speaker IDs
         """
         # Collect unique character names (excluding NARRATOR and UNKNOWN)
+        # Normalize names to merge variants
         character_names = set()
+        name_mapping = {}  # Map original names to normalized names
+        
         for segment in segments:
             if segment.type == "dialogue" and segment.speaker not in ("NARRATOR", "UNKNOWN"):
-                character_names.add(segment.speaker)
+                normalized = self._normalize_name(segment.speaker)
+                character_names.add(normalized)
+                name_mapping[segment.speaker] = normalized
+        
+        # Update segments with normalized names
+        for segment in segments:
+            if segment.type == "dialogue" and segment.speaker in name_mapping:
+                segment.speaker = name_mapping[segment.speaker]
         
         # Sort character names for deterministic assignment
         sorted_characters = sorted(character_names, key=str.lower)
