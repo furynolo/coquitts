@@ -11,6 +11,7 @@ import re
 import argparse
 import json
 import unicodedata
+import shutil
 from pathlib import Path
 import platform
 from datetime import datetime
@@ -1015,12 +1016,17 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             
             output_dir = Path(output_path).parent
             output_stem = Path(output_path).stem
+            
+            # Create a hidden temporary directory for chunk files
+            temp_chunk_dir = output_dir / f".temp_chunks_{output_stem}"
+            temp_chunk_dir.mkdir(parents=True, exist_ok=True)
+            
             chunk_files_dict = {}  # Dict of index -> path to maintain order
             failed_indices = set()  # Track which chunk indices failed
             
             # First pass: try to process all chunks
             for i, chunk in enumerate(merged_chunks, 1):
-                chunk_path = output_dir / f"{output_stem}_chunk_{i:04d}.wav"
+                chunk_path = temp_chunk_dir / f"{output_stem}_chunk_{i:04d}.wav"
                 words = [w for w in chunk.split() if w.strip()]
                 word_count = len(words)
                 print(f"  Processing chunk {i}/{len(merged_chunks)} ({word_count} words, {len(chunk)} chars)...")
@@ -1055,7 +1061,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                         continue  # Skip if already processed as part of another merge
                     
                     failed_chunk = merged_chunks[failed_idx - 1]  # Convert to 0-based
-                    retry_path = output_dir / f"{output_stem}_retry_{failed_idx:04d}.wav"
+                    retry_path = temp_chunk_dir / f"{output_stem}_retry_{failed_idx:04d}.wav"
                     merged_retry = failed_chunk
                     merged_indices = {failed_idx}
                     
@@ -1145,6 +1151,12 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             
             if not chunk_files:
                 print("[ERROR] All chunks failed to process.")
+                # Clean up temporary directory even on failure
+                try:
+                    shutil.rmtree(temp_chunk_dir)
+                    print(f"  Cleaned up temporary directory: {temp_chunk_dir.name}")
+                except Exception as cleanup_error:
+                    print(f"  Warning: Could not clean up temporary directory: {cleanup_error}")
                 return False
             
             # Combine audio files if pydub is available
@@ -1161,17 +1173,26 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
                 combined.export(output_path, format="wav")
                 print(f"[OK] Combined audio saved to: {output_path}")
                 
-                # Clean up chunk files
-                for chunk_file in chunk_files:
-                    chunk_file.unlink()
-                print(f"  Cleaned up {len(chunk_files)} temporary chunk files.")
+                # Clean up temporary directory and all chunk files
+                try:
+                    shutil.rmtree(temp_chunk_dir)
+                    print(f"  Cleaned up temporary directory: {temp_chunk_dir.name}")
+                except Exception as e:
+                    print(f"  Warning: Could not clean up temporary directory: {e}")
             elif len(chunk_files) == 1:
                 # Only one chunk succeeded, just rename it
                 chunk_files[0].rename(output_path)
                 print(f"[OK] Audio saved to: {output_path}")
+                
+                # Clean up temporary directory
+                try:
+                    shutil.rmtree(temp_chunk_dir)
+                    print(f"  Cleaned up temporary directory: {temp_chunk_dir.name}")
+                except Exception as e:
+                    print(f"  Warning: Could not clean up temporary directory: {e}")
             else:
                 print(f"[OK] Processed {len(chunk_files)} chunks (not combined - install pydub to combine)")
-                print(f"  Chunk files saved in: {output_dir}")
+                print(f"  Chunk files saved in: {temp_chunk_dir}")
             
             return True
         
