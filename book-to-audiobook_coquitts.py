@@ -168,14 +168,18 @@ def generate_unique_filename(base_name, output_dir=None, model=None, speaker=Non
     # Build filename pattern for matching existing files
     # Pattern: base_name[_model][_speaker]_N_YYYYMMDD-HHMMSS.wav
     # We match files with the same base_name, model, and speaker (if provided)
-    pattern_parts = [re.escape(base_name)]
+    # Build the prefix pattern (everything before the number) first
+    prefix_parts = [re.escape(base_name)]
     if safe_model:
-        pattern_parts.append(re.escape(safe_model))
+        prefix_parts.append(re.escape(safe_model))
     if safe_speaker:
-        pattern_parts.append(re.escape(safe_speaker))
-    pattern_parts.append(r'_(\d+)_')  # Number
-    pattern_parts.append(r'.*\.wav$')  # Timestamp and extension
-    pattern = re.compile('^' + '_'.join(pattern_parts))
+        prefix_parts.append(re.escape(safe_speaker))
+    prefix_pattern = '_'.join(prefix_parts)
+    
+    # Now build the full pattern: prefix_(\d+)_timestamp.wav
+    # The number pattern needs a single underscore before it (already in prefix_pattern)
+    # and a single underscore after it (before timestamp)
+    pattern = re.compile(rf'^{prefix_pattern}_(\d+)_\d{{8}}-\d{{6}}\.wav$')
     
     existing_numbers = []
     # Search for files matching the base pattern
@@ -1384,4 +1388,3 @@ Examples:
 
 if __name__ == "__main__":
     main()
-
