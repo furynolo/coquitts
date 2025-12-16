@@ -1597,7 +1597,13 @@ class SpeakerAssigner:
             narrator_speaker: Optional narrator speaker ID (defaults to first speaker)
         """
         self.available_speakers = available_speakers
-        self.narrator_speaker = narrator_speaker or (available_speakers[0] if available_speakers else None)
+        # Default narrator to p225 if available, otherwise first speaker
+        if narrator_speaker:
+            self.narrator_speaker = narrator_speaker
+        elif 'p225' in available_speakers:
+            self.narrator_speaker = 'p225'
+        else:
+            self.narrator_speaker = (available_speakers[0] if available_speakers else None)
         
         # Character name -> TTS speaker mapping
         self.character_map: Dict[str, str] = {}
@@ -1740,12 +1746,9 @@ class SpeakerAssigner:
                             f"({len(self.speaker_pool)}). Reusing speakers."
                         )
         
-        # Handle UNKNOWN - assign to a single speaker (not narrator if possible)
+        # Handle UNKNOWN - assign to narrator speaker (p225 by default)
         if any(s.speaker == "UNKNOWN" for s in segments if s.type == "dialogue"):
-            if self.speaker_pool:
-                self.character_map["UNKNOWN"] = self.speaker_pool[0]
-            else:
-                self.character_map["UNKNOWN"] = self.narrator_speaker
+            self.character_map["UNKNOWN"] = self.narrator_speaker
         
         return self.character_map
     
