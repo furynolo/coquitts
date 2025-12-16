@@ -2936,9 +2936,43 @@ Examples:
             parser.print_help()
             sys.exit(1)
     
+    # Validate speaker early (before filename generation) if manual speaker is specified
+    validated_speaker = manual_speaker
+    if manual_speaker and not auto_speaker_mode and args.model:
+        # Load model temporarily to validate speaker
+        try:
+            tts = TTS(model_name=args.model, progress_bar=False)
+            available_speakers = None
+            try:
+                if hasattr(tts, 'speakers') and tts.speakers is not None:
+                    available_speakers = list(tts.speakers) if tts.speakers else None
+                elif hasattr(tts, 'speaker_manager') and tts.speaker_manager is not None:
+                    if hasattr(tts.speaker_manager, 'speaker_names'):
+                        available_speakers = list(tts.speaker_manager.speaker_names)
+                    elif hasattr(tts.speaker_manager, 'speakers'):
+                        available_speakers = list(tts.speaker_manager.speakers)
+            except Exception:
+                pass
+            
+            if available_speakers:
+                if manual_speaker not in available_speakers:
+                    print(f"Warning: Speaker '{manual_speaker}' not found in model.")
+                    print(f"  Available speakers: {', '.join(available_speakers[:10])}{'...' if len(available_speakers) > 10 else ''}")
+                    print(f"  Using first available speaker: {available_speakers[0]}")
+                    validated_speaker = available_speakers[0]
+                else:
+                    validated_speaker = manual_speaker
+            # Clean up TTS object (will be reloaded in synthesize_text)
+            del tts
+        except Exception as e:
+            # If we can't validate, use the original speaker (will be validated in synthesize_text)
+            print(f"Warning: Could not validate speaker early: {e}")
+            validated_speaker = manual_speaker
+    
     # Determine speaker identifier for filename
+    # Use validated speaker (actual speaker that will be used) instead of requested speaker
     # If speaker_wav is provided, use a short identifier based on the filename
-    speaker_for_filename = manual_speaker if not auto_speaker_mode else "auto"
+    speaker_for_filename = validated_speaker if not auto_speaker_mode else "auto"
     if args.speaker_wav and not speaker_for_filename:
         # Extract a short identifier from the speaker_wav filename
         speaker_path = Path(args.speaker_wav)
@@ -3049,7 +3083,7 @@ Examples:
         chunk_size=args.chunk_size,
         is_short_input=is_short,
         pronunciations=pronunciations,
-        speaker=manual_speaker if not auto_speaker_mode else None,
+        speaker=validated_speaker if not auto_speaker_mode else None,
         speaker_wav=args.speaker_wav,
         verbose=args.verbose,
         auto_speaker=auto_speaker_mode,
