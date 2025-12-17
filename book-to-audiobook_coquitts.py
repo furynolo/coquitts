@@ -2187,7 +2187,7 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
             tts = TTS(model_name=model_name, progress_bar=True)
         else:
             # Use a recommended default model for English TTS
-            default_model = "tts_models/en/ljspeech/tacotron2-DDC"
+            default_model = "tts_models/en/vctk/vits"
             print(f"Loading default model: {default_model}")
             tts = TTS(model_name=default_model, progress_bar=True)
         
@@ -2676,7 +2676,7 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
             if model_name:
                 tts = TTS(model_name=model_name, progress_bar=False)
             else:
-                default_model = "tts_models/en/ljspeech/tacotron2-DDC"
+                default_model = "tts_models/en/vctk/vits"
                 tts = TTS(model_name=default_model, progress_bar=False)
             
             # Get available speakers
@@ -2895,6 +2895,12 @@ Examples:
     elif args.speaker:
         manual_speaker = args.speaker
     
+    # Default to p225 if using default model (vctk/vits) and no speaker is specified
+    default_model = "tts_models/en/vctk/vits"
+    if not args.model and not manual_speaker and not auto_speaker_mode and not args.speaker_wav:
+        manual_speaker = "p225"
+        print(f"Info: Using default speaker 'p225' for default model '{default_model}'")
+    
     print("Book to Audiobook Converter (CoquiTTS)\n" + "="*50)
     
     # Show NLTK status
@@ -2942,10 +2948,12 @@ Examples:
     
     # Validate speaker early (before filename generation) if manual speaker is specified
     validated_speaker = manual_speaker
-    if manual_speaker and not auto_speaker_mode and args.model:
+    # Use default model if none specified
+    model_to_validate = args.model if args.model else default_model
+    if manual_speaker and not auto_speaker_mode and model_to_validate:
         # Load model temporarily to validate speaker
         try:
-            tts = TTS(model_name=args.model, progress_bar=False)
+            tts = TTS(model_name=model_to_validate, progress_bar=False)
             available_speakers = None
             try:
                 if hasattr(tts, 'speakers') and tts.speakers is not None:
@@ -3000,6 +3008,8 @@ Examples:
     
     if args.model:
         print(f"Using model: {args.model}\n")
+    else:
+        print(f"Using default model: tts_models/en/vctk/vits\n")
     
     # Load pronunciations if provided
     pronunciations = None
