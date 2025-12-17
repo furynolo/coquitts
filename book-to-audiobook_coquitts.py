@@ -2784,6 +2784,9 @@ Examples:
   # Use pronunciations file:
   python book-to-audiobook_coquitts.py input-text/mybook.txt --pronunciations pronunciations.json
   
+  # Use multiple pronunciations files:
+  python book-to-audiobook_coquitts.py input-text/mybook.txt -pr pronunciations.json -pr custom-pronunciations.json
+  
   # Use a specific model:
   python book-to-audiobook_coquitts.py --text "Hello world" --model tts_models/en/ljspeech/tacotron2-DDC
   
@@ -2842,7 +2845,8 @@ Examples:
     parser.add_argument(
         '--pronunciations', '-pr',
         type=str,
-        help='Path to JSON file with pronunciation mappings (keys: original text, values: pronunciation)'
+        action='append',
+        help='Path to JSON file with pronunciation mappings (keys: original text, values: pronunciation). Can be specified multiple times to load multiple files.'
     )
     parser.add_argument(
         '--character-voice-mapping', '-cvm',
@@ -3000,9 +3004,20 @@ Examples:
     # Load pronunciations if provided
     pronunciations = None
     if args.pronunciations:
-        pronunciations = load_pronunciations(args.pronunciations)
-        if pronunciations is None:
-            print("Warning: Could not load pronunciations file. Continuing without pronunciation replacements.")
+        # Merge multiple pronunciation files if provided
+        pronunciations = {}
+        for pr_file in args.pronunciations:
+            loaded_pr = load_pronunciations(pr_file)
+            if loaded_pr is not None:
+                # Later files override earlier ones for duplicate keys
+                pronunciations.update(loaded_pr)
+            else:
+                print(f"Warning: Could not load pronunciation file '{pr_file}'. Skipping.")
+        
+        if pronunciations:
+            print(f"Total pronunciation mappings loaded: {len(pronunciations)}")
+        else:
+            print("Warning: No pronunciation mappings loaded. Continuing without pronunciation replacements.")
         print()  # Add blank line for readability
     
     # Load character-to-voice mapping if provided
