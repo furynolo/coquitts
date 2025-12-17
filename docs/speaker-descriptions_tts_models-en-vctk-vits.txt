@@ -144,3 +144,303 @@ Detailed: More storytelling-oriented delivery with dynamic emphasis. Effective f
 
 p276: Neutral British male, controlled
 Detailed: Controlled pacing and consistent pronunciation with minimal expressive variance. Well-suited for long-form narration where stability is critical.
+
+p277: Soft British female, calm
+Detailed: Gentle, low-energy delivery with smooth transitions. Performs best for reflective prose and relaxed non-fiction narration.
+
+p278: Clear British male, articulate
+Detailed: Crisp diction and well-defined consonants. Strong choice for technical, academic, or instructional audiobook material.
+
+p279: Bright British female, lively
+Detailed: Higher-pitched and energetic delivery with noticeable prosody. Engaging for dialogue and character narration; slightly animated for dense exposition.
+
+p280: Calm British male, even tone
+Detailed: Even, restrained delivery with little pitch fluctuation. Ideal for extended listening sessions and informational audiobooks.
+
+p281: Neutral British female, steady
+Detailed: Balanced pacing and unobtrusive tone. A safe, general-purpose narrator for mixed-content audiobooks.
+
+p282: Expressive British male, dynamic
+Detailed: Wider emotional range and emphasis variation. Well-suited to fiction and storytelling; may require careful sentence chunking to avoid overemphasis.
+
+p283: Soft British female, smooth flow
+Detailed: Smooth sentence transitions and relaxed cadence. Works well for atmospheric or contemplative narration.
+
+p284: Deep British male, authoritative
+Detailed: Lower-register voice conveying confidence and seriousness. Effective for epic, formal, or historical narration.
+
+p285: Conversational British female, friendly
+Detailed: Natural, approachable delivery with moderate expressiveness. Suitable for narrative nonfiction and dialogue-heavy prose.
+
+p286: Neutral British male, predictable
+Detailed: Consistent rhythm and pronunciation with minimal stylistic quirks. Reliable for technical documentation and long-form narration.
+
+p287: Clear British female, precise
+Detailed: Careful enunciation and controlled prosody. Well-suited for educational content where clarity and accuracy matter.
+
+p288: Lively British male, engaging
+Detailed: Energetic delivery with noticeable pitch variation. Engages well in storytelling contexts; may feel animated for purely technical text.
+
+p289*: Calm British female, low variance DOESN'T EXIST***
+Detailed: Restrained tone and smooth pacing. Designed for listener comfort over extended audiobook sessions.
+
+p290*: Authoritative British male, steady DOESN'T EXIST***
+Detailed: Confident delivery with strong sentence cohesion. Works well for serious non-fiction and formal narration.
+
+p291*: Neutral British female, unobtrusive DOESN'T EXIST***
+Detailed: Clean, understated narration style that stays out of the way of the content. A strong default for general audiobook use.
+
+p292: Measured British male, relaxed
+Detailed: Unhurried pacing and subtle inflection. Suitable for contemplative or descriptive prose.
+
+p293: Expressive British female, dynamic
+Detailed: Broader emotional range and lively prosody. Effective for fiction and dialogue, though potentially tiring for very long sessions.
+
+p294: Steady British male, neutral
+Detailed: Balanced articulation and consistent pacing. Dependable for technical, instructional, or reference-style narration.
+
+p295: Soft British female, gentle tone
+Detailed: Light, gentle delivery with smooth sentence flow. Performs well for poetic or reflective content.
+
+p296*: Clear British male, audiobook-safe DOESN'T EXIST***
+Detailed: Strong clarity and stable rhythm across paragraphs. A reliable narrator with minimal pronunciation surprises.
+
+p297: Conversational British female, warm
+Detailed: Warm tone and natural conversational cadence. Suitable for narrative nonfiction and character-focused prose.
+
+p298: Reserved British male, consistent
+Detailed: Low-variance delivery with restrained expressiveness. Ideal for long technical or documentary-style narration.
+
+p299: Neutral British female, balanced
+Detailed: Even pacing and clean articulation. A solid generalist voice for a wide range of audiobook material.
+
+p300: Expressive British male, story-driven
+Detailed: Storytelling-oriented delivery with dynamic emphasis and varied intonation. Best for fiction audiobooks and dramatic narration.
+
+p301: Neutral British male, steady
+Detailed: Even pacing and consistent pronunciation with minimal expressive variance. Reliable for long-form narration and informational audiobooks.
+
+p302: Soft British female, relaxed
+Detailed: Gentle, low-energy delivery with smooth sentence transitions. Well-suited to reflective prose and calm non-fiction.
+
+p303: Clear British male, precise
+Detailed: Strong consonant clarity and careful enunciation. Effective for technical, instructional, or academic narration.
+
+p304: Bright British female, articulate
+Detailed: Lighter pitch with crisp articulation and clear sentence boundaries. Engaging for dialogue and short narrative passages.
+
+p305: Calm British male, low variance
+Detailed: Restrained prosody and stable rhythm. Ideal for extended listening sessions where listener fatigue must be minimized.
+
+p306: Neutral British female, balanced
+Detailed: Balanced pacing and tone with no strong quirks. A dependable general-purpose narrator for mixed audiobook content.
+
+p307: Expressive British male, narrative
+Detailed: Noticeable dynamic range and emphasis changes. Suitable for fiction and character-driven narration; may require careful chunking.
+
+p308: Soft British female, smooth
+Detailed: Smooth cadence and gentle delivery. Performs well for atmospheric storytelling and reflective material.
+
+p309*: Deep British male, authoritative DOESN'T EXIST***
+Detailed: Lower-register voice conveying confidence and seriousness. Effective for epic, historical, or formal narration.
+
+p310: Conversational British female, friendly
+Detailed: Approachable tone with natural conversational flow. Works well for narrative nonfiction and dialogue-heavy prose.
+
+p311: Neutral British male, predictable
+Detailed: Consistent rhythm and pronunciation with minimal stylistic variation. Reliable for technical documentation and long-form narration.
+
+p312: Clear British female, controlled
+Detailed: Careful articulation and restrained prosody. Suitable for educational content where clarity is the priority.
+
+p313: Lively British male, engaging
+Detailed: Energetic delivery with noticeable pitch variation. Engages well in storytelling contexts; slightly animated for dense exposition.
+
+p314: Calm British female, steady
+Detailed: Even, controlled delivery with smooth sentence flow. Well-suited to long listening sessions and non-fiction audiobooks.
+
+p315*: Authoritative British male, composed DOESN'T EXIST***
+Detailed: Confident tone with strong sentence cohesion. Performs well for serious non-fiction and formal narration.
+
+p316: Neutral British female, unobtrusive
+Detailed: Clean, understated narration style that stays out of the way of the content. A strong default for general audiobook use.
+
+p317: Measured British male, relaxed
+Detailed: Unhurried pacing and subtle inflection. Suitable for contemplative or descriptive prose.
+
+p318: Expressive British female, dynamic
+Detailed: Broader emotional range and lively prosody. Effective for fiction and dialogue, though potentially tiring for very long sessions.
+
+p319*: Steady British male, neutral DOESN'T EXIST***
+Detailed: Balanced articulation and consistent pacing. Dependable for technical, instructional, or reference-style narration.
+
+p320*: Soft British female, gentle DOESN'T EXIST***
+Detailed: Light, gentle delivery with smooth transitions. Performs well for poetic or reflective content.
+
+p321*: Clear British male, audiobook-safe DOESN'T EXIST***
+Detailed: Strong clarity and stable rhythm across paragraphs. A reliable narrator with minimal pronunciation surprises.
+
+p322*: Conversational British female, warm DOESN'T EXIST***
+Detailed: Warm tone and natural conversational cadence. Suitable for narrative nonfiction and character-focused prose.
+
+p323: Reserved British male, consistent
+Detailed: Low-variance delivery with restrained expressiveness. Ideal for long technical or documentary-style narration.
+
+p324*: Neutral British female, balanced DOESN'T EXIST***
+Detailed: Even pacing and clean articulation. A solid generalist voice for a wide range of audiobook material.
+
+p325*: Expressive British male, story-focused DOESN'T EXIST***
+Detailed: Storytelling-oriented delivery with dynamic emphasis and varied intonation. Best suited to fiction audiobooks and dramatic narration.
+
+p326: Neutral British male, steady
+Detailed: Even pacing and consistent pronunciation with minimal expressive variation. Reliable for long-form narration and informational audiobooks.
+
+p327*: Soft British female, relaxed DOESN'T EXIST***
+Detailed: Gentle delivery with smooth transitions and low vocal strain. Well-suited for reflective prose and calm non-fiction.
+
+p328*: Clear British male, articulate DOESN'T EXIST***
+Detailed: Crisp diction and careful enunciation. Strong choice for technical, academic, or instructional narration.
+
+p329: Bright British female, lively
+Detailed: Higher-pitched, energetic delivery with noticeable prosody. Engaging for dialogue and character narration; slightly animated for dense exposition.
+
+p330: Calm British male, low variance
+Detailed: Restrained prosody and stable rhythm. Ideal for extended listening sessions where listener fatigue should be minimized.
+
+p331*: Neutral British female, balanced DOESN'T EXIST***
+Detailed: Balanced pacing and tone with no strong quirks. A dependable general-purpose narrator for mixed audiobook content.
+
+p332*: Expressive British male, dynamic DOESN'T EXIST***
+Detailed: Wider emotional range and emphasis variation. Well-suited to fiction and storytelling; may require careful sentence chunking.
+
+p333: Soft British female, smooth
+Detailed: Smooth cadence and gentle delivery. Performs well for atmospheric storytelling and reflective material.
+
+p334: Deep British male, authoritative
+Detailed: Lower-register voice conveying confidence and seriousness. Effective for epic, historical, or formal narration.
+
+p335: Conversational British female, friendly
+Detailed: Approachable tone with natural conversational flow. Works well for narrative nonfiction and dialogue-heavy prose.
+
+p336: Neutral British male, predictable
+Detailed: Consistent rhythm and pronunciation with minimal stylistic variation. Reliable for technical documentation and long-form narration.
+
+p337*: Clear British female, controlled DOESN'T EXIST***
+Detailed: Careful articulation and restrained prosody. Suitable for educational content where clarity is the priority.
+
+p338*: Lively British male, engaging DOESN'T EXIST***
+Detailed: Energetic delivery with noticeable pitch variation. Engages well in storytelling contexts; slightly animated for dense prose.
+
+p339: Calm British female, steady
+Detailed: Even, controlled delivery with smooth sentence flow. Well-suited to long listening sessions and non-fiction audiobooks.
+
+p340: Authoritative British male, composed
+Detailed: Confident tone with strong sentence cohesion. Performs well for serious non-fiction and formal narration.
+
+p341: Neutral British female, unobtrusive
+Detailed: Clean, understated narration style that stays out of the way of the content. A strong default for general audiobook use.
+
+p342*: Measured British male, relaxed DOESN'T EXIST***
+Detailed: Unhurried pacing and subtle inflection. Suitable for contemplative or descriptive prose.
+
+p343: Expressive British female, dynamic
+Detailed: Broader emotional range and lively prosody. Effective for fiction and dialogue, though potentially tiring for very long sessions.
+
+p344*: Steady British male, neutral DOESN'T EXIST***
+Detailed: Balanced articulation and consistent pacing. Dependable for technical, instructional, or reference-style narration.
+
+p345: Soft British female, gentle
+Detailed: Light, gentle delivery with smooth transitions. Performs well for poetic or reflective content.
+
+p346*: Clear British male, audiobook-safe DOESN'T EXIST***
+Detailed: Strong clarity and stable rhythm across paragraphs. A reliable narrator with minimal pronunciation surprises.
+
+p347: Conversational British female, warm
+Detailed: Warm tone and natural conversational cadence. Suitable for narrative nonfiction and character-focused prose.
+
+p348*: Reserved British male, consistent DOESN'T EXIST***
+Detailed: Low-variance delivery with restrained expressiveness. Ideal for long technical or documentary-style narration.
+
+p349*: Neutral British female, balanced DOESN'T EXIST***
+Detailed: Even pacing and clean articulation. A solid generalist voice for a wide range of audiobook material.
+
+p350*: Expressive British male, story-driven DOESN'T EXIST***
+Detailed: Storytelling-oriented delivery with dynamic emphasis and varied intonation. Best suited to fiction audiobooks and dramatic narration.
+
+p351: Neutral British male, steady
+Detailed: Even pacing and consistent pronunciation with minimal expressive variation. Reliable for long-form narration and informational audiobooks.
+
+p352*: Soft British female, calm DOESN'T EXIST***
+Detailed: Gentle, low-energy delivery with smooth sentence transitions. Well-suited for reflective prose and relaxed non-fiction.
+
+p353*: Clear British male, precise DOESN'T EXIST***
+Detailed: Strong consonant clarity and careful enunciation. Effective for technical, instructional, or academic narration.
+
+p354*: Bright British female, articulate DOESN'T EXIST***
+Detailed: Lighter pitch with crisp articulation and clear sentence boundaries. Engaging for dialogue and shorter narrative passages.
+
+p355*: Calm British male, low variance DOESN'T EXIST***
+Detailed: Restrained prosody and stable rhythm. Ideal for extended listening sessions where listener fatigue should be minimized.
+
+p356*: Neutral British female, balanced DOESN'T EXIST***
+Detailed: Balanced pacing and tone with no strong quirks. A dependable general-purpose narrator for mixed audiobook content.
+
+p357*: Expressive British male, narrative DOESN'T EXIST***
+Detailed: Noticeable dynamic range and emphasis changes. Suitable for fiction and character-driven narration; may require careful sentence chunking.
+
+p358*: Soft British female, smooth DOESN'T EXIST***
+Detailed: Smooth cadence and gentle delivery. Performs well for atmospheric storytelling and reflective material.
+
+p359*: Deep British male, authoritative DOESN'T EXIST***
+Detailed: Lower-register voice conveying confidence and seriousness. Effective for epic, historical, or formal narration.
+
+p360: Conversational British female, friendly
+Detailed: Approachable tone with natural conversational flow. Works well for narrative nonfiction and dialogue-heavy prose.
+
+p361: Neutral British male, predictable
+Detailed: Consistent rhythm and pronunciation with minimal stylistic variation. Reliable for technical documentation and long-form narration.
+
+p362: Clear British female, controlled
+Detailed: Careful articulation and restrained prosody. Suitable for educational content where clarity is the priority.
+
+p363: Lively British male, engaging
+Detailed: Energetic delivery with noticeable pitch variation. Engages well in storytelling contexts; slightly animated for dense exposition.
+
+p364: Calm British female, steady
+Detailed: Even, controlled delivery with smooth sentence flow. Well-suited to long listening sessions and non-fiction audiobooks.
+
+p365*: Authoritative British male, composed DOESN'T EXIST***
+Detailed: Confident tone with strong sentence cohesion. Performs well for serious non-fiction and formal narration.
+
+p366*: Neutral British female, unobtrusive DOESN'T EXIST***
+Detailed: Clean, understated narration style that stays out of the way of the content. A strong default for general audiobook use.
+
+p367*: Measured British male, relaxed DOESN'T EXIST***
+Detailed: Unhurried pacing and subtle inflection. Suitable for contemplative or descriptive prose.
+
+p368*: Expressive British female, dynamic DOESN'T EXIST***
+Detailed: Broader emotional range and lively prosody. Effective for fiction and dialogue, though potentially tiring for very long sessions.
+
+p369*: Steady British male, neutral DOESN'T EXIST***
+Detailed: Balanced articulation and consistent pacing. Dependable for technical, instructional, or reference-style narration.
+
+p370*: Soft British female, gentle DOESN'T EXIST***
+Detailed: Light, gentle delivery with smooth transitions. Performs well for poetic or reflective content.
+
+p371*: Clear British male, audiobook-safe DOESN'T EXIST***
+Detailed: Strong clarity and stable rhythm across paragraphs. A reliable narrator with minimal pronunciation surprises.
+
+p372*: Conversational British female, warm DOESN'T EXIST***
+Detailed: Warm tone and natural conversational cadence. Suitable for narrative nonfiction and character-focused prose.
+
+p373*: Reserved British male, consistent DOESN'T EXIST***
+Detailed: Low-variance delivery with restrained expressiveness. Ideal for long technical or documentary-style narration.
+
+p374: Neutral British female, balanced
+Detailed: Even pacing and clean articulation. A solid generalist voice for a wide range of audiobook material.
+
+p375*: Expressive British male, story-focused DOESN'T EXIST***
+Detailed: Storytelling-oriented delivery with dynamic emphasis and varied intonation. Best suited to fiction audiobooks and dramatic narration.
+
+p376: Neutral British male, steady
+Detailed: Even pacing and consistent pronunciation with minimal expressive variation. Reliable for long-form narration and informational audiobooks.
