@@ -748,6 +748,8 @@ class DialogueSegmenter:
         self.unknown_count = 0
         self.verbose = verbose
         self._nltk_pos_available = False
+        # Track UNKNOWN dialogue segments for identification mode
+        self.unknown_segments = []  # List of dicts with text, before_context, after_context
         
         # Try to use NLTK for POS tagging if available
         if NLTK_AVAILABLE:
@@ -1054,7 +1056,23 @@ class DialogueSegmenter:
                     print(f"      [FOUND] Speaker via NLTK: {speaker}")
                 return speaker
         
-        # No speaker found - provide detailed debug output
+        # No speaker found - store information for identification mode
+        import re
+        # Store UNKNOWN segment info (always, not just in verbose mode)
+        unknown_info = {
+            'dialogue_text': dialogue_text,
+            'before_context': before_context[-200:] if len(before_context) > 200 else before_context,
+            'after_context': after_context[:200] if len(after_context) > 200 else after_context,
+            'full_before_context': before_context_for_pronouns[-500:] if len(before_context_for_pronouns) > 500 else before_context_for_pronouns,
+            'full_after_context': after_context_extended[:500] if len(after_context_extended) > 500 else after_context_extended,
+        }
+        # Check for potential names in context that were rejected
+        potential_names = re.findall(r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})\b', before_context[-100:] + after_context[:100])
+        if potential_names:
+            unknown_info['potential_names'] = list(set(potential_names[:10]))
+        self.unknown_segments.append(unknown_info)
+        
+        # Provide detailed debug output if verbose
         if self.verbose:
             print(f"      [NOT FOUND] No speaker detected - using UNKNOWN")
             print(f"      [DEBUG] Full dialogue text ({len(dialogue_text)} chars): \"{dialogue_text[:200]}{'...' if len(dialogue_text) > 200 else ''}\"")
@@ -1076,9 +1094,6 @@ class DialogueSegmenter:
                 print(f"        - Dialogue text is very long ({len(dialogue_text)} chars) - might be narration")
             if not any(c in dialogue_text for c in '!?.'):
                 print(f"        - Dialogue text lacks sentence-ending punctuation - might be narration")
-            # Check if there are names in context that weren't detected
-            import re
-            potential_names = re.findall(r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,2})\b', before_context[-100:] + after_context[:100])
             if potential_names:
                 print(f"        - Found potential names in context (may have been rejected): {', '.join(set(potential_names[:5]))}")
         self.unknown_count += 1
@@ -2632,6 +2647,153 @@ def synthesize_text(text, output_path, model_name=None, chunk_size=5000, is_shor
         print("\nTip: Try specifying a different model or check available models with scripts/list_models.py")
         return False
 
+def _is_suspicious_speaker_nltk(speaker_name: str) -> bool:
+    """
+    Use NLTK to determine if a detected speaker name is likely a false positive.
+    
+    Returns True if the name is suspicious (likely not a real person name).
+    Uses NLTK POS tagging and stopwords to identify common words that shouldn't be names.
+    """
+    if not speaker_name or speaker_name in ("NARRATOR", "UNKNOWN"):
+        return False
+    
+    words = speaker_name.split()
+    if not words:
+        return False
+    
+    # Very short names (1-2 chars) are suspicious unless they're clearly proper nouns
+    if len(words) == 1 and len(speaker_name) <= 2:
+        return True
+    
+    # Check if NLTK is available
+    if not NLTK_AVAILABLE:
+        # Fallback: basic heuristics if NLTK not available
+        # Check for common articles/conjunctions at start
+        first_word_lower = words[0].lower()
+        if first_word_lower in ['the', 'a', 'an', 'and', 'or', 'but', 'if', 'when', 'where', 'why', 'how']:
+            return True
+        return False
+    
+    try:
+        from nltk import word_tokenize
+        from nltk.tag import pos_tag
+        from nltk.corpus import stopwords
+        
+        # Try to load stopwords (download if needed)
+        try:
+            stop_words = set(stopwords.words('english'))
+        except LookupError:
+            try:
+                import nltk
+                nltk.download('stopwords', quiet=True)
+                stop_words = set(stopwords.words('english'))
+            except Exception:
+                stop_words = set()  # Fallback to empty set
+        
+        # Tokenize and POS tag the speaker name
+        # Create a simple sentence context to help NLTK tag properly
+        # (e.g., "Are" might be tagged as verb, "John" as proper noun)
+        test_sentence = f"{speaker_name} said something."
+        tokens = word_tokenize(test_sentence)
+        pos_tags = pos_tag(tokens)
+        
+        # Find the tags for words in the speaker name
+        speaker_tokens = word_tokenize(speaker_name)
+        speaker_pos_map = {}
+        token_idx = 0
+        for word, pos in pos_tags:
+            if token_idx < len(speaker_tokens) and word.lower() == speaker_tokens[token_idx].lower():
+                speaker_pos_map[word] = pos
+                token_idx += 1
+        
+        # If we couldn't match tokens, try a simpler approach
+        if not speaker_pos_map:
+            # Just tag the speaker name directly
+            speaker_tokens = word_tokenize(speaker_name)
+            speaker_pos_tags = pos_tag(speaker_tokens)
+            speaker_pos_map = {word: pos for word, pos in speaker_pos_tags}
+        
+        # Check each word in the speaker name
+        all_proper_nouns = True
+        has_common_word = False
+        has_stopword = False
+        words_with_pos = []
+        
+        for word in words:
+            word_lower = word.lower()
+            
+            # Check if it's a stopword
+            if word_lower in stop_words:
+                has_stopword = True
+                has_common_word = True
+                all_proper_nouns = False
+            
+            # Get POS tag for this word
+            word_pos = None
+            for token, pos in speaker_pos_map.items():
+                if token.lower() == word_lower:
+                    word_pos = pos
+                    break
+            
+            # If we couldn't find it in the map, tag it directly
+            if word_pos is None:
+                try:
+                    word_tokens = word_tokenize(word)
+                    word_pos_tags = pos_tag(word_tokens)
+                    if word_pos_tags:
+                        word_pos = word_pos_tags[0][1]
+                except Exception:
+                    pass
+            
+            words_with_pos.append((word, word_pos))
+            
+            # Check POS tag
+            if word_pos:
+                # Proper nouns (NNP, NNPS) are good - these are likely real names
+                if not word_pos.startswith('NNP'):
+                    # Not a proper noun - suspicious
+                    all_proper_nouns = False
+                    # Common parts of speech that shouldn't be names:
+                    if word_pos.startswith(('VB', 'JJ', 'RB', 'DT', 'IN', 'CC', 'PRP')):
+                        # Verb, Adjective, Adverb, Determiner, Preposition, Conjunction, Pronoun
+                        has_common_word = True
+        
+        # Decision logic:
+        # 1. If all words are proper nouns (NNP) and no stopwords, it's likely a real name
+        if all_proper_nouns and not has_stopword and words_with_pos:
+            # Double-check: make sure we actually got POS tags for all words
+            if all(pos is not None for _, pos in words_with_pos):
+                return False
+        
+        # 2. If any word is a stopword, it's suspicious
+        if has_stopword:
+            return True
+        
+        # 3. If any word is a common part of speech (verb, adjective, etc.), it's suspicious
+        if has_common_word:
+            return True
+        
+        # 4. Check for common sentence starters
+        first_word_lower = words[0].lower()
+        if first_word_lower in ['the', 'a', 'an', 'and', 'or', 'but', 'if', 'when', 'where', 'why', 'how', 'what', 'who']:
+            return True
+        
+        # 5. If it's a multi-word phrase starting with common words, it's suspicious
+        if len(words) >= 2:
+            if first_word_lower in ['let', 'our', 'the', 'a', 'an']:
+                return True
+        
+        # Default: if we can't determine, don't mark as suspicious
+        return False
+        
+    except Exception as e:
+        # If NLTK fails, fall back to basic heuristics
+        first_word_lower = words[0].lower() if words else ''
+        if first_word_lower in ['the', 'a', 'an', 'and', 'or', 'but', 'if', 'when']:
+            return True
+        return False
+
+
 def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciations=None, auto_speaker=False, verbose=False, character_voice_mapping=None):
     """
     Identify text structure (chunks, speakers, dialogue) without synthesizing.
@@ -2739,6 +2901,7 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
             results['segments'] = [{'type': s.type, 'speaker': s.speaker, 'original_speaker': s.original_speaker if s.original_speaker else s.speaker, 'text': s.text[:50] + '...' if len(s.text) > 50 else s.text} 
                                    for s in segments]
             results['unknown_dialogue_count'] = segmenter.unknown_count
+            results['unknown_segments'] = segmenter.unknown_segments
             
             # Assign speakers
             assigner = SpeakerAssigner(available_speakers, character_voice_mapping=character_voice_mapping)
@@ -2751,6 +2914,14 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
                     if seg.speaker not in original_name_map:
                         original_name_map[seg.speaker] = seg.original_speaker if seg.original_speaker else seg.speaker
             
+            # Identify suspicious speaker names (likely false positives) using NLTK
+            # This uses POS tagging and stopwords to identify common words that shouldn't be names
+            suspicious_speakers = []
+            for char_name in character_map.keys():
+                if char_name not in ("NARRATOR", "UNKNOWN"):
+                    if _is_suspicious_speaker_nltk(char_name):
+                        suspicious_speakers.append(char_name)
+            
             # Build speaker mapping (include narrator)
             results['speakers'] = {
                 'NARRATOR': assigner.narrator_speaker,
@@ -2758,6 +2929,7 @@ def identify_text_structure(text, model_name=None, chunk_size=5000, pronunciatio
             }
             results['original_name_map'] = original_name_map  # Store original names for display
             results['warnings'] = assigner.warnings
+            results['suspicious_speakers'] = suspicious_speakers
             
         except Exception as e:
             results['error'] = str(e)
@@ -3086,6 +3258,39 @@ Examples:
                                 print(f"    {char_name} -> {speaker_id}")
                     if results.get('unknown_dialogue_count', 0) > 0:
                         print(f"\n  Warning: {results['unknown_dialogue_count']} dialogue segments with unknown speaker")
+                        
+                        # Show UNKNOWN dialogue segments for identification mode
+                        if results.get('unknown_segments'):
+                            print(f"\n  UNKNOWN Dialogue Segments (for review):")
+                            print(f"  {'='*70}")
+                            for idx, unknown_seg in enumerate(results['unknown_segments'][:20], 1):  # Limit to first 20
+                                dialogue = unknown_seg.get('dialogue_text', '')
+                                before = unknown_seg.get('before_context', '')
+                                after = unknown_seg.get('after_context', '')
+                                potential_names = unknown_seg.get('potential_names', [])
+                                
+                                print(f"\n  [{idx}] Dialogue text:")
+                                print(f"      \"{dialogue[:150]}{'...' if len(dialogue) > 150 else ''}\"")
+                                if before:
+                                    print(f"      Before: ...{before[-80:]}")
+                                if after:
+                                    print(f"      After: {after[:80]}...")
+                                if potential_names:
+                                    print(f"      Potential names in context (rejected): {', '.join(potential_names[:5])}")
+                            if len(results['unknown_segments']) > 20:
+                                print(f"\n  ... and {len(results['unknown_segments']) - 20} more UNKNOWN segments")
+                            print(f"  {'='*70}")
+                    
+                    # Show suspicious speaker detections
+                    if results.get('suspicious_speakers'):
+                        print(f"\n  ⚠️  Suspicious Speaker Detections (likely false positives):")
+                        for sus_speaker in sorted(results['suspicious_speakers']):
+                            original = results.get('original_name_map', {}).get(sus_speaker, sus_speaker)
+                            if original != sus_speaker:
+                                print(f"    - \"{original}\" (normalized as \"{sus_speaker}\")")
+                            else:
+                                print(f"    - \"{sus_speaker}\"")
+                    
                     if results.get('warnings'):
                         for warning in results['warnings']:
                             print(f"  Warning: {warning}")
