@@ -3053,6 +3053,11 @@ Examples:
     
     args = parser.parse_args()
     
+    # #region agent log
+    with open(r'c:\develop\coquitts\.cursor\debug.log', 'a', encoding='utf-8') as f:
+        f.write(json.dumps({"id": "log_args_parsed", "timestamp": datetime.now().timestamp() * 1000, "location": "book-to-audiobook_coquitts.py:3054", "message": "Arguments parsed", "data": {"speaker": args.speaker, "model": args.model, "pronunciations": args.pronunciations, "text": args.text, "play": args.play}, "sessionId": "debug-session", "runId": "run1", "hypothesisId": "A"}) + "\n")
+    # #endregion
+    
     # Determine auto speaker mode
     # Precedence: --auto-speaker wins over --speaker unless --speaker is "auto"
     auto_speaker_mode = False
@@ -3066,6 +3071,11 @@ Examples:
         auto_speaker_mode = True
     elif args.speaker:
         manual_speaker = args.speaker
+    
+    # #region agent log
+    with open(r'c:\develop\coquitts\.cursor\debug.log', 'a', encoding='utf-8') as f:
+        f.write(json.dumps({"id": "log_speaker_determined", "timestamp": datetime.now().timestamp() * 1000, "location": "book-to-audiobook_coquitts.py:3068", "message": "Speaker determined", "data": {"args_speaker": args.speaker, "auto_speaker_mode": auto_speaker_mode, "manual_speaker": manual_speaker}, "sessionId": "debug-session", "runId": "run1", "hypothesisId": "A"}) + "\n")
+    # #endregion
     
     # Default to p225 if using default model (vctk/vits) and no speaker is specified
     default_model = "tts_models/en/vctk/vits"
@@ -3186,9 +3196,17 @@ Examples:
     # Load pronunciations if provided
     pronunciations = None
     if args.pronunciations:
+        # #region agent log
+        with open(r'c:\develop\coquitts\.cursor\debug.log', 'a', encoding='utf-8') as f:
+            f.write(json.dumps({"id": "log_pronunciations_start", "timestamp": datetime.now().timestamp() * 1000, "location": "book-to-audiobook_coquitts.py:3185", "message": "Loading pronunciations files", "data": {"pronunciations_files": args.pronunciations}, "sessionId": "debug-session", "runId": "run1", "hypothesisId": "B"}) + "\n")
+        # #endregion
         # Merge multiple pronunciation files if provided
         pronunciations = {}
         for pr_file in args.pronunciations:
+            # #region agent log
+            with open(r'c:\develop\coquitts\.cursor\debug.log', 'a', encoding='utf-8') as f:
+                f.write(json.dumps({"id": "log_pronunciations_file", "timestamp": datetime.now().timestamp() * 1000, "location": "book-to-audiobook_coquitts.py:3190", "message": "Loading pronunciation file", "data": {"pron_file": pr_file, "file_exists": os.path.exists(pr_file) if pr_file else False}, "sessionId": "debug-session", "runId": "run1", "hypothesisId": "B"}) + "\n")
+            # #endregion
             loaded_pr = load_pronunciations(pr_file)
             if loaded_pr is not None:
                 # Later files override earlier ones for duplicate keys
@@ -3200,6 +3218,10 @@ Examples:
             print(f"Total pronunciation mappings loaded: {len(pronunciations)}")
         else:
             print("Warning: No pronunciation mappings loaded. Continuing without pronunciation replacements.")
+        # #region agent log
+        with open(r'c:\develop\coquitts\.cursor\debug.log', 'a', encoding='utf-8') as f:
+            f.write(json.dumps({"id": "log_pronunciations_loaded", "timestamp": datetime.now().timestamp() * 1000, "location": "book-to-audiobook_coquitts.py:3197", "message": "Pronunciations loaded", "data": {"pronunciations_count": len(pronunciations) if pronunciations else 0}, "sessionId": "debug-session", "runId": "run1", "hypothesisId": "B"}) + "\n")
+        # #endregion
         print()  # Add blank line for readability
     
     # Load character-to-voice mapping if provided
@@ -3306,6 +3328,10 @@ Examples:
     # Synthesize text to speech
     # Mark as short input if text was provided directly (likely a single word/phrase)
     is_short = args.text is not None
+    # #region agent log
+    with open(r'c:\develop\coquitts\.cursor\debug.log', 'a', encoding='utf-8') as f:
+        f.write(json.dumps({"id": "log_before_synthesize", "timestamp": datetime.now().timestamp() * 1000, "location": "book-to-audiobook_coquitts.py:3235", "message": "Before synthesize_text call", "data": {"model_name": args.model, "speaker": validated_speaker if not auto_speaker_mode else None, "pronunciations_count": len(pronunciations) if pronunciations else 0, "is_short_input": is_short, "auto_speaker": auto_speaker_mode}, "sessionId": "debug-session", "runId": "run1", "hypothesisId": "D"}) + "\n")
+    # #endregion
     success = synthesize_text(
         text, 
         output_file, 
