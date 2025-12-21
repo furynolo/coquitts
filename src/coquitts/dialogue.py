@@ -378,6 +378,47 @@ class SpeakerAssigner:
         
         return self.character_map
     
+    def _suggest_speaker_flow(self, segments: List[Segment]) -> None:
+        """
+        Analyze conversation flow to suggest speakers for UNKNOWN segments.
+        Assumes A-B-A-B patterns in close proximity.
+        """
+        # Iterate through segments
+        for i, segment in enumerate(segments):
+            if segment.type == "dialogue" and segment.speaker == "UNKNOWN":
+                # Look backwards for the last known speaker in dialogue
+                prev_speaker = None
+                distance = 0
+                for j in range(i - 1, -1, -1):
+                    other = segments[j]
+                    if other.type == "dialogue":
+                        if other.speaker != "UNKNOWN" and other.speaker != "NARRATOR":
+                            prev_speaker = other.speaker
+                            break
+                        distance += 1
+                        if distance > 5: # Don't look too far back
+                            break
+                            
+                # Look forwards for the next known speaker
+                next_speaker = None
+                distance = 0
+                for j in range(i + 1, len(segments)):
+                    other = segments[j]
+                    if other.type == "dialogue":
+                        if other.speaker != "UNKNOWN" and other.speaker != "NARRATOR":
+                            next_speaker = other.speaker
+                            break
+                        distance += 1
+                        if distance > 5:
+                            break
+                
+                # Heuristic: If trapped between two same speakers (A -> ? -> A), might be B? 
+                # Or if (A -> ? -> B), ? might be B or A depending on narration?
+                # Simple Heuristic: If we have limits, we can try to guess.
+                # For now, we will just store this context or leave it for later enhancement.
+                # This function is a placeholder for more advanced flow analysis if requested.
+                pass
+
     def get_speaker_for_segment(self, segment: Segment) -> str:
         """
         Get the TTS speaker ID for a given segment.
@@ -392,7 +433,11 @@ class SpeakerAssigner:
             return self.narrator_speaker or self.available_speakers[0]
         else:
             # Dialogue
-            return self.character_map.get(segment.speaker, self.narrator_speaker or self.available_speakers[0])
+            speaker_id = self.character_map.get(segment.speaker)
+            if not speaker_id:
+                # If mapped to None or not found, fallback to narrator
+                return self.narrator_speaker or self.available_speakers[0]
+            return speaker_id
 
 class DialogueSegmenter:
     """Segments text into narration and dialogue blocks with speaker attribution."""

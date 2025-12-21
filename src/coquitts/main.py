@@ -26,6 +26,8 @@ def parse_args():
     parser.add_argument("--speaker-wav", "-w", help="Path to reference audio for voice cloning")
     parser.add_argument("--auto-speaker", action="store_true", help="Enable automatic speaker detection and dialogue routing")
     parser.add_argument("--character-voice-mapping", "-c", help="JSON file mapping character names to speaker IDs")
+    parser.add_argument("--generate-corrections", action="store_true", help="Generate a JSON file for manual unknown speaker corrections")
+    parser.add_argument("--apply-corrections", type=str, help="Path to JSON file with speaker corrections to apply")
     
     # Processing Configuration
     parser.add_argument("--chunk-size", type=int, default=5000, help="Maximum characters per chunk")
@@ -40,7 +42,9 @@ def parse_args():
 
 def identify_text_structure(text: str, model_name: str = None, chunk_size: int = 5000, 
                           pronunciations: dict = None, auto_speaker: bool = False, 
-                          verbose: bool = False, character_voice_mapping: dict = None) -> Dict[str, Any]:
+                          verbose: bool = False, character_voice_mapping: dict = None,
+                          generate_corrections: bool = False, apply_corrections_file: str = None,
+                          input_file_path: str = None) -> Dict[str, Any]:
     """
     Identify text structure (chunks, speakers, dialogue) without synthesizing.
     """
@@ -93,8 +97,30 @@ def identify_text_structure(text: str, model_name: str = None, chunk_size: int =
             orig_segments = segmenter_orig.segment_text(original_text)
             
             # Segment processed text
+            # Segment processed text
             segmenter = DialogueSegmenter(verbose=verbose)
             segments = segmenter.segment_text(text)
+            
+            # Apply corrections if provided
+            if apply_corrections_file:
+                from .unknown_speakers import CorrectionManager
+                cm = CorrectionManager(verbose=verbose)
+                corrections = cm.load_corrections(apply_corrections_file)
+                cm.apply_corrections(segments, corrections)
+            
+            # Generate corrections file if requested
+            if generate_corrections:
+                from .unknown_speakers import CorrectionManager
+                cm = CorrectionManager(verbose=verbose)
+                
+                # Determine output path
+                json_output = "corrections.json"
+                if input_file_path:
+                    p = Path(input_file_path)
+                    json_output = str(p.with_suffix('')) + "_corrections.json"
+                    
+                cm.export_corrections(segments, text, json_output)
+                results['correction_file'] = json_output
             
             # Build original name map
             original_name_map = {}
@@ -204,7 +230,10 @@ def main():
             pronunciations=pronunciations,
             auto_speaker=auto_speaker_mode,
             verbose=args.verbose,
-            character_voice_mapping=character_voice_mapping
+            character_voice_mapping=character_voice_mapping,
+            generate_corrections=args.generate_corrections,
+            apply_corrections_file=args.apply_corrections,
+            input_file_path=args.input_file
         )
         
         # Print results (simplified for brevity, similar to original)
@@ -231,7 +260,8 @@ def main():
         speaker_wav=args.speaker_wav,
         verbose=args.verbose,
         auto_speaker=auto_speaker_mode,
-        character_voice_mapping=character_voice_mapping
+        character_voice_mapping=character_voice_mapping,
+        apply_corrections_file=args.apply_corrections
     )
     
     if success:

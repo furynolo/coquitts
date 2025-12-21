@@ -275,7 +275,8 @@ class AudioSynthesizer:
                   is_short_input: bool = False, pronunciations: Dict[str, str] = None,
                   speaker: Optional[str] = None, speaker_wav: Optional[str] = None,
                   verbose: bool = False, auto_speaker: bool = False,
-                  character_voice_mapping: Optional[Dict[str, str]] = None) -> bool:
+                  character_voice_mapping: Optional[Dict[str, str]] = None,
+                  apply_corrections_file: str = None) -> bool:
         """
         Synthesize text to speech.
         """
@@ -291,7 +292,7 @@ class AudioSynthesizer:
             
             return self._synthesize_with_auto_speaker(
                 text, original_text, output_path, verbose, 
-                character_voice_mapping, pronunciations
+                character_voice_mapping, pronunciations, apply_corrections_file
             )
         
         # Handle manual speaker selection for multi-speaker models
@@ -321,7 +322,7 @@ class AudioSynthesizer:
 
     def _synthesize_with_auto_speaker(self, text: str, original_text: str, output_path: str, 
                                      verbose: bool, character_voice_mapping: Optional[Dict[str, str]],
-                                     pronunciations: Optional[Dict[str, str]]) -> bool:
+                                     pronunciations: Optional[Dict[str, str]], apply_corrections_file: str = None) -> bool:
         """Handle synthesis with automatic speaker assignment."""
         print("Auto speaker mode enabled - detecting dialogue and assigning voices...")
         
@@ -333,9 +334,12 @@ class AudioSynthesizer:
         segmenter = DialogueSegmenter(verbose=verbose)
         segments = segmenter.segment_text(text)
         
-        # Map original names to segments (simplified logic)
-        # For simplicity in this refactor, we'll assume direct mapping or just use post-processing names
-        # Ideally, we'd do the improved mapping from the original script
+        # Apply corrections if provided
+        if apply_corrections_file:
+            from .unknown_speakers import CorrectionManager
+            cm = CorrectionManager(verbose=verbose)
+            corrections = cm.load_corrections(apply_corrections_file)
+            cm.apply_corrections(segments, corrections)
         
         # Assign speakers
         assigner = SpeakerAssigner(self.available_speakers, character_voice_mapping=character_voice_mapping)
