@@ -46,3 +46,8 @@ models/
 # OS
 .DS_Store
 Thumbs.db
+
+.cursor/
+output-audio/
+input-text/txt-books/
+input-text/pdf-books/
