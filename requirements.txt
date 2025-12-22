@@ -1,2 +1,8 @@
 coqui-tts
 pydub
+
+transformers
+torch
+spacy
+soundfile
+librosa
