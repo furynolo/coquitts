@@ -3,6 +3,7 @@ import os
 import sys
 import argparse
 import json
+import re
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, Optional
@@ -186,7 +187,15 @@ def main():
             input_stem = input_path.stem
             output_filename = f"{input_stem}_{model_name_safe}{speaker_suffix}_{timestamp}.wav"
         else:
-            output_filename = f"output_speech_{model_name_safe}{speaker_suffix}_{timestamp}.wav"
+            # Use snippets of text for filename if available
+            raw_snippet = args.text[:30] if args.text else "output_speech"
+            # Sanitize: keep only alphanumerics, replace others with underscore
+            sanitized_snippet = re.sub(r'[^\w]+', '_', raw_snippet).strip('_').lower()
+            
+            if not sanitized_snippet:
+                sanitized_snippet = "output_speech"
+                
+            output_filename = f"{sanitized_snippet}_{model_name_safe}{speaker_suffix}_{timestamp}.wav"
             
         output_file = output_dir / output_filename
             
