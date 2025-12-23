@@ -25,9 +25,9 @@ def parse_args():
     parser.add_argument("--model", "-m", help="Name of the TTS model to use")
     parser.add_argument("--speaker", "-s", help="Speaker ID for multi-speaker models (use 'auto' for automatic dialogue routing)")
     parser.add_argument("--speaker-wav", "-w", help="Path to reference audio for voice cloning")
-    parser.add_argument("--auto-speaker", action="store_true", help="Enable automatic speaker detection and dialogue routing")
+    parser.add_argument("--auto-speaker", "-a", action="store_true", help="Enable automatic speaker detection and dialogue routing")
     parser.add_argument("--character-voice-mapping", "-c", help="JSON file mapping character names to speaker IDs")
-    parser.add_argument("--generate-corrections", action="store_true", help="Generate a JSON file for manual unknown speaker corrections")
+    parser.add_argument("--generate-corrections", "-g", action="store_true", help="Generate a JSON file for manual unknown speaker corrections")
     parser.add_argument("--apply-corrections", type=str, help="Path to JSON file with speaker corrections to apply")
     
     # Processing Configuration
