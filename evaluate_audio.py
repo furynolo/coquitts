@@ -10,6 +10,7 @@ import argparse
 import difflib
 import logging
 import sys
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -203,7 +204,12 @@ if __name__ == "__main__":
     judge = AudioJudge()
     
     # Default output if not specified
-    out_path = args.output if args.output else "evaluation_report.json"
+    if args.output:
+        out_path = args.output
+    else:
+        reports_dir = Path("output/reports")
+        reports_dir.mkdir(parents=True, exist_ok=True)
+        out_path = str(reports_dir / "evaluation_report.json")
     
     found_issues = judge.evaluate(reference_text, args.audio, out_path, ignore_set=ignore_words)
     

@@ -115,10 +115,17 @@ def identify_text_structure(text: str, model_name: str = None, chunk_size: int =
                 cm = CorrectionManager(verbose=verbose)
                 
                 # Determine output path
-                json_output = "corrections.json"
                 if input_file_path:
                     p = Path(input_file_path)
-                    json_output = str(p.with_suffix('')) + "_corrections.json"
+                    filename_stem = p.stem
+                else:
+                    filename_stem = "output_speech"
+                
+                # Create corrections directory if it doesn't exist
+                corrections_dir = Path("output/corrections")
+                corrections_dir.mkdir(parents=True, exist_ok=True)
+                
+                json_output = str(corrections_dir / f"{filename_stem}_corrections.json")
                     
                 cm.export_corrections(segments, text, json_output)
                 results['correction_file'] = json_output
@@ -178,8 +185,8 @@ def main():
     if args.output:
         output_file = Path(args.output)
     else:
-        # Default output directory is 'output-audio' in the current working directory
-        output_dir = Path("output-audio")
+        # Default output directory is 'output/audio' in the current working directory
+        output_dir = Path("output/audio")
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         if args.input_file:

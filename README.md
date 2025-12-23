@@ -6,8 +6,9 @@ This project contains a setup for CoquiTTS, a text-to-speech synthesis system.
 
 ```
 coquitts/
-├── book-to-audiobook_coquitts.py  # Main conversion script
-├── requirements.txt               # Python dependencies
+├── config/                       # Configuration files (voices, pronunciations)
+├── book-to-audiobook_coquitts.py # Main conversion script
+├── requirements.txt              # Python dependencies
 ├── README.md                     # This file
 ├── docs/                         # Documentation
 │   ├── ESPEAK_INSTALL.md
@@ -19,7 +20,10 @@ coquitts/
 │   ├── config_example.py
 │   └── enable_long_paths.ps1
 ├── input-text/                   # Input text files
-└── output-audio/                 # Generated audio files
+└── output/                       # Generated files
+    ├── audio/                    # Audio output
+    ├── corrections/              # Speaker corrections
+    └── reports/                  # Evaluation reports
 ```
 
 ## Installation
@@ -96,7 +100,7 @@ Convert a text file to audiobook:
 python book-to-audiobook_coquitts.py input-text/mybook.txt
 ```
 
-The output file will be saved as `output-audio/mybook.wav` (matching the input filename).
+The output file will be saved as `output/audio/mybook.wav` (matching the input filename).
 
 **Optional:** Specify a different model:
 

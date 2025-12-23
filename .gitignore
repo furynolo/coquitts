@@ -42,6 +42,50 @@ output.*
 models/
 *.onnx
 *.pth
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CoquiTTS
+*.wav
+*.mp3
+output.*
+models/
+*.onnx
+*.pth
 
 # OS
 .DS_Store
@@ -49,6 +93,8 @@ Thumbs.db
 
 .cursor/
 output-audio/
+output/
 input-text/txt-books/
 input-text/pdf-books/
 evaluation_report.json
+config/
