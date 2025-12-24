@@ -374,50 +374,131 @@ class SpeakerAssigner:
         
         # Handle UNKNOWN - assign to narrator speaker (p225 by default)
         if any(s.speaker == "UNKNOWN" for s in segments if s.type == "dialogue"):
-            self.character_map["UNKNOWN"] = self.narrator_speaker
+            # Try to resolve UNKNOWN speakers using conversation flow heuristics
+            self._suggest_speaker_flow(segments, name_mapping)
+            
+            # Re-check for UNKNOWN
+            if any(s.speaker == "UNKNOWN" for s in segments if s.type == "dialogue"):
+                self.character_map["UNKNOWN"] = self.narrator_speaker
         
         return self.character_map
     
-    def _suggest_speaker_flow(self, segments: List[Segment]) -> None:
+    def _suggest_speaker_flow(self, segments: List[Segment], name_mapping: Dict[str, str]) -> None:
         """
         Analyze conversation flow to suggest speakers for UNKNOWN segments.
         Assumes A-B-A-B patterns in close proximity.
         """
+        print("  Running conversation flow analysis...")
+        resolved_count = 0
+        
         # Iterate through segments
-        for i, segment in enumerate(segments):
-            if segment.type == "dialogue" and segment.speaker == "UNKNOWN":
-                # Look backwards for the last known speaker in dialogue
-                prev_speaker = None
-                distance = 0
-                for j in range(i - 1, -1, -1):
+        for i in range(len(segments)):
+            segment = segments[i]
+            
+            # Skip if not UNKNOWN dialogue
+            if segment.type != "dialogue" or segment.speaker != "UNKNOWN":
+                continue
+                
+            # Look backwards for the last known speaker in dialogue
+            prev_speaker = None
+            prev_index = -1
+            distance_back = 0
+            
+            for j in range(i - 1, -1, -1):
+                other = segments[j]
+                if other.type == "dialogue":
+                    if other.speaker != "UNKNOWN" and other.speaker != "NARRATOR":
+                        prev_speaker = other.speaker
+                        prev_index = j
+                        break
+                    distance_back += 1
+                    if distance_back > 3: # Don't look too far back (in dialogue terms)
+                        break
+            
+            # Look forwards for the next known speaker
+            next_speaker = None
+            next_index = -1
+            distance_fwd = 0
+            
+            for j in range(i + 1, len(segments)):
+                other = segments[j]
+                if other.type == "dialogue":
+                    if other.speaker != "UNKNOWN" and other.speaker != "NARRATOR":
+                        next_speaker = other.speaker
+                        next_index = j
+                        break
+                    distance_fwd += 1
+                    if distance_fwd > 3:
+                        break
+            
+            # Heuristic 1: Sandwiched (A -> ? -> A) => Likely B? No, usually implies 3 parties or narration break.
+            # But (A -> ? -> A) could be (A -> B -> A) implies ? is B. 
+            # We don't know B yet.
+            
+            # Heuristic 2: Alternating (A -> ? -> B) => Likely ? is B? Or ? is A?
+            # Standard pattern: A says something. B replies. A replies.
+            # If we have A -> ? -> A, it implies the middle one is NOT A.
+            
+            proposed_speaker = None
+            reason = ""
+            
+            # Scenario: A -> ? -> A
+            # The middle one is likely the OTHER person in the conversation.
+            # Do we know who the other person is?
+            # We can look further back: B -> A -> ? -> A
+            if prev_speaker and next_speaker and prev_speaker == next_speaker:
+                # We are between two lines from the same person.
+                # Likely we are the other interactant.
+                # Check 2 steps back
+                speaker_2_back = None
+                for j in range(prev_index - 1, -1, -1):
                     other = segments[j]
                     if other.type == "dialogue":
                         if other.speaker != "UNKNOWN" and other.speaker != "NARRATOR":
-                            prev_speaker = other.speaker
+                            speaker_2_back = other.speaker
                             break
-                        distance += 1
-                        if distance > 5: # Don't look too far back
+                        # Stop if too far
+                        if (prev_index - j) > 5: 
                             break
                             
-                # Look forwards for the next known speaker
-                next_speaker = None
-                distance = 0
-                for j in range(i + 1, len(segments)):
+                if speaker_2_back and speaker_2_back != prev_speaker:
+                    # Pattern: B -> A -> [UNKNOWN] -> A
+                    # Inference: UNKNOWN is B
+                    proposed_speaker = speaker_2_back
+                    reason = f"Alternating pattern ({speaker_2_back} -> {prev_speaker} -> ? -> {prev_speaker})"
+            
+            # Scenario: A -> B -> ? 
+            # Likely A (Alternating)
+            elif prev_speaker:
+                # Check who spoke before prev_speaker
+                speaker_2_back = None
+                for j in range(prev_index - 1, -1, -1):
                     other = segments[j]
                     if other.type == "dialogue":
                         if other.speaker != "UNKNOWN" and other.speaker != "NARRATOR":
-                            next_speaker = other.speaker
+                            speaker_2_back = other.speaker
                             break
-                        distance += 1
-                        if distance > 5:
+                        if (prev_index - j) > 5:
                             break
                 
-                # Heuristic: If trapped between two same speakers (A -> ? -> A), might be B? 
-                # Or if (A -> ? -> B), ? might be B or A depending on narration?
-                # Simple Heuristic: If we have limits, we can try to guess.
-                # For now, we will just store this context or leave it for later enhancement.
-                # This function is a placeholder for more advanced flow analysis if requested.
-                pass
+                if speaker_2_back and speaker_2_back != prev_speaker:
+                    # Pattern: A -> B -> ?
+                    # Inference: ? is A
+                    proposed_speaker = speaker_2_back
+                    reason = f"Alternating pattern ({speaker_2_back} -> {prev_speaker} -> ?)"
+            
+            # Scenario: ? -> A -> B
+            # Likely B (Alternating backwards?) -> Harder to be sure.
+            
+            if proposed_speaker:
+                # Apply change
+                segment.speaker = proposed_speaker
+                segment.original_speaker = proposed_speaker # Update original too so it sticks
+                resolved_count += 1
+                # print(f"  [FLOW] Resolved UNKNOWN at index {i}-ish to '{proposed_speaker}'. Reason: {reason}")
+        
+        if resolved_count > 0:
+            print(f"  [FLOW] Resolved {resolved_count} UNKNOWN segments using conversation flow.")
 
     def get_speaker_for_segment(self, segment: Segment) -> str:
         """
