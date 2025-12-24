@@ -616,32 +616,57 @@ class DialogueSegmenter:
                 from nltk.data import find as nltk_find
                 
                 # Try to download required data
-                # The standard NLTK POS tagger resource is 'averaged_perceptron_tagger'
+                # NLTK recently split the tagger into language specific packages
+                # We need to try both legacy and new names
                 tagger_available = False
+                tagger_resource = 'averaged_perceptron_tagger'
+                
+                # Check for new English-specific tagger first (for NLTK 3.9+)
                 try:
-                    nltk_find('taggers/averaged_perceptron_tagger')
+                    nltk_find('taggers/averaged_perceptron_tagger_eng')
                     tagger_available = True
+                    tagger_resource = 'averaged_perceptron_tagger_eng'
                 except LookupError:
-                    # Try to download it
+                    try:
+                        nltk_find('taggers/averaged_perceptron_tagger')
+                        tagger_available = True
+                        tagger_resource = 'averaged_perceptron_tagger'
+                    except LookupError:
+                        pass
+                
+                if not tagger_available:
+                    # Try to download both to be safe
                     try:
                         if self.verbose:
-                            print("    [NLTK] Downloading averaged_perceptron_tagger...")
+                            print("    [NLTK] Downloading NLTK taggers...")
                         import nltk
-                        nltk.download('averaged_perceptron_tagger', quiet=not self.verbose)
-                        # Verify it was downloaded
                         try:
-                            nltk_find('taggers/averaged_perceptron_tagger')
+                            nltk.download('averaged_perceptron_tagger_eng', quiet=not self.verbose)
+                            tagger_resource = 'averaged_perceptron_tagger_eng'
+                        except Exception:
+                            nltk.download('averaged_perceptron_tagger', quiet=not self.verbose)
+                            tagger_resource = 'averaged_perceptron_tagger'
+                        
+                        # Verify download
+                        try:
+                            try:
+                                nltk_find(f'taggers/{tagger_resource}')
+                            except LookupError:
+                                # Fallback check
+                                nltk_find('taggers/averaged_perceptron_tagger')
+                                tagger_resource = 'averaged_perceptron_tagger'
+                            
                             tagger_available = True
                             if self.verbose:
-                                print("    [NLTK] averaged_perceptron_tagger downloaded successfully")
+                                print("    [NLTK] Tagger downloaded successfully")
                         except LookupError:
                             if self.verbose:
-                                print("    [NLTK] Warning: averaged_perceptron_tagger download may have failed")
+                                print("    [NLTK] Warning: Tagger download may have failed")
                     except Exception as e:
                         if self.verbose:
-                            print(f"    [NLTK] Error downloading averaged_perceptron_tagger: {e}")
+                            print(f"    [NLTK] Error downloading taggers: {e}")
                 
-                # Verify punkt is available
+                # Verify punkt is available (and punkt_tab for newer NLTK)
                 punkt_available = False
                 try:
                     nltk_find('tokenizers/punkt')
@@ -650,11 +675,18 @@ class DialogueSegmenter:
                     try:
                         import nltk
                         nltk.download('punkt', quiet=True)
-                        try:
-                            nltk_find('tokenizers/punkt')
-                            punkt_available = True
-                        except LookupError:
-                            pass
+                        nltk_find('tokenizers/punkt')
+                        punkt_available = True
+                    except Exception:
+                        pass
+
+                # Newer NLTK versions require punkt_tab for some functions
+                try:
+                    nltk_find('tokenizers/punkt_tab')
+                except LookupError:
+                    try:
+                        import nltk
+                        nltk.download('punkt_tab', quiet=True)
                     except Exception:
                         pass
                 
@@ -670,15 +702,19 @@ class DialogueSegmenter:
                         if self.verbose:
                             print(f"    [NLTK SETUP] NLTK POS tagging initialized successfully")
                     except LookupError as lookup_error:
-                        # If we get a LookupError, it means the tagger resource wasn't found
-                        # This can happen if NLTK is looking for a different resource name
+                        # If we get a LookupError, it means a resource is missing
                         if self.verbose:
-                            print(f"    [NLTK SETUP] Tagger resource not found: {lookup_error}")
-                            print(f"    [NLTK SETUP] Attempting to download required resources...")
-                        # Try downloading the tagger again
+                            print(f"    [NLTK SETUP] Resource missing during test: {lookup_error}")
+                            print(f"    [NLTK SETUP] Attempting to fix...")
+                        
                         try:
                             import nltk
+                            # Download everything we might need
+                            nltk.download('averaged_perceptron_tagger_eng', quiet=False)
                             nltk.download('averaged_perceptron_tagger', quiet=False)
+                            nltk.download('punkt', quiet=False)
+                            nltk.download('punkt_tab', quiet=False)
+                            
                             # Try the test again
                             test_tokens = word_tokenize("Test sentence.")
                             test_tags = pos_tag(test_tokens)
@@ -686,7 +722,7 @@ class DialogueSegmenter:
                             self._pos_tag = pos_tag
                             self._word_tokenize = word_tokenize
                             if self.verbose:
-                                print(f"    [NLTK SETUP] NLTK POS tagging initialized successfully after download")
+                                print(f"    [NLTK SETUP] NLTK POS tagging fixed and initialized")
                         except Exception as retry_error:
                             if self.verbose:
                                 print(f"    [NLTK SETUP] NLTK initialization failed after retry: {retry_error}")
