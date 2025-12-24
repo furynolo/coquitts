@@ -64,7 +64,7 @@ def load_pronunciations(pronunciations_file):
             if isinstance(value, str):
                 # Remove combining characters from the pronunciation value
                 cleaned_value = combining_pattern.sub('', value)
-                cleaned_pronunciations[key] = cleaned_value
+                cleaned_pronunciations[key] = cleaned_value.strip()
             else:
                 cleaned_pronunciations[key] = value
         

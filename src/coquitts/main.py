@@ -148,6 +148,31 @@ def identify_text_structure(text: str, model_name: str = None, chunk_size: int =
             results['speakers'] = character_map
             results['warnings'].extend(assigner.warnings)
             
+            # Export voice mapping configuration
+            if character_map:
+                try:
+                    # Determine output path
+                    if input_file_path:
+                        p = Path(input_file_path)
+                        filename_stem = p.stem
+                    else:
+                        filename_stem = "output_speech"
+                    
+                    # Create configs directory if it doesn't exist
+                    configs_dir = Path("output/configs")
+                    configs_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    mapping_output = configs_dir / f"{filename_stem}_voice_mapping.json"
+                    
+                    with open(mapping_output, 'w', encoding='utf-8') as f:
+                        json.dump(character_map, f, indent=2, ensure_ascii=False)
+                        
+                    results['voice_mapping_file'] = str(mapping_output)
+                    print(f"Exported character voice mapping to '{mapping_output}'")
+                    
+                except Exception as e:
+                    print(f"Error exporting voice mapping: {e}")
+            
         except Exception as e:
             results['error'] = str(e)
             

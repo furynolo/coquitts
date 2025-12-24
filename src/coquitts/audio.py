@@ -260,12 +260,12 @@ class AudioSynthesizer:
         self.available_speakers = None
         try:
             if hasattr(self.tts, 'speakers') and self.tts.speakers is not None:
-                self.available_speakers = list(self.tts.speakers) if self.tts.speakers else None
+                self.available_speakers = [s.strip() for s in self.tts.speakers] if self.tts.speakers else None
             elif hasattr(self.tts, 'speaker_manager') and self.tts.speaker_manager is not None:
                 if hasattr(self.tts.speaker_manager, 'speaker_names'):
-                    self.available_speakers = list(self.tts.speaker_manager.speaker_names)
+                    self.available_speakers = [s.strip() for s in self.tts.speaker_manager.speaker_names]
                 elif hasattr(self.tts.speaker_manager, 'speakers'):
-                    self.available_speakers = list(self.tts.speaker_manager.speakers)
+                    self.available_speakers = [s.strip() for s in self.tts.speaker_manager.speakers]
         except Exception:
             pass
             
