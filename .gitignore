@@ -93,7 +93,8 @@ Thumbs.db
 
 .cursor/
 output-audio/
-output/
+output/audio/
+output/speaker-examples/
 input-text/txt-books/
 input-text/pdf-books/
 evaluation_report.json
