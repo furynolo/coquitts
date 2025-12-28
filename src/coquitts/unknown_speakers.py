@@ -19,27 +19,30 @@ class CorrectionManager:
         unique_str = f"{start_pos}:{text}"
         return hashlib.md5(unique_str.encode('utf-8')).hexdigest()
 
-    def export_corrections(self, segments: List[Segment], full_text: str, output_path: str, context_size: int = 500):
+    def export_corrections(self, segments: List[Segment], full_text: str, output_path: str, context_size: int = 500, include_all: bool = False):
         """
-        Export UNKNOWN segments to a JSON file for manual correction.
+        Export dialogue segments to a JSON file for manual correction.
         
         Args:
             segments: List of all segments
             full_text: The complete input text (for extracting context)
             output_path: Path to save the JSON file
             context_size: Number of characters of context to include
+            include_all: If True, include ALL dialogue segments. If False, only UNKNOWN.
         """
         export_data = []
         
-        unknown_segments = [s for s in segments if s.type == "dialogue" and s.speaker == "UNKNOWN"]
+        if include_all:
+            target_segments = [s for s in segments if s.type == "dialogue"]
+            print(f"Exporting ALL {len(target_segments)} dialogue segments for manual review...")
+        else:
+            target_segments = [s for s in segments if s.type == "dialogue" and s.speaker == "UNKNOWN"]
+            if not target_segments:
+                print("No UNKNOWN speakers found. Nothing to export.")
+                return
+            print(f"Found {len(target_segments)} UNKNOWN segments. Generating correction file...")
         
-        if not unknown_segments:
-            print("No UNKNOWN speakers found. Nothing to export.")
-            return
-
-        print(f"Found {len(unknown_segments)} UNKNOWN segments. Generating correction file...")
-        
-        for i, segment in enumerate(unknown_segments):
+        for i, segment in enumerate(target_segments):
             # Extract context
             start = max(0, segment.start_pos - context_size)
             end = min(len(full_text), segment.end_pos + context_size)
@@ -56,7 +59,7 @@ class CorrectionManager:
                 "id": self._calculate_segment_hash(segment.text, segment.start_pos),
                 "index": i, # Human readable order
                 "text": segment.text,
-                "speaker": "UNKNOWN", # Current value
+                "speaker": segment.speaker, # Current value
                 "correction": "", # User fills this in
                 "context_before": before_context,
                 "context_after": after_context,

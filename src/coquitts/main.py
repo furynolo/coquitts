@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument("--auto-speaker", "-a", action="store_true", help="Enable automatic speaker detection and dialogue routing")
     parser.add_argument("--character-voice-mapping", "-c", help="JSON file mapping character names to speaker IDs")
     parser.add_argument("--generate-corrections", "-g", action="store_true", help="Generate a JSON file for manual unknown speaker corrections")
+    parser.add_argument("--include-all-dialogue", action="store_true", help="When generating corrections, include all dialogue segments (not just UNKNOWN)")
     parser.add_argument("--apply-corrections", type=str, help="Path to JSON file with speaker corrections to apply")
     
     # Processing Configuration
@@ -45,7 +46,7 @@ def identify_text_structure(text: str, model_name: str = None, chunk_size: int =
                           pronunciations: dict = None, auto_speaker: bool = False, 
                           verbose: bool = False, character_voice_mapping: dict = None,
                           generate_corrections: bool = False, apply_corrections_file: str = None,
-                          input_file_path: str = None) -> Dict[str, Any]:
+                          input_file_path: str = None, include_all_dialogue: bool = False) -> Dict[str, Any]:
     """
     Identify text structure (chunks, speakers, dialogue) without synthesizing.
     """
@@ -109,7 +110,27 @@ def identify_text_structure(text: str, model_name: str = None, chunk_size: int =
                 corrections = cm.load_corrections(apply_corrections_file)
                 cm.apply_corrections(segments, corrections)
             
-            # Generate corrections file if requested
+
+            
+            # Build original name map
+            original_name_map = {}
+            # (Simplified mapping logic for display)
+            for seg in segments:
+                if seg.type == "dialogue" and seg.speaker not in ("NARRATOR", "UNKNOWN"):
+                    original_name_map[seg.speaker] = seg.speaker # Default
+            
+            results['unknown_dialogue_count'] = segmenter.unknown_count
+            results['unknown_segments'] = segmenter.unknown_segments
+            results['original_name_map'] = original_name_map
+            
+            # Assign speakers (and resolve UNKNOWNs via flow analysis)
+            assigner = SpeakerAssigner(available_speakers, character_voice_mapping=character_voice_mapping)
+            character_map = assigner.assign_speakers(segments)
+            
+            results['speakers'] = character_map
+            results['warnings'].extend(assigner.warnings)
+            
+            # Generate corrections file if requested (AFTER assignment/resolution)
             if generate_corrections:
                 from .unknown_speakers import CorrectionManager
                 cm = CorrectionManager(verbose=verbose)
@@ -127,26 +148,8 @@ def identify_text_structure(text: str, model_name: str = None, chunk_size: int =
                 
                 json_output = str(corrections_dir / f"{filename_stem}_corrections.json")
                     
-                cm.export_corrections(segments, text, json_output)
+                cm.export_corrections(segments, text, json_output, include_all=include_all_dialogue)
                 results['correction_file'] = json_output
-            
-            # Build original name map
-            original_name_map = {}
-            # (Simplified mapping logic for display)
-            for seg in segments:
-                if seg.type == "dialogue" and seg.speaker not in ("NARRATOR", "UNKNOWN"):
-                    original_name_map[seg.speaker] = seg.speaker # Default
-            
-            results['unknown_dialogue_count'] = segmenter.unknown_count
-            results['unknown_segments'] = segmenter.unknown_segments
-            results['original_name_map'] = original_name_map
-            
-            # Assign speakers
-            assigner = SpeakerAssigner(available_speakers, character_voice_mapping=character_voice_mapping)
-            character_map = assigner.assign_speakers(segments)
-            
-            results['speakers'] = character_map
-            results['warnings'].extend(assigner.warnings)
             
             # Export voice mapping configuration
             if character_map:
@@ -274,7 +277,8 @@ def main():
             character_voice_mapping=character_voice_mapping,
             generate_corrections=args.generate_corrections,
             apply_corrections_file=args.apply_corrections,
-            input_file_path=args.input_file
+            input_file_path=args.input_file,
+            include_all_dialogue=args.include_all_dialogue
         )
         
         # Print results (simplified for brevity, similar to original)
