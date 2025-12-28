@@ -1,7 +1,33 @@
 [
   {
-    "id": "6c1e45de20bbb09feeea3619ac9a6820",
+    "id": "eb469c0676ee889d66a62cf2b26f0518",
     "index": 0,
+    "text": "Surely your survival is a sign, a message from the Light.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "fully short. Then the sound of orcish voices just around the bend of the inner wall drifted to him. It sounded as if they were rooting through the corpses, looking for something or someone. His time had run out.\n\nNobundo took up his hammer. Though it cost considerable time and effort and sapped what little strength he had left, he made it over the remaining bodies and through the gap in the wall.\n\nAs he shambled slowly, painfully into Terokkar Forest, female screams atop Aldor Rise began anew.\n\n",
+    "context_after": "\n\n\"It blesses each of us in its own way. When the time comes, you will find it again.\"\n\n\"I hope that is true, old friend. I just... I do not feel the same. Something within me has changed.\"\n\n\"Nonsense. You are tired and confused, and after all you have been through, you cannot be faulted for either. Get some rest.\"\n\nRolc exited the cave. Nobundo laid back and closed his eyes....\n\nCries. The frantic pleas of the females.\n\nNobundo's eyes snapped open. He had been here for several days now, in one ",
+    "metadata": {
+      "start_pos": 19774,
+      "end_pos": 19833
+    }
+  },
+  {
+    "id": "d8360e82d2f9e18e4cd8bcef4db713d5",
+    "index": 1,
+    "text": "It blesses each of us in its own way. When the time comes, you will find it again.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "bend of the inner wall drifted to him. It sounded as if they were rooting through the corpses, looking for something or someone. His time had run out.\n\nNobundo took up his hammer. Though it cost considerable time and effort and sapped what little strength he had left, he made it over the remaining bodies and through the gap in the wall.\n\nAs he shambled slowly, painfully into Terokkar Forest, female screams atop Aldor Rise began anew.\n\n\"Surely your survival is a sign, a message from the Light.\"\n\n",
+    "context_after": "\n\n\"I hope that is true, old friend. I just... I do not feel the same. Something within me has changed.\"\n\n\"Nonsense. You are tired and confused, and after all you have been through, you cannot be faulted for either. Get some rest.\"\n\nRolc exited the cave. Nobundo laid back and closed his eyes....\n\nCries. The frantic pleas of the females.\n\nNobundo's eyes snapped open. He had been here for several days now, in one of the few camps occupied by those who had gone into hiding before the battle. Yet he ",
+    "metadata": {
+      "start_pos": 19835,
+      "end_pos": 19919
+    }
+  },
+  {
+    "id": "6c1e45de20bbb09feeea3619ac9a6820",
+    "index": 2,
     "text": "I hope that is true, old friend. I just... I do not feel the same. Something within me has changed.",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -14,7 +40,7 @@
   },
   {
     "id": "a393e78044d30dc4b439d0cff9fcb657",
-    "index": 1,
+    "index": 3,
     "text": "Nonsense. You are tired and confused, and after all you have been through, you cannot be faulted for either. Get some rest.",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -27,7 +53,7 @@
   },
   {
     "id": "8bedf33be1e788b7a709173356757944",
-    "index": 2,
+    "index": 4,
     "text": "Survivors from Shattrath.",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -39,8 +65,21 @@
     }
   },
   {
+    "id": "d4b52fe49644d58e723c344428800e8a",
+    "index": 5,
+    "text": "Where are we? What has happened? I do not feel--something is...",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "ale and one female, were being assisted by camp members past the perimeter guards. Another, unconscious, was carried behind them.\n\nNobundo shot a questioning glance to one of the guards, who responded to the unspoken enquiry: \"Survivors from Shattrath.\"\n\nGalvanized, Nobundo followed the party back to the caves, where the survivors were carefully laid down on blankets. Rolc laid his hands on the unconscious one first, but was unable to awaken him.\n\nThe female, seemingly in a daze, was muttering, ",
+    "context_after": "\n\nRolc came and shushed her. \"Just relax. You are among friends now. Everything is going to be fine.\"\n\nNobundo wondered. Would everything be fine? Orcish hunting parties had already discovered one camp and wiped it out. And these four, how had they survived? What horrors had the female witnessed? What had driven the unconscious one to his catatonic state? Even more, the way they looked and behaved... Nobundo wondered if their injuries went beyond the physical: they appeared drained, dispirited.\n",
+    "metadata": {
+      "start_pos": 22038,
+      "end_pos": 22103
+    }
+  },
+  {
     "id": "ceb2c6e0975bd775767c89201e567d6c",
-    "index": 3,
+    "index": 6,
     "text": "Just relax. You are among friends now. Everything is going to be fine.",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -52,8 +91,151 @@
     }
   },
   {
+    "id": "6bd80a788ccbae6ba44fcaf842debf8e",
+    "index": 7,
+    "text": "We were lucky. We stayed deep in the mountain, in one of the few hiding places that remained undiscovered... at least for the most part.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": ", how had they survived? What horrors had the female witnessed? What had driven the unconscious one to his catatonic state? Even more, the way they looked and behaved... Nobundo wondered if their injuries went beyond the physical: they appeared drained, dispirited.\n\nThey looked the way he felt.\n\nSeveral days later the survivors had recovered sufficiently for Nobundo to feel comfortable asking them about Shattrath.\n\nThe female, Korin, spoke first. Her voice broke as she recounted the experience. ",
+    "context_after": "\n\nNobundo looked puzzled.\n\n\"At one point a band of the green-skinned monsters found us. The battle that followed was... I have never seen such things. Four of the men who had volunteered to defend our group were slaughtered, but they killed many of the orcs as well. Finally only Herac and Estes were left. They killed the brutal creatures that remained. They were savage beasts. And those eyes, those terrible eyes...\" Korin shuddered at the memory.\n\nEstes spoke: \"There was an explosion. Moments la",
+    "metadata": {
+      "start_pos": 22837,
+      "end_pos": 22975
+    }
+  },
+  {
+    "id": "c569ed29fee57e2934362906365a10a8",
+    "index": 8,
+    "text": "There was an explosion. Moments later a putrid gas filtered into our hiding place, choking us, causing a sickness such as none of us had ever felt before.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "red... at least for the most part.\"\n\nNobundo looked puzzled.\n\n\"At one point a band of the green-skinned monsters found us. The battle that followed was... I have never seen such things. Four of the men who had volunteered to defend our group were slaughtered, but they killed many of the orcs as well. Finally only Herac and Estes were left. They killed the brutal creatures that remained. They were savage beasts. And those eyes, those terrible eyes...\" Korin shuddered at the memory.\n\nEstes spoke: ",
+    "context_after": "\n\nNobundo thought of the unnatural red mist and quickly forced the memory away. Herac broke in. \"It felt as if we were dying. Most of us blacked out. When we awoke, it was morning. The upper levels were deserted. We made our way into the Barrier Hills, and from there journeyed into Nuh-Grand, where we were found many days later.\"\n\n\"How many of you were there?\"\n\nHerac answered: \"Twenty, maybe more. Mostly women, some children. Others trickled in days later, like the one who lies unconscious in th",
+    "metadata": {
+      "start_pos": 23440,
+      "end_pos": 23596
+    }
+  },
+  {
+    "id": "e04d57e9130b4816496e96c1019a45d8",
+    "index": 9,
+    "text": "How many of you were there?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "tes spoke: \"There was an explosion. Moments later a putrid gas filtered into our hiding place, choking us, causing a sickness such as none of us had ever felt before.\"\n\nNobundo thought of the unnatural red mist and quickly forced the memory away. Herac broke in. \"It felt as if we were dying. Most of us blacked out. When we awoke, it was morning. The upper levels were deserted. We made our way into the Barrier Hills, and from there journeyed into Nuh-Grand, where we were found many days later.\"\n\n",
+    "context_after": "\n\nHerac answered: \"Twenty, maybe more. Mostly women, some children. Others trickled in days later, like the one who lies unconscious in the cave... Akama, they said his name is. We were told he caught a larger dose of the gas than any of the other survivors. Rolc is still unsure if he will ever...\" Herac broke off and fell silent.\n\nEstes continued, \"Later we were split up and sent to different camps throughout Zangarmarsh and Nuh-Grand. A precaution, so that if one of the camps were discovered b",
+    "metadata": {
+      "start_pos": 23929,
+      "end_pos": 23958
+    }
+  },
+  {
+    "id": "2e73c43dae20bc431333a1206f3aede5",
+    "index": 10,
+    "text": "Later we were split up and sent to different camps throughout Zangarmarsh and Nuh-Grand. A precaution, so that if one of the camps were discovered by the orcs, we would not all be killed.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "We made our way into the Barrier Hills, and from there journeyed into Nuh-Grand, where we were found many days later.\"\n\n\"How many of you were there?\"\n\nHerac answered: \"Twenty, maybe more. Mostly women, some children. Others trickled in days later, like the one who lies unconscious in the cave... Akama, they said his name is. We were told he caught a larger dose of the gas than any of the other survivors. Rolc is still unsure if he will ever...\" Herac broke off and fell silent.\n\nEstes continued, ",
+    "context_after": "\n\n\"Were any of you priests or Vindicators--wielders of the Light?\"\n\nAll three shook their heads. \"I cannot speak for Akama, but Estes and I were simple craftsmen, unaccustomed to wielding a weapon of any kind. That was why we were assigned to the caves: to be a last line of defense.\"\n\nKorin asked Nobundo, \"When you escaped, did any others make it with you? Were there more survivors? We heard the orcs in the lower levels, but we did not want to risk discovery, so we fled.\"\n\nNobundo thought of the",
+    "metadata": {
+      "start_pos": 24309,
+      "end_pos": 24498
+    }
+  },
+  {
+    "id": "04125c1ca880ff47badf03235cbdf37f",
+    "index": 11,
+    "text": "Were any of you priests or Vindicators--wielders of the Light?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "tly women, some children. Others trickled in days later, like the one who lies unconscious in the cave... Akama, they said his name is. We were told he caught a larger dose of the gas than any of the other survivors. Rolc is still unsure if he will ever...\" Herac broke off and fell silent.\n\nEstes continued, \"Later we were split up and sent to different camps throughout Zangarmarsh and Nuh-Grand. A precaution, so that if one of the camps were discovered by the orcs, we would not all be killed.\"\n\n",
+    "context_after": "\n\nAll three shook their heads. \"I cannot speak for Akama, but Estes and I were simple craftsmen, unaccustomed to wielding a weapon of any kind. That was why we were assigned to the caves: to be a last line of defense.\"\n\nKorin asked Nobundo, \"When you escaped, did any others make it with you? Were there more survivors? We heard the orcs in the lower levels, but we did not want to risk discovery, so we fled.\"\n\nNobundo thought of the piled bodies in Lower City... heard the pleas from Aldor Rise, tr",
+    "metadata": {
+      "start_pos": 24500,
+      "end_pos": 24564
+    }
+  },
+  {
+    "id": "c86b4120aff08c1b8fe1c44804f7281e",
+    "index": 12,
+    "text": "I cannot speak for Akama, but Estes and I were simple craftsmen, unaccustomed to wielding a weapon of any kind. That was why we were assigned to the caves: to be a last line of defense.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "he cave... Akama, they said his name is. We were told he caught a larger dose of the gas than any of the other survivors. Rolc is still unsure if he will ever...\" Herac broke off and fell silent.\n\nEstes continued, \"Later we were split up and sent to different camps throughout Zangarmarsh and Nuh-Grand. A precaution, so that if one of the camps were discovered by the orcs, we would not all be killed.\"\n\n\"Were any of you priests or Vindicators--wielders of the Light?\"\n\nAll three shook their heads. ",
+    "context_after": "\n\nKorin asked Nobundo, \"When you escaped, did any others make it with you? Were there more survivors? We heard the orcs in the lower levels, but we did not want to risk discovery, so we fled.\"\n\nNobundo thought of the piled bodies in Lower City... heard the pleas from Aldor Rise, tried to force the tortured screams from his mind.\n\n\"No,\" he answered. \"There were no more that I know of.\"\n\nSeasons passed.\n\nVelen, their prophet leader, had visited them two days ago... or was it four? Lately Nobundo f",
+    "metadata": {
+      "start_pos": 24595,
+      "end_pos": 24782
+    }
+  },
+  {
+    "id": "6c27b37c64280b4b58752cf70006790a",
+    "index": 13,
+    "text": "No,",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": " Akama, but Estes and I were simple craftsmen, unaccustomed to wielding a weapon of any kind. That was why we were assigned to the caves: to be a last line of defense.\"\n\nKorin asked Nobundo, \"When you escaped, did any others make it with you? Were there more survivors? We heard the orcs in the lower levels, but we did not want to risk discovery, so we fled.\"\n\nNobundo thought of the piled bodies in Lower City... heard the pleas from Aldor Rise, tried to force the tortured screams from his mind.\n\n",
+    "context_after": " he answered. \"There were no more that I know of.\"\n\nSeasons passed.\n\nVelen, their prophet leader, had visited them two days ago... or was it four? Lately Nobundo found it harder to remember some things. Velen had come from one of the neighboring camps. His exact location remained a closely guarded secret, in case one of their number was taken alive and tortured. The draenei could not give up information they did not possess. At any rate, Velen had spoken to them about their future, about how the",
+    "metadata": {
+      "start_pos": 25114,
+      "end_pos": 25119
+    }
+  },
+  {
+    "id": "a4a16ec75451f79815c594092a18cee7",
+    "index": 14,
+    "text": "There were no more that I know of.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "nd I were simple craftsmen, unaccustomed to wielding a weapon of any kind. That was why we were assigned to the caves: to be a last line of defense.\"\n\nKorin asked Nobundo, \"When you escaped, did any others make it with you? Were there more survivors? We heard the orcs in the lower levels, but we did not want to risk discovery, so we fled.\"\n\nNobundo thought of the piled bodies in Lower City... heard the pleas from Aldor Rise, tried to force the tortured screams from his mind.\n\n\"No,\" he answered. ",
+    "context_after": "\n\nSeasons passed.\n\nVelen, their prophet leader, had visited them two days ago... or was it four? Lately Nobundo found it harder to remember some things. Velen had come from one of the neighboring camps. His exact location remained a closely guarded secret, in case one of their number was taken alive and tortured. The draenei could not give up information they did not possess. At any rate, Velen had spoken to them about their future, about how they would have to lie low for quite a long time, pos",
+    "metadata": {
+      "start_pos": 25133,
+      "end_pos": 25169
+    }
+  },
+  {
+    "id": "d5e0af3a5559d119ca12a52581a5e19b",
+    "index": 15,
+    "text": "I am finished for today. I need to go lie down.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "rown slightly larger; her face looked drawn; and her posture had deteriorated. As improbable as it sounded, her tail seemed to have actually shrunk.\n\nHerac and Estes approached, and Nobundo could have sworn he saw similar transformations in them. He looked down at his own forearms. Was it his imagination, or did they appear swollen? He had not felt right ever since... ever since that night. But he had assumed he would recover in time. Now he was becoming increasingly worried.\n\nKorin approached. ",
+    "context_after": " She handed Nobundo her spear.\n\n\"Are you okay?\" he asked.\n\nKorin attempted a smile that lacked conviction. \"Just tired,\" she replied.\n\nNobundo sat atop the mountains overlooking Zangarmarsh, eyes closed. He felt tired, tired to his very bones. He had come here to be alone. He had not seen Korin in several days. She and the other two had holed up in one of the caves, and when he enquired as to their condition, his enquiries were answered with unknowing shrugs. As for the one called Akama, he was ",
+    "metadata": {
+      "start_pos": 27053,
+      "end_pos": 27102
+    }
+  },
+  {
+    "id": "585173d0f455db2574acee603ea95231",
+    "index": 16,
+    "text": "Are you okay?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": " improbable as it sounded, her tail seemed to have actually shrunk.\n\nHerac and Estes approached, and Nobundo could have sworn he saw similar transformations in them. He looked down at his own forearms. Was it his imagination, or did they appear swollen? He had not felt right ever since... ever since that night. But he had assumed he would recover in time. Now he was becoming increasingly worried.\n\nKorin approached. \"I am finished for today. I need to go lie down.\" She handed Nobundo her spear.\n\n",
+    "context_after": " he asked.\n\nKorin attempted a smile that lacked conviction. \"Just tired,\" she replied.\n\nNobundo sat atop the mountains overlooking Zangarmarsh, eyes closed. He felt tired, tired to his very bones. He had come here to be alone. He had not seen Korin in several days. She and the other two had holed up in one of the caves, and when he enquired as to their condition, his enquiries were answered with unknowing shrugs. As for the one called Akama, he was still unresponsive, barely hanging on despite R",
+    "metadata": {
+      "start_pos": 27134,
+      "end_pos": 27149
+    }
+  },
+  {
+    "id": "89d681140cde1b5de7e4ce21b6809b0f",
+    "index": 17,
+    "text": "Just tired,",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "and Estes approached, and Nobundo could have sworn he saw similar transformations in them. He looked down at his own forearms. Was it his imagination, or did they appear swollen? He had not felt right ever since... ever since that night. But he had assumed he would recover in time. Now he was becoming increasingly worried.\n\nKorin approached. \"I am finished for today. I need to go lie down.\" She handed Nobundo her spear.\n\n\"Are you okay?\" he asked.\n\nKorin attempted a smile that lacked conviction. ",
+    "context_after": " she replied.\n\nNobundo sat atop the mountains overlooking Zangarmarsh, eyes closed. He felt tired, tired to his very bones. He had come here to be alone. He had not seen Korin in several days. She and the other two had holed up in one of the caves, and when he enquired as to their condition, his enquiries were answered with unknowing shrugs. As for the one called Akama, he was still unresponsive, barely hanging on despite Rolc's continued efforts.\n\nSomething was drastically wrong. Nobundo knew i",
+    "metadata": {
+      "start_pos": 27209,
+      "end_pos": 27222
+    }
+  },
+  {
     "id": "9964a1a2792a4893572010384c56bcbd",
-    "index": 4,
+    "index": 18,
     "text": "I want to die! I just want to die; I want the pain gone!",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -66,7 +248,7 @@
   },
   {
     "id": "3f5dead87c9dff905b45fdaf4f838fdc",
-    "index": 5,
+    "index": 19,
     "text": "Don't be foolish!",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -79,7 +261,7 @@
   },
   {
     "id": "88e56fa20e7319895f7f149cb6693ddd",
-    "index": 6,
+    "index": 20,
     "text": "Can you not cure her?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -92,7 +274,7 @@
   },
   {
     "id": "f335bdd049cb28f6b849f57dee6e7ebf",
-    "index": 7,
+    "index": 21,
     "text": "I have tried!",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -105,7 +287,7 @@
   },
   {
     "id": "ef5587eb895d6bc8e732c3cb6597fa13",
-    "index": 8,
+    "index": 22,
     "text": "Let me go! Let me die!",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -118,7 +300,7 @@
   },
   {
     "id": "0a7187a420fb55555c1bde495e384b17",
-    "index": 9,
+    "index": 23,
     "text": "I have done all I know. It's as if her body, like her will, has been broken.",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -131,7 +313,7 @@
   },
   {
     "id": "5de181e63aaf310498f80d9f06221399",
-    "index": 10,
+    "index": 24,
     "text": "There must be something that can--some way to--",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -144,7 +326,7 @@
   },
   {
     "id": "c632d10fb3ef0b6e5f2c098d02c3e518",
-    "index": 11,
+    "index": 25,
     "text": "We have to do something!",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -156,8 +338,34 @@
     }
   },
   {
+    "id": "fe9095dec3d9d2af23788227e0f52441",
+    "index": 26,
+    "text": "What are you saying? What has happened?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "has been broken.\"\n\n\"There must be something that can--some way to--\" Nobundo struggled to properly communicate his thoughts. \"We have to do something!\" he finally blurted.\n\nRolc was silent for a moment. \"I worry for them, for you. We have received reports that Shattrath survivors in the other camps are undergoing similar changes. Whatever this is, it is not responding to any kind of treatment, and it is not going away. Our people are afraid that if measures are not taken, we will all be lost.\"\n\n",
+    "context_after": "\n\nRolc sighed. \"Just talk. For now. I have tried to be the voice of reason, but even I cannot defend you and the others for very long. And, truth be told, I am not sure that I should.\"\n\nNobundo felt bitter disappointment in his friend, in the one person he thought he could trust, who was now succumbing to the same narrow-minded paranoia as the others.\n\nAt a loss for words, Nobundo turned and walked away.\n\nKorin's condition worsened, and the decision that Nobundo dreaded, that Rolc had spoken of,",
+    "metadata": {
+      "start_pos": 31275,
+      "end_pos": 31316
+    }
+  },
+  {
+    "id": "9e85d7b1db4fc5f02c165e598b58fb8e",
+    "index": 27,
+    "text": "Just talk. For now. I have tried to be the voice of reason, but even I cannot defend you and the others for very long. And, truth be told, I am not sure that I should.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "me way to--\" Nobundo struggled to properly communicate his thoughts. \"We have to do something!\" he finally blurted.\n\nRolc was silent for a moment. \"I worry for them, for you. We have received reports that Shattrath survivors in the other camps are undergoing similar changes. Whatever this is, it is not responding to any kind of treatment, and it is not going away. Our people are afraid that if measures are not taken, we will all be lost.\"\n\n\"What are you saying? What has happened?\"\n\nRolc sighed. ",
+    "context_after": "\n\nNobundo felt bitter disappointment in his friend, in the one person he thought he could trust, who was now succumbing to the same narrow-minded paranoia as the others.\n\nAt a loss for words, Nobundo turned and walked away.\n\nKorin's condition worsened, and the decision that Nobundo dreaded, that Rolc had spoken of, was finally rendered a few days later.\n\nNobundo, Korin, Estes, and Herac were gathered before the camp members. Some wore grim expressions; some appeared sad; others were unreadable. ",
+    "metadata": {
+      "start_pos": 31331,
+      "end_pos": 31500
+    }
+  },
+  {
     "id": "e7df0b532b0cd0f17298e119162179d4",
-    "index": 12,
+    "index": 28,
     "text": "This is not easy for me, for any of us....",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -170,7 +378,7 @@
   },
   {
     "id": "6a2a807c012d5492a436081300d0e204",
-    "index": 13,
+    "index": 29,
     "text": "We are being banished?",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -183,7 +391,7 @@
   },
   {
     "id": "6251a34fee7285bc959dd23e1ac94d2e",
-    "index": 14,
+    "index": 30,
     "text": "That is exactly what this is! They cannot solve our problems, so they... they hope to ignore us! They just want us to go away!",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -196,7 +404,7 @@
   },
   {
     "id": "00f608108fea1972d493b88437412fdd",
-    "index": 15,
+    "index": 31,
     "text": "We cannot help you!",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -208,8 +416,125 @@
     }
   },
   {
+    "id": "53e4540ef04bd5e92cbb7d5a8801ea3a",
+    "index": 32,
+    "text": "We have no idea whether or not your condition is contagious, and your decreased physical abilities, your diminished mental faculties are a liability that we cannot afford. There are not enough of us left to take chances!",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": " to a decision. We believe it would be in the best interests of everyone involved if those of you who have been... afflicted commune together, but... separate from those of us who remain in good health.\"\n\nKorin, looking particularly forlorn, spoke in a harsh rasp: \"We are being banished?\"\n\nBefore Rolc could demur, Nobundo broke in: \"That is exactly what this is! They cannot solve our problems, so they... they hope to ignore us! They just want us to go away!\"\n\n\"We cannot help you!\" Rolc blurted. ",
+    "context_after": "\n\n\"What of the other, Akama?\" Korin asked.\n\n\"He will stay here in my care until he awakens,\" Rolc responded, and then added, \"if he awakens.\"\n\n\"How kind of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n\"I gave everyth",
+    "metadata": {
+      "start_pos": 32922,
+      "end_pos": 33144
+    }
+  },
+  {
+    "id": "4ff10f756186430a70361f38ecab34de",
+    "index": 33,
+    "text": "What of the other, Akama?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "icularly forlorn, spoke in a harsh rasp: \"We are being banished?\"\n\nBefore Rolc could demur, Nobundo broke in: \"That is exactly what this is! They cannot solve our problems, so they... they hope to ignore us! They just want us to go away!\"\n\n\"We cannot help you!\" Rolc blurted. \"We have no idea whether or not your condition is contagious, and your decreased physical abilities, your diminished mental faculties are a liability that we cannot afford. There are not enough of us left to take chances!\"\n\n",
+    "context_after": " Korin asked.\n\n\"He will stay here in my care until he awakens,\" Rolc responded, and then added, \"if he awakens.\"\n\n\"How kind of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n\"I gave everything at Shattrath! I was prepa",
+    "metadata": {
+      "start_pos": 33146,
+      "end_pos": 33173
+    }
+  },
+  {
+    "id": "3e28394a1d9afd98e19545828db1258c",
+    "index": 34,
+    "text": "He will stay here in my care until he awakens,",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "We are being banished?\"\n\nBefore Rolc could demur, Nobundo broke in: \"That is exactly what this is! They cannot solve our problems, so they... they hope to ignore us! They just want us to go away!\"\n\n\"We cannot help you!\" Rolc blurted. \"We have no idea whether or not your condition is contagious, and your decreased physical abilities, your diminished mental faculties are a liability that we cannot afford. There are not enough of us left to take chances!\"\n\n\"What of the other, Akama?\" Korin asked.\n\n",
+    "context_after": " Rolc responded, and then added, \"if he awakens.\"\n\n\"How kind of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n\"I gave everything at Shattrath! I was prepared to die so that you, all of you could live!\"\n\n\"Yes, but you ",
+    "metadata": {
+      "start_pos": 33188,
+      "end_pos": 33236
+    }
+  },
+  {
+    "id": "021f5ca682e2251c37ccea5537841703",
+    "index": 35,
+    "text": "How kind of you,",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "They cannot solve our problems, so they... they hope to ignore us! They just want us to go away!\"\n\n\"We cannot help you!\" Rolc blurted. \"We have no idea whether or not your condition is contagious, and your decreased physical abilities, your diminished mental faculties are a liability that we cannot afford. There are not enough of us left to take chances!\"\n\n\"What of the other, Akama?\" Korin asked.\n\n\"He will stay here in my care until he awakens,\" Rolc responded, and then added, \"if he awakens.\"\n\n",
+    "context_after": " Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n\"I gave everything at Shattrath! I was prepared to die so that you, all of you could live!\"\n\n\"Yes, but you did not die.\"\n\n\"What are you--are you saying I deserted?\"\n\n\"I think t",
+    "metadata": {
+      "start_pos": 33287,
+      "end_pos": 33305
+    }
+  },
+  {
+    "id": "8bd39a1ce5c45e7ad1f720296db8dcd8",
+    "index": 36,
+    "text": "You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "al abilities, your diminished mental faculties are a liability that we cannot afford. There are not enough of us left to take chances!\"\n\n\"What of the other, Akama?\" Korin asked.\n\n\"He will stay here in my care until he awakens,\" Rolc responded, and then added, \"if he awakens.\"\n\n\"How kind of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, ",
+    "context_after": "\n\n\"I gave everything at Shattrath! I was prepared to die so that you, all of you could live!\"\n\n\"Yes, but you did not die.\"\n\n\"What are you--are you saying I deserted?\"\n\n\"I think that if the Light has abandoned you, it has done so with reason. Who are we to question the ways of the Light?\" Rolc looked back at the others for support. Some of them looked away, but many did not. \"Whatever the case, I think it is time you accepted your new place in the order of things. I think it is time you took the ",
+    "metadata": {
+      "start_pos": 33509,
+      "end_pos": 33627
+    }
+  },
+  {
+    "id": "edfd14eaecd9d7987a1ef956ce9fdf35",
+    "index": 37,
+    "text": "I gave everything at Shattrath! I was prepared to die so that you, all of you could live!",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": " take chances!\"\n\n\"What of the other, Akama?\" Korin asked.\n\n\"He will stay here in my care until he awakens,\" Rolc responded, and then added, \"if he awakens.\"\n\n\"How kind of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n",
+    "context_after": "\n\n\"Yes, but you did not die.\"\n\n\"What are you--are you saying I deserted?\"\n\n\"I think that if the Light has abandoned you, it has done so with reason. Who are we to question the ways of the Light?\" Rolc looked back at the others for support. Some of them looked away, but many did not. \"Whatever the case, I think it is time you accepted your new place in the order of things. I think it is time you took the welfare of others into account....\"\n\nRolc reached down and snatched the hammer from Nobundo's",
+    "metadata": {
+      "start_pos": 33629,
+      "end_pos": 33720
+    }
+  },
+  {
+    "id": "6acf4db32fa310e6f50611eb654a9dc2",
+    "index": 38,
+    "text": "Yes, but you did not die.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "l he awakens,\" Rolc responded, and then added, \"if he awakens.\"\n\n\"How kind of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n\"I gave everything at Shattrath! I was prepared to die so that you, all of you could live!\"\n\n",
+    "context_after": "\n\n\"What are you--are you saying I deserted?\"\n\n\"I think that if the Light has abandoned you, it has done so with reason. Who are we to question the ways of the Light?\" Rolc looked back at the others for support. Some of them looked away, but many did not. \"Whatever the case, I think it is time you accepted your new place in the order of things. I think it is time you took the welfare of others into account....\"\n\nRolc reached down and snatched the hammer from Nobundo's hand.\n\n\"And I think it is ti",
+    "metadata": {
+      "start_pos": 33722,
+      "end_pos": 33749
+    }
+  },
+  {
+    "id": "af6997e71f42ac406540e6631c6713b1",
+    "index": 39,
+    "text": "What are you--are you saying I deserted?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": ", and then added, \"if he awakens.\"\n\n\"How kind of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n\"I gave everything at Shattrath! I was prepared to die so that you, all of you could live!\"\n\n\"Yes, but you did not die.\"\n\n",
+    "context_after": "\n\n\"I think that if the Light has abandoned you, it has done so with reason. Who are we to question the ways of the Light?\" Rolc looked back at the others for support. Some of them looked away, but many did not. \"Whatever the case, I think it is time you accepted your new place in the order of things. I think it is time you took the welfare of others into account....\"\n\nRolc reached down and snatched the hammer from Nobundo's hand.\n\n\"And I think it is time you stopped trying to be something you ar",
+    "metadata": {
+      "start_pos": 33751,
+      "end_pos": 33793
+    }
+  },
+  {
+    "id": "c7bd4cbb0279c52df01fab27d4c375d7",
+    "index": 40,
+    "text": "I think that if the Light has abandoned you, it has done so with reason. Who are we to question the ways of the Light?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "d of you,\" Nobundo muttered, his words laced with sarcasm.\n\nRolc strode forward to stand defiantly before Nobundo. Despite his failing health, Nobundo straightened and looked Rolc squarely in the eyes.\n\nRolc said, \"You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.\"\n\n\"I gave everything at Shattrath! I was prepared to die so that you, all of you could live!\"\n\n\"Yes, but you did not die.\"\n\n\"What are you--are you saying I deserted?\"\n\n",
+    "context_after": " Rolc looked back at the others for support. Some of them looked away, but many did not. \"Whatever the case, I think it is time you accepted your new place in the order of things. I think it is time you took the welfare of others into account....\"\n\nRolc reached down and snatched the hammer from Nobundo's hand.\n\n\"And I think it is time you stopped trying to be something you are not.\"\n\nIt was a mistake to come here. Nothing has changed. You are still Krokul,you are still Broken.\n\nNo. They would li",
+    "metadata": {
+      "start_pos": 33795,
+      "end_pos": 33915
+    }
+  },
+  {
     "id": "07b193f300093a5e823a5fa8b1ffbd3f",
-    "index": 16,
+    "index": 41,
     "text": "Whatever the case, I think it is time you accepted your new place in the order of things. I think it is time you took the welfare of others into account....",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -222,7 +547,7 @@
   },
   {
     "id": "829563bf577b9369ccd15ff4ddd76714",
-    "index": 17,
+    "index": 42,
     "text": "And I think it is time you stopped trying to be something you are not.",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -235,7 +560,7 @@
   },
   {
     "id": "1cee270a52071d0823284eaf617ebd62",
-    "index": 18,
+    "index": 43,
     "text": "This is nonsense,",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -247,11 +572,24 @@
     }
   },
   {
+    "id": "2ad6fd92210594cacd38a9fe97b80654",
+    "index": 44,
+    "text": "I have come to... to talk to you about--",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "rom the gathered assembly to the fountain in the center of the small plaza. From that water he asked for clarity.\n\nHe felt his thoughts resolve into focus. He thanked the water and, leaning heavily on his stick, forced himself to meet the sea of disapproving gazes below. There was a moment of awkward silence.\n\n\"This is nonsense,\" he heard someone whisper.\n\nWhen at first he tried to speak, his voice sounded small and hoarse, distant to his own ears. He cleared his throat and began again, louder. ",
+    "context_after": "\n\n\"We are wasting our time. What can a Krokul have to say to us?\"\n\nMore voices of dissent joined in. Nobundo faltered. His mouth worked, but his voice was lost.\n\nI was right. This was a mistake.\n\nNobundo turned to depart, and looked up into the placid eyes of the prophet, their leader, Velen.\n\nThe seer fixed Nobundo with a critical gaze. \"Going somewhere?\"\n\nNobundo sat atop one of the cliffs overlooking the scorched lands. They had not changed much in the last... how long had it been since he fi",
+    "metadata": {
+      "start_pos": 35009,
+      "end_pos": 35051
+    }
+  },
+  {
     "id": "83b01722e87265929e1478a3c313a910",
-    "index": 19,
+    "index": 45,
     "text": "We are wasting our time. What can a Krokul have to say to us?",
     "speaker": "UNKNOWN",
-    "correction": "NARRATOR",
+    "correction": "",
     "context_before": " the center of the small plaza. From that water he asked for clarity.\n\nHe felt his thoughts resolve into focus. He thanked the water and, leaning heavily on his stick, forced himself to meet the sea of disapproving gazes below. There was a moment of awkward silence.\n\n\"This is nonsense,\" he heard someone whisper.\n\nWhen at first he tried to speak, his voice sounded small and hoarse, distant to his own ears. He cleared his throat and began again, louder. \"I have come to... to talk to you about--\"\n\n",
     "context_after": "\n\nMore voices of dissent joined in. Nobundo faltered. His mouth worked, but his voice was lost.\n\nI was right. This was a mistake.\n\nNobundo turned to depart, and looked up into the placid eyes of the prophet, their leader, Velen.\n\nThe seer fixed Nobundo with a critical gaze. \"Going somewhere?\"\n\nNobundo sat atop one of the cliffs overlooking the scorched lands. They had not changed much in the last... how long had it been since he first ventured out here? Five years? Six?\n\nWhen he and the others w",
     "metadata": {
@@ -260,8 +598,21 @@
     }
   },
   {
+    "id": "fc75ccafccc837320cd46b38d5cbff9a",
+    "index": 46,
+    "text": "Going somewhere?",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "to speak, his voice sounded small and hoarse, distant to his own ears. He cleared his throat and began again, louder. \"I have come to... to talk to you about--\"\n\n\"We are wasting our time. What can a Krokul have to say to us?\"\n\nMore voices of dissent joined in. Nobundo faltered. His mouth worked, but his voice was lost.\n\nI was right. This was a mistake.\n\nNobundo turned to depart, and looked up into the placid eyes of the prophet, their leader, Velen.\n\nThe seer fixed Nobundo with a critical gaze. ",
+    "context_after": "\n\nNobundo sat atop one of the cliffs overlooking the scorched lands. They had not changed much in the last... how long had it been since he first ventured out here? Five years? Six?\n\nWhen he and the others were sent away to the new camp for Krokul, as they had finally come to be called, Nobundo was angry, frustrated, and depressed. He went to the farthest spot possible in the only direction he was allowed. He had always meant to investigate the hills bordering Zangarmarsh, but at the base of tho",
+    "metadata": {
+      "start_pos": 35391,
+      "end_pos": 35409
+    }
+  },
+  {
     "id": "9c37d9c6582adc86322459a44217b2e7",
-    "index": 20,
+    "index": 47,
     "text": "unaffected",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -286,8 +637,21 @@
     }
   },
   {
+    "id": "1f0726dbb1e7e461a8fd9da10da6f4d6",
+    "index": 49,
+    "text": "Nobundo.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "at you came here to do.\n\nHe put it off because part of him knew this time would be no different. But he would do it anyway, just as he had done every day for the past several years... because somehow, someway a part of him still maintained hope.\n\nHe closed his eyes, forced all extraneous thought from his mind, and reached out for the Light. Please, just this once... let me bask again in your radiant glory.\n\nNothing.\n\nTry harder.\n\nHe focused with every ounce of concentration he had left in him.\n\n",
+    "context_after": "\n\nHe nearly jumped out of his skin, his eyes snapping open as he put out a hand to steady himself. He looked around, up at the sky.\n\n\"I found you!\"\n\nHe turned to see Korin and let out a deep breath, shaking his head.\n\nYou should have known better than to think the Light would favor you again.\n\nShe came and sat down next to him, looking worn and weathered and somewhat confused.\n\n\"How are you?\" he asked.\n\n\"No worse than normal.\"\n\nNobundo waited for more, but Korin simply stared out over the harsh ",
+    "metadata": {
+      "start_pos": 38039,
+      "end_pos": 38049
+    }
+  },
+  {
     "id": "0afbf1619dacdb7b58d80a2d9d1d67cb",
-    "index": 22,
+    "index": 50,
     "text": "I found you!",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -300,7 +664,7 @@
   },
   {
     "id": "bbe8398f6ccbd06284ecf880473f2b09",
-    "index": 23,
+    "index": 51,
     "text": "How are you?",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -312,8 +676,21 @@
     }
   },
   {
+    "id": "538442dd2b2389970f18b06c9a9c6638",
+    "index": 52,
+    "text": "No worse than normal.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "g.\n\nTry harder.\n\nHe focused with every ounce of concentration he had left in him.\n\n\"Nobundo.\"\n\nHe nearly jumped out of his skin, his eyes snapping open as he put out a hand to steady himself. He looked around, up at the sky.\n\n\"I found you!\"\n\nHe turned to see Korin and let out a deep breath, shaking his head.\n\nYou should have known better than to think the Light would favor you again.\n\nShe came and sat down next to him, looking worn and weathered and somewhat confused.\n\n\"How are you?\" he asked.\n\n",
+    "context_after": "\n\nNobundo waited for more, but Korin simply stared out over the harsh vista.\n\nUnseen by both of them, a figure peeked out from a nearby cluster of jagged stone, watching. Listening.\n\n\"Was there something you wanted to tell me?\"\n\nKorin considered for a moment. \"Oh yes!\" she said at last. \"New member came to camp today. Said the orcs were... regrouping. Getting ready for something. They are led by some new... what are they named? The ones who make the dark magic?\"\n\n\"Warlock?\"\n\n\"Yes, I think that w",
+    "metadata": {
+      "start_pos": 38456,
+      "end_pos": 38479
+    }
+  },
+  {
     "id": "50a3761b82de6dd24bb0ba0605f5fda5",
-    "index": 24,
+    "index": 53,
     "text": "Was there something you wanted to tell me?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -326,7 +703,7 @@
   },
   {
     "id": "6353a738abe9c5f800bfe535febb62fb",
-    "index": 25,
+    "index": 54,
     "text": "Oh yes!",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -339,7 +716,7 @@
   },
   {
     "id": "4f35c92789c526f325dda51ef5fa5dec",
-    "index": 26,
+    "index": 55,
     "text": "New member came to camp today. Said the orcs were... regrouping. Getting ready for something. They are led by some new... what are they named? The ones who make the dark magic?",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -352,7 +729,7 @@
   },
   {
     "id": "14e67cd313760682a8954df4618c9bef",
-    "index": 27,
+    "index": 56,
     "text": "Warlock?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -365,7 +742,7 @@
   },
   {
     "id": "df7b88dd6fe710417d9bd90b40fd1143",
-    "index": 28,
+    "index": 57,
     "text": "Yes, I think that was it.",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -378,7 +755,7 @@
   },
   {
     "id": "3cb62eabdb33e5f5791f39446369b03d",
-    "index": 29,
+    "index": 58,
     "text": "What do you think would happen if I took a few more steps?",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -391,7 +768,7 @@
   },
   {
     "id": "66974cd9c49db4a1afbc9e62a8d0cb2f",
-    "index": 30,
+    "index": 59,
     "text": "I think you would fall.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -404,7 +781,7 @@
   },
   {
     "id": "1fa2ff6321d819eac17cb764fa30a0fe",
-    "index": 31,
+    "index": 60,
     "text": "Yes, my body would fall. But sometimes I think my spirit would... fly? No, that's not the word. What's the word... to go up and up, like flying?",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -417,7 +794,7 @@
   },
   {
     "id": "4e3f9cf9d08032c4a47d82e8187dabf8",
-    "index": 32,
+    "index": 61,
     "text": "Soar?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -430,7 +807,7 @@
   },
   {
     "id": "0bced54eaf7fe674c7d081d2a8b19638",
-    "index": 33,
+    "index": 62,
     "text": "Yes! My body would fall, but my spirit would soar.",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -443,7 +820,7 @@
   },
   {
     "id": "ed910b4921fbb51d55d3dfc085421846",
-    "index": 34,
+    "index": 63,
     "text": "Our world is coming to an end,",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -456,7 +833,7 @@
   },
   {
     "id": "0acc716c61501003f6a1cd25097123d6",
-    "index": 35,
+    "index": 64,
     "text": "She left.",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -469,7 +846,7 @@
   },
   {
     "id": "df586eb7e8087de056384adc140bb633",
-    "index": 36,
+    "index": 65,
     "text": "Left? Where? When?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -482,7 +859,7 @@
   },
   {
     "id": "e2fab3b4213c68c81a0990c22fc1b2b8",
-    "index": 37,
+    "index": 66,
     "text": "Moments ago. She did not say where. She behaved strangely... said she was going to--what was the word?",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -495,7 +872,7 @@
   },
   {
     "id": "78310be7e6051e22280fed853ab1e239",
-    "index": 38,
+    "index": 67,
     "text": "That is right. She said she was going to 'soar'.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -507,8 +884,34 @@
     }
   },
   {
+    "id": "3c7b06d14339f887e3612b68bb6f8593",
+    "index": 68,
+    "text": "Korin! Stop!",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "en?\"\n\n\"Moments ago. She did not say where. She behaved strangely... said she was going to--what was the word?\"\n\nThe Broken paused, thinking, then nodded in recollection.\n\n\"That is right. She said she was going to 'soar'.\"\n\nNobundo ran as quickly as his legs would carry him. By the time he reached the mountain peaks, his lungs were on fire; he was coughing up thick green mucus; and his legs shook uncontrollably.\n\nOn the plateau leading to the cliff he saw her, standing at the edge looking down.\n\n",
+    "context_after": "\n\nShe looked back, offered the slightest hint of a smile, then turned and pitched forward silently, disappearing into a thick cloud of steam.\n\nNobundo reached the edge and glanced over, seeing nothing but that faint glow far, far below.\n\nYou were too late.\n\nHe had failed once again, just as he had failed to save the women of Shattrath. Nobundo closed his eyes tight and called out to the Light with his mind: Why? Why have you abandoned me? Why do you continue to torment me? Did I not serve you fa",
+    "metadata": {
+      "start_pos": 48036,
+      "end_pos": 48050
+    }
+  },
+  {
+    "id": "62434a1fa1b1708586e22d44b1fb3e79",
+    "index": 69,
+    "text": "speak",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "d to a gush then, scattering clouds of steam and pushing so forcefully it backed Nobundo away from the edge. In its rushing he distinctly heard a single word: Everything...\n\nNobundo strained to hear. Surely his sanity had reached its end; surely his mind was playing tricks on him.\n\nThe figure near the rocks took cover again, maintaining its silent watch.\n\nThe wind picked up once more. Everything that is...\n\nMore words. What madness was this? This was not the work of the Light. The Light did not ",
+    "context_after": ": it was warmth that pervaded the body. This was something new, something different. A final blast of wind rolled over the plateau, forcing Nobundo to take a seat.\n\nEverything that is... is alive.\n\nAfter all these years of pleading, Nobundo had finally received an answer; an answer that came not from the Light...\n\nBut from the wind.\n\nNobundo had heard of orcish practices that dealt with the elements: earth, wind, fire, and water. His people had witnessed some of the powers wielded by these \"sham",
+    "metadata": {
+      "start_pos": 49714,
+      "end_pos": 49721
+    }
+  },
+  {
     "id": "28a3653818c421b3c09c638c0ad47439",
-    "index": 39,
+    "index": 70,
     "text": "shaman",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -521,7 +924,7 @@
   },
   {
     "id": "325cd9f8a64f873709518c63afec32ff",
-    "index": 40,
+    "index": 71,
     "text": "To go there, I will have to pass through the camps of the unaffected, where my kind is forbidden.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -534,7 +937,7 @@
   },
   {
     "id": "d4a5157c9452ff6166ef3e9fc3e89c03",
-    "index": 41,
+    "index": 72,
     "text": "What is your business here?",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -546,8 +949,60 @@
     }
   },
   {
+    "id": "b2551f6cb151feddfaf646dd7f5b7dc9",
+    "index": 73,
+    "text": "I mean only to pass through to the mountains.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "ard footsteps somewhere behind him. Always when he looked back, he sensed that whoever or whatever was following him had just ducked out of sight. He wondered if maybe it was the elements. Or a fabrication of his mind.\n\nWhen he came at last to the camps of the unaffected, the sun had long since left the sky. Undoubtedly the watchmen had observed his approach, however, for two guards awaited him as he reached the camp perimeter.\n\n\"What is your business here?\" the larger of the two guards asked.\n\n",
+    "context_after": "\n\nSome of the other camp members had emerged, eyeing Nobundo warily.\n\n\"We have strict orders. No Krokul are allowed in the camps. You will have to go elsewhere.\"\n\n\"I do not wish to stay in your camp, only to pass through.\" Nobundo took a step forward.\n\nThe larger guard thrust out his hand, shoving Nobundo backward. \"I told you--\"\n\nThere was a deafening clap of thunder then, and a black mass of clouds appeared where clear skies had been only seconds before, releasing a sudden deluge of rain. The ",
+    "metadata": {
+      "start_pos": 52858,
+      "end_pos": 52905
+    }
+  },
+  {
+    "id": "7f1cfdf26644e71abb79c4229e0362c1",
+    "index": 74,
+    "text": "We have strict orders. No Krokul are allowed in the camps. You will have to go elsewhere.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "had just ducked out of sight. He wondered if maybe it was the elements. Or a fabrication of his mind.\n\nWhen he came at last to the camps of the unaffected, the sun had long since left the sky. Undoubtedly the watchmen had observed his approach, however, for two guards awaited him as he reached the camp perimeter.\n\n\"What is your business here?\" the larger of the two guards asked.\n\n\"I mean only to pass through to the mountains.\"\n\nSome of the other camp members had emerged, eyeing Nobundo warily.\n\n",
+    "context_after": "\n\n\"I do not wish to stay in your camp, only to pass through.\" Nobundo took a step forward.\n\nThe larger guard thrust out his hand, shoving Nobundo backward. \"I told you--\"\n\nThere was a deafening clap of thunder then, and a black mass of clouds appeared where clear skies had been only seconds before, releasing a sudden deluge of rain. The wind that had gently urged Nobundo forward now gushed with fantastic strength, forcing the two guards backward. Most incredible of all, the wind and the stinging",
+    "metadata": {
+      "start_pos": 52975,
+      "end_pos": 53066
+    }
+  },
+  {
+    "id": "359ecaa0e3d0fb5488e3c5de9b1c407c",
+    "index": 75,
+    "text": "I do not wish to stay in your camp, only to pass through.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "is mind.\n\nWhen he came at last to the camps of the unaffected, the sun had long since left the sky. Undoubtedly the watchmen had observed his approach, however, for two guards awaited him as he reached the camp perimeter.\n\n\"What is your business here?\" the larger of the two guards asked.\n\n\"I mean only to pass through to the mountains.\"\n\nSome of the other camp members had emerged, eyeing Nobundo warily.\n\n\"We have strict orders. No Krokul are allowed in the camps. You will have to go elsewhere.\"\n\n",
+    "context_after": " Nobundo took a step forward.\n\nThe larger guard thrust out his hand, shoving Nobundo backward. \"I told you--\"\n\nThere was a deafening clap of thunder then, and a black mass of clouds appeared where clear skies had been only seconds before, releasing a sudden deluge of rain. The wind that had gently urged Nobundo forward now gushed with fantastic strength, forcing the two guards backward. Most incredible of all, the wind and the stinging rain both moved around Nobundo to hammer against the two gua",
+    "metadata": {
+      "start_pos": 53068,
+      "end_pos": 53127
+    }
+  },
+  {
+    "id": "b620794a4f8be1872b6e85711a5c824f",
+    "index": 76,
+    "text": "I told you--",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "wever, for two guards awaited him as he reached the camp perimeter.\n\n\"What is your business here?\" the larger of the two guards asked.\n\n\"I mean only to pass through to the mountains.\"\n\nSome of the other camp members had emerged, eyeing Nobundo warily.\n\n\"We have strict orders. No Krokul are allowed in the camps. You will have to go elsewhere.\"\n\n\"I do not wish to stay in your camp, only to pass through.\" Nobundo took a step forward.\n\nThe larger guard thrust out his hand, shoving Nobundo backward. ",
+    "context_after": "\n\nThere was a deafening clap of thunder then, and a black mass of clouds appeared where clear skies had been only seconds before, releasing a sudden deluge of rain. The wind that had gently urged Nobundo forward now gushed with fantastic strength, forcing the two guards backward. Most incredible of all, the wind and the stinging rain both moved around Nobundo to hammer against the two guards, who fell in the slick mud.\n\nNobundo witnessed the events, eyes wide in wonderment. \"So this is what it i",
+    "metadata": {
+      "start_pos": 53222,
+      "end_pos": 53236
+    }
+  },
+  {
     "id": "98c9bdb1ed88f8545d37a99c9bd4f882",
-    "index": 42,
+    "index": 77,
     "text": "So this is what it is like",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -560,7 +1015,7 @@
   },
   {
     "id": "f3165fc62e86dc51d4798a98375fe1ec",
-    "index": 43,
+    "index": 78,
     "text": "to have the elements on your side.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -572,8 +1027,21 @@
     }
   },
   {
+    "id": "6acd2267ad94852ef708b4599ce7df90",
+    "index": 79,
+    "text": "The cataclysm,",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "ing to a cacophony that forced him to stop. Enough! I cannot understand all of you at once.\n\nNobundo summoned what little strength he had left and crested a hill that opened onto a lush vista. Here was Draynoor as it had once been; fertile and serene, a beautiful garden-like refuge of cascading waterfalls and vibrant life.\n\nYou must forgive them: it has been too long since they have felt the tempering influence of the shaman. They are angry, confused, still reeling from the blow dealt to them.\n\n",
+    "context_after": " Nobundo said as he stepped farther into the tranquil setting. He knelt and drank from a pool of water and felt immediately rejuvenated. He felt his mind open up, his thoughts becoming a part of his surroundings as the surroundings in turn became a part of him.\n\nThe voice that answered him was at once clear and soothing, strong and robust. Yes. I was perhaps the least affected, but it has always been this way. It is a necessity that I adapt quickly, given that I provide the very foundations of l",
+    "metadata": {
+      "start_pos": 55868,
+      "end_pos": 55884
+    }
+  },
+  {
     "id": "7437287252790ecf38ce9899ea020c82",
-    "index": 44,
+    "index": 80,
     "text": "Water.",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -586,7 +1054,7 @@
   },
   {
     "id": "0389f77e43dc031197372660efcb5a1f",
-    "index": 45,
+    "index": 81,
     "text": "Why have you chosen me?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -599,7 +1067,7 @@
   },
   {
     "id": "5d836ea02a74b93926b5c843877d06a5",
-    "index": 46,
+    "index": 82,
     "text": "Will I be able to use these abilities to help my people?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -612,7 +1080,7 @@
   },
   {
     "id": "61be53b56d36d23a3ddac4527b8ee3c5",
-    "index": 47,
+    "index": 83,
     "text": "Yes,",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -625,7 +1093,7 @@
   },
   {
     "id": "94c37db45e9d496cbaea91dd7da266e3",
-    "index": 48,
+    "index": 84,
     "text": "I am haunted by the spirits of those who passed at Shattrath. Can the elements assist in this?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -638,7 +1106,7 @@
   },
   {
     "id": "890c8103c0f9e1964141302a44211992",
-    "index": 49,
+    "index": 85,
     "text": "Will this inner struggle prevent me from realizing my true potential as a shaman?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -651,7 +1119,7 @@
   },
   {
     "id": "33e93317688ee21dbf35b66b1307e9d4",
-    "index": 50,
+    "index": 86,
     "text": "No matter how far my journey takes me, I suppose true understanding lies in the knowledge that the journey will never end.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -664,7 +1132,7 @@
   },
   {
     "id": "72d0913344a6348a9b6f98789388ddb5",
-    "index": 51,
+    "index": 87,
     "text": "I am ready.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -676,8 +1144,60 @@
     }
   },
   {
+    "id": "75eb8ffd43a74be50cf5f5e6a1783488",
+    "index": 88,
+    "text": "They will not listen to me! I do not think this was a good idea.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "ld had its own elements, its own powers to call upon.\n\nAnd there was more. Out here in the void was another element, one that seemed to bind the worlds together, one composed of unspeakable energy. If he could call upon this one--but he knew immediately that he was far too inexperienced at this stage of his journey to commune with this mysterious new element. This was just a glimpse, a gift of understanding...\n\nAn epiphany.\n\nVelen appraised Nobundo with his crystal blue eyes. Nobundo protested, ",
+    "context_after": "\n\nVelen's lip curved upward on one side. He wore that same expression that made Nobundo feel as if the Prophet was aware of so many things beyond Nobundo's understanding. \"After all you have been through, all you have overcome, are you really willing to give up now?\"\n\n\"I cannot get them to see me as anything more than Krokul, despite what I may have to teach.\"\n\n\"Perhaps the true problem does not lie with them.\"\n\nThat is what the elements said, Nobundo thought.\n\nAs a result of their previous conv",
+    "metadata": {
+      "start_pos": 61976,
+      "end_pos": 62042
+    }
+  },
+  {
+    "id": "de0dbe30bf2eacf8c0a977c114912fc4",
+    "index": 89,
+    "text": "I cannot get them to see me as anything more than Krokul, despite what I may have to teach.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "is mysterious new element. This was just a glimpse, a gift of understanding...\n\nAn epiphany.\n\nVelen appraised Nobundo with his crystal blue eyes. Nobundo protested, \"They will not listen to me! I do not think this was a good idea.\"\n\nVelen's lip curved upward on one side. He wore that same expression that made Nobundo feel as if the Prophet was aware of so many things beyond Nobundo's understanding. \"After all you have been through, all you have overcome, are you really willing to give up now?\"\n\n",
+    "context_after": "\n\n\"Perhaps the true problem does not lie with them.\"\n\nThat is what the elements said, Nobundo thought.\n\nAs a result of their previous conversations, Nobundo had learned not to try and guess at what the Prophet was thinking, so he stayed silent and waited.\n\nVelen continued, \"I hear the screams in your mind: the women of Shattrath. I am aware of your heart's burden. You have questioned whether or not your departure was an act of cowardice.\"\n\nNobundo nodded, suddenly overcome with emotion.\n\n\"A part",
+    "metadata": {
+      "start_pos": 62311,
+      "end_pos": 62404
+    }
+  },
+  {
+    "id": "e63e701c1f521844408fde516fb24af5",
+    "index": 90,
+    "text": "Perhaps the true problem does not lie with them.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "elen appraised Nobundo with his crystal blue eyes. Nobundo protested, \"They will not listen to me! I do not think this was a good idea.\"\n\nVelen's lip curved upward on one side. He wore that same expression that made Nobundo feel as if the Prophet was aware of so many things beyond Nobundo's understanding. \"After all you have been through, all you have overcome, are you really willing to give up now?\"\n\n\"I cannot get them to see me as anything more than Krokul, despite what I may have to teach.\"\n\n",
+    "context_after": "\n\nThat is what the elements said, Nobundo thought.\n\nAs a result of their previous conversations, Nobundo had learned not to try and guess at what the Prophet was thinking, so he stayed silent and waited.\n\nVelen continued, \"I hear the screams in your mind: the women of Shattrath. I am aware of your heart's burden. You have questioned whether or not your departure was an act of cowardice.\"\n\nNobundo nodded, suddenly overcome with emotion.\n\n\"A part of you knew even then that it was imperative for yo",
+    "metadata": {
+      "start_pos": 62406,
+      "end_pos": 62456
+    }
+  },
+  {
+    "id": "dd350ba124177fd373e570d21e906006",
+    "index": 91,
+    "text": "I hear the screams in your mind: the women of Shattrath. I am aware of your heart's burden. You have questioned whether or not your departure was an act of cowardice.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "gs beyond Nobundo's understanding. \"After all you have been through, all you have overcome, are you really willing to give up now?\"\n\n\"I cannot get them to see me as anything more than Krokul, despite what I may have to teach.\"\n\n\"Perhaps the true problem does not lie with them.\"\n\nThat is what the elements said, Nobundo thought.\n\nAs a result of their previous conversations, Nobundo had learned not to try and guess at what the Prophet was thinking, so he stayed silent and waited.\n\nVelen continued, ",
+    "context_after": "\n\nNobundo nodded, suddenly overcome with emotion.\n\n\"A part of you knew even then that it was imperative for you to survive, to embrace your greater destiny. And throughout so many trials from that day on, never once did you give up. That is why I chose you. Why the elements have chosen you. Our people call you Krokul, Broken, but I believe you may present us with our greatest hope.\"\n\nVelen extended a gentle hand to Nobundo's shoulder. \"Let them go. Let the screams be silenced.\"\n\nIt was true. He ",
+    "metadata": {
+      "start_pos": 62678,
+      "end_pos": 62846
+    }
+  },
+  {
     "id": "d3a10b6ca6606ad1ecabf184e8ce5abf",
-    "index": 52,
+    "index": 92,
     "text": "Let them go. Let the screams be silenced.",
     "speaker": "UNKNOWN",
     "correction": "Velen",
@@ -690,7 +1210,7 @@
   },
   {
     "id": "6ebf6504ac8e7e520a042ac53e38783a",
-    "index": 53,
+    "index": 93,
     "text": "Now, for the good of all of us, go. Go and embrace your destiny.",
     "speaker": "UNKNOWN",
     "correction": "Velen",
@@ -702,8 +1222,60 @@
     }
   },
   {
+    "id": "106b4f7b9a1a9ef65160f5ea4d87392f",
+    "index": 94,
+    "text": "Watch and listen.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "aiting for him. He felt a sense of joy from the elements, as if they were... proud.\n\nVelen smiled. \"Now, for the good of all of us, go. Go and embrace your destiny.\"\n\nNobundo returned to the landing. The gathered draenei were conversing among themselves, paying no heed to the frail figure above.\n\nHe raised his staff. Clouds gathered from a clear blue sky, casting a dark shadow onto the settlement. The draenei stopped their conversations.\n\nNobundo called out, his voice carrying across the marsh. ",
+    "context_after": "\n\nA deluge of rain poured down. Lightning danced between the lamps surrounding the plaza, shattering the glass. The gathered draenei stared in awe.\n\n\"You have come here to learn. To one day wield these powers: the powers of the shaman.\"\n\n\"But shamanism is an orcish practice!\" one of the audience called out. Others joined in concurrence.\n\n\"Yes. A practice they abandoned in favor of communing with demons. Now we will journey the shaman's path, a path that will lead us to a future where no one will",
+    "metadata": {
+      "start_pos": 64106,
+      "end_pos": 64125
+    }
+  },
+  {
+    "id": "727e8be2990e6c6592fd663f790a2ade",
+    "index": 95,
+    "text": "You have come here to learn. To one day wield these powers: the powers of the shaman.",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "obundo returned to the landing. The gathered draenei were conversing among themselves, paying no heed to the frail figure above.\n\nHe raised his staff. Clouds gathered from a clear blue sky, casting a dark shadow onto the settlement. The draenei stopped their conversations.\n\nNobundo called out, his voice carrying across the marsh. \"Watch and listen.\"\n\nA deluge of rain poured down. Lightning danced between the lamps surrounding the plaza, shattering the glass. The gathered draenei stared in awe.\n\n",
+    "context_after": "\n\n\"But shamanism is an orcish practice!\" one of the audience called out. Others joined in concurrence.\n\n\"Yes. A practice they abandoned in favor of communing with demons. Now we will journey the shaman's path, a path that will lead us to a future where no one will kill our women...\"\n\nNobundo paused, keeping his voice steady.\n\n\"Or our children. Where Krokul and unaffected will work together to realize a dream that has long been forgotten by our people: true freedom.\"\n\nThe members of the assembly ",
+    "metadata": {
+      "start_pos": 64274,
+      "end_pos": 64361
+    }
+  },
+  {
+    "id": "6b743c919184601886f84e4671545b6e",
+    "index": 96,
+    "text": "But shamanism is an orcish practice!",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "ying no heed to the frail figure above.\n\nHe raised his staff. Clouds gathered from a clear blue sky, casting a dark shadow onto the settlement. The draenei stopped their conversations.\n\nNobundo called out, his voice carrying across the marsh. \"Watch and listen.\"\n\nA deluge of rain poured down. Lightning danced between the lamps surrounding the plaza, shattering the glass. The gathered draenei stared in awe.\n\n\"You have come here to learn. To one day wield these powers: the powers of the shaman.\"\n\n",
+    "context_after": " one of the audience called out. Others joined in concurrence.\n\n\"Yes. A practice they abandoned in favor of communing with demons. Now we will journey the shaman's path, a path that will lead us to a future where no one will kill our women...\"\n\nNobundo paused, keeping his voice steady.\n\n\"Or our children. Where Krokul and unaffected will work together to realize a dream that has long been forgotten by our people: true freedom.\"\n\nThe members of the assembly looked at one another, seeking approval ",
+    "metadata": {
+      "start_pos": 64363,
+      "end_pos": 64401
+    }
+  },
+  {
+    "id": "2965d0f2d7e321cc4ca3c58c8e378c92",
+    "index": 97,
+    "text": "Yes. A practice they abandoned in favor of communing with demons. Now we will journey the shaman's path, a path that will lead us to a future where no one will kill our women...",
+    "speaker": "UNKNOWN",
+    "correction": "",
+    "context_before": "asting a dark shadow onto the settlement. The draenei stopped their conversations.\n\nNobundo called out, his voice carrying across the marsh. \"Watch and listen.\"\n\nA deluge of rain poured down. Lightning danced between the lamps surrounding the plaza, shattering the glass. The gathered draenei stared in awe.\n\n\"You have come here to learn. To one day wield these powers: the powers of the shaman.\"\n\n\"But shamanism is an orcish practice!\" one of the audience called out. Others joined in concurrence.\n\n",
+    "context_after": "\n\nNobundo paused, keeping his voice steady.\n\n\"Or our children. Where Krokul and unaffected will work together to realize a dream that has long been forgotten by our people: true freedom.\"\n\nThe members of the assembly looked at one another, seeking approval from one another, measuring any continued resistance. Finally they all seemed to come to the same conclusion: they would listen.\n\n\"Your journey begins with these simple words....\"\n\nNobundo smiled. The clouds above swirled. Lightning arced. Rai",
+    "metadata": {
+      "start_pos": 64465,
+      "end_pos": 64644
+    }
+  },
+  {
     "id": "abc8230a937e34d6d1d9eded6ccdda9f",
-    "index": 54,
+    "index": 98,
     "text": "Or our children. Where Krokul and unaffected will work together to realize a dream that has long been forgotten by our people: true freedom.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -716,7 +1288,7 @@
   },
   {
     "id": "90fff4fc315cf42adcd4afb015b45d86",
-    "index": 55,
+    "index": 99,
     "text": "Your journey begins with these simple words....",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -729,7 +1301,7 @@
   },
   {
     "id": "83e32072231d2ed0511472767a0309c4",
-    "index": 56,
+    "index": 100,
     "text": "Everything that is, is alive.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
