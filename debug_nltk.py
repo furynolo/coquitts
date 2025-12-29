@@ -1,38 +1,22 @@
 
-import nltk
-from nltk import word_tokenize, pos_tag
 import sys
+import nltk
 
-print(f"NLTK Version: {nltk.__version__}")
-print(f"NLTK Path: {nltk.data.path}")
-
-print("\nChecking resources...")
 try:
-    nltk.data.find('taggers/averaged_perceptron_tagger')
-    print("Found averaged_perceptron_tagger")
-except LookupError as e:
-    print(f"Missing averaged_perceptron_tagger: {e}")
-
+    nltk.data.find('taggers/averaged_perceptron_tagger_eng')
+except LookupError:
+    nltk.download('averaged_perceptron_tagger_eng', quiet=True)
 try:
     nltk.data.find('tokenizers/punkt')
-    print("Found punkt")
-except LookupError as e:
-    print(f"Missing punkt: {e}")
+except LookupError:
+    nltk.download('punkt', quiet=True)
 
-try:
-    nltk.data.find('tokenizers/punkt_tab')
-    print("Found punkt_tab")
-except LookupError as e:
-    print(f"Missing punkt_tab: {e}")
+text = "Korin approached."
+text2 = "Herac and Estes approached,"
+tokens = nltk.word_tokenize(text)
+tags = nltk.pos_tag(tokens)
+print(f"'{text}': {tags}")
 
-print("\nTesting functionality...")
-try:
-    tokens = word_tokenize("Test sentence.")
-    print(f"Tokenization successful: {tokens}")
-    try:
-        tags = pos_tag(tokens)
-        print(f"POS Tagging successful: {tags}")
-    except Exception as e:
-        print(f"POS Tagging failed: {e}")
-except Exception as e:
-    print(f"Tokenization failed: {e}")
+tokens2 = nltk.word_tokenize(text2)
+tags2 = nltk.pos_tag(tokens2)
+print(f"'{text2}': {tags2}")
