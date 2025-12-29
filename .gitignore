@@ -100,3 +100,6 @@ input-text/pdf-books/
 evaluation_report.json
 config/
 logs/
+debug_nltk.py
+test_input.txt
+output/

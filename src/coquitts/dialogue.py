@@ -533,7 +533,7 @@ class DialogueSegmenter:
         'shout', 'shouted', 'shouts', 'shouting',
         'mutter', 'muttered', 'mutters', 'muttering',
         'cry', 'cried', 'cries', 'crying',
-        'call', 'called', 'calls', 'calling',
+        # 'call', 'called' removed as it matches "one called Name" too often
         'exclaim', 'exclaimed', 'exclaims', 'exclaiming',
         'declare', 'declared', 'declares', 'declaring',
         'announce', 'announced', 'announces', 'announcing',
@@ -796,7 +796,10 @@ class DialogueSegmenter:
                         end_pos=match.end()
                     ))
             
-            last_end = match.end()
+            if last_end < match.end():
+                last_end = match.end()
+                
+        # Add remaining narration after last quote
         
         # Add remaining narration after last quote
         if last_end < len(text):
@@ -883,10 +886,11 @@ class DialogueSegmenter:
                 return True
         
         # Very long quotes without dialogue markers are often narration
-        # Also check for very long quotes (like the 4932 char one)
-        if len(text) > 500:
+        # Increased limit from 500 to 2000 to allow for long monologues
+        if len(text) > 2000:
             return True
-        if len(text) > 200 and not any(marker in text for marker in ['!', '?']):
+        # Relaxed check for punctuation - only flag if extremely long and no punctuation
+        if len(text) > 1000 and not any(marker in text for marker in ['!', '?']):
             return True
         
         # Check for patterns like "he said, pointing at..." (dialogue tags with actions)
@@ -1094,6 +1098,34 @@ class DialogueSegmenter:
         
         if self.verbose:
             print(f"      [PATTERN] No matches found in after context")
+        
+        # Pattern 3: Name said (Subject + Verb) - e.g. "...," she said.
+        # This was missing!
+        name_verb_pattern = r'\b([A-Z][a-zA-Z\'-]+(?:\s+[A-Z][a-zA-Z\'-]+){0,3})(?:[,:]?\s+)(' + verbs_pattern + r')(?:[,:;]|\s+|\.|$)'
+        match = re.search(name_verb_pattern, text)
+        if match:
+            name = match.group(1).strip()
+            if self._validate_name(name):
+                if self.verbose:
+                    print(f"      [PATTERN MATCH] Found (Subject+Verb after): {name} {match.group(2)}")
+                return name
+                
+        # Pattern 4: Pronoun said (Subject + Verb) - e.g. "...," she said.
+        pronoun_verb_pattern = r'\b(he|she|they|it)\s+(' + verbs_pattern + r')(?:[,:;]|\s+|$)'
+        pronoun_match = re.search(pronoun_verb_pattern, text, re.IGNORECASE)
+        if pronoun_match:
+            # Look backwards in the text BEFORE the quote for the name matches
+            # We can't easily do checking here because we only have 'text' (after context).
+            # But usually if "she said" is AFTER the quote, the name was BEFORE the quote.
+            # However, _attribute_speaker checks valid names before the quote separately.
+            # If we are here, it means we found "she said" AFTER the quote.
+            # We should probably return checking for pronouns if we can link it to a gender/name, 
+            # but for now, let's just log it or rely on the fact that _find_speaker_before handles the "Before" context.
+            # Wait, if "She said" follows the quote, the name might be in the narrative BEFORE the quote.
+            # This method only sees 'text' which is AFTER context.
+            # So we can't resolve the pronoun here easily without passing in before_context.
+            pass
+
         return None
     
     def _find_speaker_with_nltk(self, before_context: str, after_context: str) -> Optional[str]:
@@ -1137,33 +1169,51 @@ class DialogueSegmenter:
                 if sys.stderr is stderr_buffer:
                     sys.stderr = old_stderr
             
+            # Determine the split point (token index where the quote would be)
+            # Note: This is an approximation since tokenization of combined text might differ slightly
+            # from tokenization of parts, but it's close enough for ranking.
+            try:
+                before_tokens_count = len(self._word_tokenize(before_context))
+            except:
+                before_tokens_count = len(pos_tags) // 2
+
+            matches = []
+
             # Look for patterns: Proper noun (NNP) followed by verb (VB/VBD/VBZ/VBG)
             # or verb followed by proper noun
             for i in range(len(pos_tags) - 1):
                 word1, pos1 = pos_tags[i]
                 word2, pos2 = pos_tags[i + 1] if i + 1 < len(pos_tags) else ('', '')
                 
+                candidate_name = None
+                match_type = ""
+
                 # Pattern 1: NNP (proper noun) followed by verb
                 if pos1.startswith('NNP') and pos2.startswith('VB'):
-                    # Check if word2 is a speech verb (case-insensitive)
-                    if word2.lower() in self.SPEECH_VERBS:
-                        # Extract the name (may be multi-word)
-                        name_parts = [word1]
-                        # Look backwards for more proper nouns
-                        for j in range(i - 1, max(-1, i - 4), -1):
-                            if j >= 0 and pos_tags[j][1].startswith('NNP'):
-                                name_parts.insert(0, pos_tags[j][0])
-                            else:
-                                break
-                        name = ' '.join(name_parts)
-                        if self._validate_name(name):
-                            if self.verbose:
-                                print(f"      [NLTK] Found pattern: {name} {word2} (NNP + VB)")
-                            return name
+                    # DYNAMIC: Accept ANY verb here if the name is valid.
+                    
+                    # Extract the name (may be multi-word)
+                    name_parts = [word1]
+                    # Look backwards for more proper nouns
+                    start_idx = i
+                    for j in range(i - 1, max(-1, i - 4), -1):
+                        if j >= 0 and pos_tags[j][1].startswith('NNP'):
+                            name_parts.insert(0, pos_tags[j][0])
+                            start_idx = j
+                        else:
+                            break
+                    name = ' '.join(name_parts)
+                    if self._validate_name(name):
+                        candidate_name = name
+                        match_type = "NNP+VB"
+                        # Use the index of the name as the position
+                        match_pos = i 
                 
                 # Pattern 2: Verb followed by NNP (proper noun)
-                if pos1.startswith('VB') and pos2.startswith('NNP'):
-                    # Check if word1 is a speech verb
+                elif pos1.startswith('VB') and pos2.startswith('NNP'):
+                    # STRICT: Only accept text-to-speech verbs for Inverted order (Verb Subject).
+                    # "Said Korin" -> OK.
+                    # "Handed Nobundo" -> BAD (Nobundo is object).
                     if word1.lower() in self.SPEECH_VERBS:
                         # Extract the name (may be multi-word)
                         name_parts = [word2]
@@ -1175,9 +1225,16 @@ class DialogueSegmenter:
                                 break
                         name = ' '.join(name_parts)
                         if self._validate_name(name):
-                            if self.verbose:
-                                print(f"      [NLTK] Found pattern: {word1} {name} (VB + NNP)")
-                            return name
+                            candidate_name = name
+                            match_type = "VB+NNP"
+                            match_pos = i + 1
+
+                if candidate_name:
+                    # Calculate distance to summary split point
+                    # if match is before split (index < before_tokens_count), distance is split - index
+                    # if match is after split (index >= before_tokens_count), distance is index - split
+                    distance = abs(match_pos - before_tokens_count)
+                    matches.append((distance, candidate_name, match_type))
             
             # Also look for any proper nouns near speech verbs (within 3 words)
             speech_verb_indices = [i for i, (word, pos) in enumerate(pos_tags) 
@@ -1192,9 +1249,17 @@ class DialogueSegmenter:
                     if 0 <= check_idx < len(pos_tags):
                         word, pos = pos_tags[check_idx]
                         if pos.startswith('NNP') and self._validate_name(word):
-                            if self.verbose:
-                                print(f"      [NLTK] Found proper noun near speech verb: {word} (offset {offset} from '{pos_tags[verb_idx][0]}')")
-                            return word
+                            distance = abs(check_idx - before_tokens_count)
+                            matches.append((distance, word, "SpeechVerbProximity"))
+
+            if matches:
+                # Sort by distance (ascending)
+                matches.sort(key=lambda x: x[0])
+                best_match = matches[0]
+                if self.verbose:
+                    print(f"      [NLTK] Found {len(matches)} candidates. Best: {best_match[1]} (Dist: {best_match[0]}, Type: {best_match[2]})")
+                return best_match[1]
+
             
         except Exception as e:
             if self.verbose:
