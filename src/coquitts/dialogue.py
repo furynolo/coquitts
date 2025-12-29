@@ -753,7 +753,7 @@ class DialogueSegmenter:
         
         # Pattern to match quoted dialogue (handles both straight and curly quotes)
         # Matches: "text" or "text" or "text"
-        quote_pattern = re.compile(r'["""]([^"""]*)["""]', re.DOTALL)
+        quote_pattern = re.compile(r'["“”]([^"“”]*)["“”]', re.DOTALL)
         
         last_end = 0
         
@@ -862,9 +862,14 @@ class DialogueSegmenter:
             if re.search(r'\b(he|she|they|it|the|a|an|imperator|warchief|councilor|councillor)\s+\w+\s+(said|whispered|shouted|replied|asked|muttered|growled|snarled|roared|yelled|screamed|spoke|continued|interrupted|added|concluded|finished|agreed|nodded|shook|laughed|smiled|frowned|sighed|gasped|hissed|snapped|barked|commanded|ordered|demanded|insisted|argued|protested|objected|admitted|confessed|claimed|suggested|proposed|offered|promised|warned|threatened|begged|pleaded|urged|encouraged|advised|explained|described|mentioned|noted|observed|commented|remarked|conceded|acknowledged|confirmed|denied|refused|accepted|admitted)\s+(flatly|with|pointing|looking|walking|turning|moving|reaching|grabbing|holding|pushing|pulling|throwing|dropping|picking|putting|placing|opening|closing|starting|stopping|beginning|ending|continuing|pausing|waiting|hurrying|rushing)', text_lower):
                 return True
         
+        # Safeguard: If the text contains 1st/2nd person pronouns, it is likely dialogue.
+        if re.search(r'\b(i|me|my|mine|we|us|our|ours|you|your|yours)\b', text_lower):
+            return False
+
         # Check for narration patterns (e.g., "Because he had to, Mar'gok leaned down")
         narration_patterns = [
-            r'^(because|when|while|as|after|before|during|since|until|if|unless|although|though|even|despite)',
+            # Conjunctions followed by 3rd person pronouns or articles (indicates narration)
+            r'^(because|when|while|as|after|before|during|since|until|if|unless|although|though|even|despite)\s+(he|she|they|it|the|a|an)\b',
             r'^(the|a|an)\s+\w+\s+(did not|does not|will not|would not|could not|should not|may not|might not|must not|cannot|was not|were not|is not|are not|had not|has not|have not)',
             r'^(he|she|they|it|the|a|an)\s+\w+\s+(leaned|turned|walked|ran|stood|sat|looked|glanced|stared|gazed|watched|saw|heard|felt|touched|reached|grabbed|held|pushed|pulled|threw|dropped|picked|put|placed|moved|went|came|arrived|left|entered|exited|opened|closed|started|stopped|began|ended|continued|paused|waited|hurried|rushed|hit|struck|punched|kicked|slapped|squeezed|twisted|bent|straightened|raised|lowered|lifted|fell|jumped|hopped|stepped|sprinted|dashed|strolled|marched|trudged|limped|crawled|climbed|descended|ascended|flew|soared|dove|swam|floated|sank|rose|plunged|leaped|bounded|sprang|lunged|charged|attacked|shoved|yanked|tugged|dragged|hauled|carried|brought|took|seized|snatched|caught|gripped|clutched|crushed|smashed|slammed|bashed|pounded|hammered|beat|stomped|squashed|flattened|squished|compressed|compacted|packed|stuffed|filled|emptied|poured|spilled|dripped|tumbled|rolled|spun|rotated|stretched|extended|retracted|saluted|responded|snorted|seemed|held|beamed|stamped|raised|lowered)',
             # Patterns like "All feet stamped; fists were raised."
@@ -1015,7 +1020,7 @@ class DialogueSegmenter:
             name = match.group(1).strip()
             if self._validate_name(name):
                 if self.verbose:
-                    print(f"      [PATTERN MATCH] Found: {name} {match.group(2)}")
+                    print(f"      [PATTERN MATCH] Found: {name}")
                 return name
         
         # Pattern 2: Name said [additional text] (e.g., "Mar'gok said, waving him off")
@@ -1026,7 +1031,7 @@ class DialogueSegmenter:
             name = match.group(1).strip()
             if self._validate_name(name):
                 if self.verbose:
-                    print(f"      [PATTERN MATCH] Found (with trailing text): {name} {match.group(2)}")
+                    print(f"      [PATTERN MATCH] Found (with trailing text): {name}")
                 return name
         
         # Pattern 3: Handle pronouns (he/she/they) by finding last mentioned name
