@@ -208,8 +208,21 @@
     }
   },
   {
-    "id": "6c27b37c64280b4b58752cf70006790a",
+    "id": "2dd5c500f5e8412cb907505fd00cbf61",
     "index": 16,
+    "text": "When you escaped, did any others make it with you? Were there more survivors? We heard the orcs in the lower levels, but we did not want to risk discovery, so we fled.",
+    "speaker": "Korin",
+    "correction": "",
+    "context_before": "ed, \"Later we were split up and sent to different camps throughout Zangarmarsh and Nuh-Grand. A precaution, so that if one of the camps were discovered by the orcs, we would not all be killed.\"\n\n\"Were any of you priests or Vindicators--wielders of the Light?\"\n\nAll three shook their heads. \"I cannot speak for Akama, but Estes and I were simple craftsmen, unaccustomed to wielding a weapon of any kind. That was why we were assigned to the caves: to be a last line of defense.\"\n\nKorin asked Nobundo, ",
+    "context_after": "\n\nNobundo thought of the piled bodies in Lower City... heard the pleas from Aldor Rise, tried to force the tortured screams from his mind.\n\n\"No,\" he answered. \"There were no more that I know of.\"\n\nSeasons passed.\n\nVelen, their prophet leader, had visited them two days ago... or was it four? Lately Nobundo found it harder to remember some things. Velen had come from one of the neighboring camps. His exact location remained a closely guarded secret, in case one of their number was taken alive and ",
+    "metadata": {
+      "start_pos": 24805,
+      "end_pos": 24974
+    }
+  },
+  {
+    "id": "6c27b37c64280b4b58752cf70006790a",
+    "index": 17,
     "text": "No,",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -222,7 +235,7 @@
   },
   {
     "id": "a4a16ec75451f79815c594092a18cee7",
-    "index": 17,
+    "index": 18,
     "text": "There were no more that I know of.",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -235,7 +248,7 @@
   },
   {
     "id": "d5e0af3a5559d119ca12a52581a5e19b",
-    "index": 18,
+    "index": 19,
     "text": "I am finished for today. I need to go lie down.",
     "speaker": "Korin",
     "correction": "",
@@ -248,7 +261,7 @@
   },
   {
     "id": "585173d0f455db2574acee603ea95231",
-    "index": 19,
+    "index": 20,
     "text": "Are you okay?",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -261,7 +274,7 @@
   },
   {
     "id": "89d681140cde1b5de7e4ce21b6809b0f",
-    "index": 20,
+    "index": 21,
     "text": "Just tired,",
     "speaker": "Nobundo",
     "correction": "Korin",
@@ -274,7 +287,7 @@
   },
   {
     "id": "9964a1a2792a4893572010384c56bcbd",
-    "index": 21,
+    "index": 22,
     "text": "I want to die! I just want to die; I want the pain gone!",
     "speaker": "Rolc",
     "correction": "Korin",
@@ -287,7 +300,7 @@
   },
   {
     "id": "3f5dead87c9dff905b45fdaf4f838fdc",
-    "index": 22,
+    "index": 23,
     "text": "Don't be foolish!",
     "speaker": "Rolc",
     "correction": "Nobundo",
@@ -300,7 +313,7 @@
   },
   {
     "id": "88e56fa20e7319895f7f149cb6693ddd",
-    "index": 23,
+    "index": 24,
     "text": "Can you not cure her?",
     "speaker": "Rolc",
     "correction": "Nobundo",
@@ -313,7 +326,7 @@
   },
   {
     "id": "f335bdd049cb28f6b849f57dee6e7ebf",
-    "index": 24,
+    "index": 25,
     "text": "I have tried!",
     "speaker": "UNKNOWN",
     "correction": "Rolc",
@@ -326,7 +339,7 @@
   },
   {
     "id": "ef5587eb895d6bc8e732c3cb6597fa13",
-    "index": 25,
+    "index": 26,
     "text": "Let me go! Let me die!",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -339,7 +352,7 @@
   },
   {
     "id": "0a7187a420fb55555c1bde495e384b17",
-    "index": 26,
+    "index": 27,
     "text": "I have done all I know. It's as if her body, like her will, has been broken.",
     "speaker": "Rolc",
     "correction": "",
@@ -352,7 +365,7 @@
   },
   {
     "id": "5de181e63aaf310498f80d9f06221399",
-    "index": 27,
+    "index": 28,
     "text": "There must be something that can--some way to--",
     "speaker": "Rolc",
     "correction": "Nobundo",
@@ -365,7 +378,7 @@
   },
   {
     "id": "c632d10fb3ef0b6e5f2c098d02c3e518",
-    "index": 28,
+    "index": 29,
     "text": "We have to do something!",
     "speaker": "Rolc",
     "correction": "Nobundo",
@@ -378,7 +391,7 @@
   },
   {
     "id": "a530b0975616a602a2d0269fea774f3b",
-    "index": 29,
+    "index": 30,
     "text": "I worry for them, for you. We have received reports that Shattrath survivors in the other camps are undergoing similar changes. Whatever this is, it is not responding to any kind of treatment, and it is not going away. Our people are afraid that if measures are not taken, we will all be lost.",
     "speaker": "Rolc",
     "correction": "",
@@ -391,7 +404,7 @@
   },
   {
     "id": "fe9095dec3d9d2af23788227e0f52441",
-    "index": 30,
+    "index": 31,
     "text": "What are you saying? What has happened?",
     "speaker": "Rolc",
     "correction": "Nobundo",
@@ -404,7 +417,7 @@
   },
   {
     "id": "9e85d7b1db4fc5f02c165e598b58fb8e",
-    "index": 31,
+    "index": 32,
     "text": "Just talk. For now. I have tried to be the voice of reason, but even I cannot defend you and the others for very long. And, truth be told, I am not sure that I should.",
     "speaker": "Nobundo",
     "correction": "Rolc",
@@ -417,7 +430,7 @@
   },
   {
     "id": "e7df0b532b0cd0f17298e119162179d4",
-    "index": 32,
+    "index": 33,
     "text": "This is not easy for me, for any of us....",
     "speaker": "Rolc",
     "correction": "",
@@ -430,7 +443,7 @@
   },
   {
     "id": "9757ab4b9871982a49da1abfe63015c2",
-    "index": 33,
+    "index": 34,
     "text": "But we have spoken with representatives from the other camps, and together we have come to a decision. We believe it would be in the best interests of everyone involved if those of you who have been... afflicted commune together, but... separate from those of us who remain in good health.",
     "speaker": "Nobundo",
     "correction": "Rolc",
@@ -443,7 +456,7 @@
   },
   {
     "id": "6a2a807c012d5492a436081300d0e204",
-    "index": 34,
+    "index": 35,
     "text": "We are being banished?",
     "speaker": "Korin",
     "correction": "",
@@ -456,7 +469,7 @@
   },
   {
     "id": "6251a34fee7285bc959dd23e1ac94d2e",
-    "index": 35,
+    "index": 36,
     "text": "That is exactly what this is! They cannot solve our problems, so they... they hope to ignore us! They just want us to go away!",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -469,7 +482,7 @@
   },
   {
     "id": "00f608108fea1972d493b88437412fdd",
-    "index": 36,
+    "index": 37,
     "text": "We cannot help you!",
     "speaker": "Korin",
     "correction": "Rolc",
@@ -482,7 +495,7 @@
   },
   {
     "id": "53e4540ef04bd5e92cbb7d5a8801ea3a",
-    "index": 37,
+    "index": 38,
     "text": "We have no idea whether or not your condition is contagious, and your decreased physical abilities, your diminished mental faculties are a liability that we cannot afford. There are not enough of us left to take chances!",
     "speaker": "Korin",
     "correction": "Rolc",
@@ -495,7 +508,7 @@
   },
   {
     "id": "4ff10f756186430a70361f38ecab34de",
-    "index": 38,
+    "index": 39,
     "text": "What of the other, Akama?",
     "speaker": "Korin",
     "correction": "",
@@ -508,7 +521,7 @@
   },
   {
     "id": "3e28394a1d9afd98e19545828db1258c",
-    "index": 39,
+    "index": 40,
     "text": "He will stay here in my care until he awakens,",
     "speaker": "Rolc",
     "correction": "",
@@ -521,7 +534,7 @@
   },
   {
     "id": "021f5ca682e2251c37ccea5537841703",
-    "index": 40,
+    "index": 41,
     "text": "How kind of you,",
     "speaker": "Rolc",
     "correction": "Nobundo",
@@ -534,7 +547,7 @@
   },
   {
     "id": "8bd39a1ce5c45e7ad1f720296db8dcd8",
-    "index": 41,
+    "index": 42,
     "text": "You have said that you wonder if perhaps the Light is punishing you with its silence, for your failure at Shattrath.",
     "speaker": "Rolc",
     "correction": "",
@@ -547,7 +560,7 @@
   },
   {
     "id": "edfd14eaecd9d7987a1ef956ce9fdf35",
-    "index": 42,
+    "index": 43,
     "text": "I gave everything at Shattrath! I was prepared to die so that you, all of you could live!",
     "speaker": "Rolc",
     "correction": "Nobundo",
@@ -560,7 +573,7 @@
   },
   {
     "id": "6acf4db32fa310e6f50611eb654a9dc2",
-    "index": 43,
+    "index": 44,
     "text": "Yes, but you did not die.",
     "speaker": "Rolc",
     "correction": "",
@@ -573,7 +586,7 @@
   },
   {
     "id": "af6997e71f42ac406540e6631c6713b1",
-    "index": 44,
+    "index": 45,
     "text": "What are you--are you saying I deserted?",
     "speaker": "Nobundo",
     "correction": "",
@@ -586,7 +599,7 @@
   },
   {
     "id": "c7bd4cbb0279c52df01fab27d4c375d7",
-    "index": 45,
+    "index": 46,
     "text": "I think that if the Light has abandoned you, it has done so with reason. Who are we to question the ways of the Light?",
     "speaker": "Nobundo",
     "correction": "Rolc",
@@ -599,7 +612,7 @@
   },
   {
     "id": "07b193f300093a5e823a5fa8b1ffbd3f",
-    "index": 46,
+    "index": 47,
     "text": "Whatever the case, I think it is time you accepted your new place in the order of things. I think it is time you took the welfare of others into account....",
     "speaker": "Rolc",
     "correction": "",
@@ -612,7 +625,7 @@
   },
   {
     "id": "829563bf577b9369ccd15ff4ddd76714",
-    "index": 47,
+    "index": 48,
     "text": "And I think it is time you stopped trying to be something you are not.",
     "speaker": "Rolc",
     "correction": "",
@@ -625,7 +638,7 @@
   },
   {
     "id": "aaa5080b68d10948523f9c5d7ba0498f",
-    "index": 48,
+    "index": 49,
     "text": "This is nonsense,",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -638,7 +651,7 @@
   },
   {
     "id": "353ab5dcaca674e0bd586208b84241a6",
-    "index": 49,
+    "index": 50,
     "text": "I have come to... to talk to you about--",
     "speaker": "Krokul",
     "correction": "Nobundo",
@@ -651,7 +664,7 @@
   },
   {
     "id": "dd736977396fbfbe0e82cd65f556740b",
-    "index": 50,
+    "index": 51,
     "text": "We are wasting our time. What can a Krokul have to say to us?",
     "speaker": "Nobundo",
     "correction": "NARRATOR",
@@ -664,7 +677,7 @@
   },
   {
     "id": "8d0e7395adfb4d36d991029e4575119b",
-    "index": 51,
+    "index": 52,
     "text": "Going somewhere?",
     "speaker": "Nobundo",
     "correction": "Velen",
@@ -677,7 +690,7 @@
   },
   {
     "id": "7e0a675b30c5ffc490585f7aae639618",
-    "index": 52,
+    "index": 53,
     "text": "unaffected",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -690,7 +703,7 @@
   },
   {
     "id": "49733c61f0bce4ccc3f50bd15d765117",
-    "index": 53,
+    "index": 54,
     "text": "his kind",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -703,7 +716,7 @@
   },
   {
     "id": "9be047e7f31849f71d5f75c86e0d7338",
-    "index": 54,
+    "index": 55,
     "text": "Nobundo.",
     "speaker": "Nobundo",
     "correction": "Korin",
@@ -716,7 +729,7 @@
   },
   {
     "id": "bd3228384cdcfc24df592016b1cad02e",
-    "index": 55,
+    "index": 56,
     "text": "I found you!",
     "speaker": "UNKNOWN",
     "correction": "Korin",
@@ -729,7 +742,7 @@
   },
   {
     "id": "10284d549fe4950ab64cb8a5a50bdfe8",
-    "index": 56,
+    "index": 57,
     "text": "How are you?",
     "speaker": "Nobundo",
     "correction": "",
@@ -742,7 +755,7 @@
   },
   {
     "id": "f2e7239db7839e8cf09585bf5e4748d3",
-    "index": 57,
+    "index": 58,
     "text": "No worse than normal.",
     "speaker": "Nobundo",
     "correction": "Korin",
@@ -755,7 +768,7 @@
   },
   {
     "id": "300dc71521c7cf262cbc2dd07de8ae16",
-    "index": 58,
+    "index": 59,
     "text": "Was there something you wanted to tell me?",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -768,7 +781,7 @@
   },
   {
     "id": "f7294ab6c90209caf8d6d51bb388cb52",
-    "index": 59,
+    "index": 60,
     "text": "Oh yes!",
     "speaker": "Korin",
     "correction": "",
@@ -781,7 +794,7 @@
   },
   {
     "id": "cd45319d26c27267ba57c76322f40358",
-    "index": 60,
+    "index": 61,
     "text": "New member came to camp today. Said the orcs were... regrouping. Getting ready for something. They are led by some new... what are they named? The ones who make the dark magic?",
     "speaker": "Korin",
     "correction": "",
@@ -794,7 +807,7 @@
   },
   {
     "id": "b6a56cd2eef3261ad4c8f826ad0f3a6e",
-    "index": 61,
+    "index": 62,
     "text": "Warlock?",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -807,7 +820,7 @@
   },
   {
     "id": "c10290af8a416878b642ce3aea6372d8",
-    "index": 62,
+    "index": 63,
     "text": "Yes, I think that was it.",
     "speaker": "Korin",
     "correction": "",
@@ -820,7 +833,7 @@
   },
   {
     "id": "94cbab9c65f167f12d3d12645c7b2731",
-    "index": 63,
+    "index": 64,
     "text": "What do you think would happen if I took a few more steps?",
     "speaker": "Nobundo",
     "correction": "Korin",
@@ -833,7 +846,7 @@
   },
   {
     "id": "4be4296df8aaf9e7a4315ec373d860e4",
-    "index": 64,
+    "index": 65,
     "text": "I think you would fall.",
     "speaker": "Nobundo",
     "correction": "",
@@ -846,7 +859,7 @@
   },
   {
     "id": "5991a83ac2c0d69247f36335e649660f",
-    "index": 65,
+    "index": 66,
     "text": "Yes, my body would fall. But sometimes I think my spirit would... fly? No, that's not the word. What's the word... to go up and up, like flying?",
     "speaker": "Nobundo",
     "correction": "Korin",
@@ -859,7 +872,7 @@
   },
   {
     "id": "5da9a1cc8102a4b489b4a212521b051a",
-    "index": 66,
+    "index": 67,
     "text": "Soar?",
     "speaker": "Nobundo",
     "correction": "",
@@ -872,7 +885,7 @@
   },
   {
     "id": "62291e0887c401adc4db8b4efc0150db",
-    "index": 67,
+    "index": 68,
     "text": "Yes! My body would fall, but my spirit would soar.",
     "speaker": "Nobundo",
     "correction": "Korin",
@@ -885,7 +898,7 @@
   },
   {
     "id": "05989f01df36fed72e05f95efed0f063",
-    "index": 68,
+    "index": 69,
     "text": "Our world is coming to an end,",
     "speaker": "Korin",
     "correction": "",
@@ -898,7 +911,7 @@
   },
   {
     "id": "7e7fde66f492183b7a5b3c3a137d8166",
-    "index": 69,
+    "index": 70,
     "text": "She left.",
     "speaker": "Nobundo",
     "correction": "NARRATOR",
@@ -911,7 +924,7 @@
   },
   {
     "id": "8f1b769799f6383c0c8c13bbed9a9862",
-    "index": 70,
+    "index": 71,
     "text": "Left? Where? When?",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -924,7 +937,7 @@
   },
   {
     "id": "11965aeac1a4f7f37f4371124a98b9b7",
-    "index": 71,
+    "index": 72,
     "text": "Moments ago. She did not say where. She behaved strangely... said she was going to--what was the word?",
     "speaker": "Broken",
     "correction": "NARRATOR",
@@ -937,7 +950,7 @@
   },
   {
     "id": "537b973105ab1e4299907bedb5aa9c46",
-    "index": 72,
+    "index": 73,
     "text": "That is right. She said she was going to 'soar'.",
     "speaker": "Nobundo",
     "correction": "NARRATOR",
@@ -950,7 +963,7 @@
   },
   {
     "id": "63e660d7ebf16f51847baa35079f8a44",
-    "index": 73,
+    "index": 74,
     "text": "Korin! Stop!",
     "speaker": "Korin",
     "correction": "Nobundo",
@@ -963,7 +976,7 @@
   },
   {
     "id": "7ab03d012e209b947a8d9c4dbc3d966e",
-    "index": 74,
+    "index": 75,
     "text": "speak",
     "speaker": "Nobundo",
     "correction": "NARRATOR",
@@ -976,7 +989,7 @@
   },
   {
     "id": "3b882389f1a11d9f8201be02805d02f3",
-    "index": 75,
+    "index": 76,
     "text": "shaman",
     "speaker": "Korin",
     "correction": "NARRATOR",
@@ -989,7 +1002,7 @@
   },
   {
     "id": "7c08820d3ef2c7a59e8b7ebeae537b28",
-    "index": 76,
+    "index": 77,
     "text": "To go there, I will have to pass through the camps of the unaffected, where my kind is forbidden.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1002,7 +1015,7 @@
   },
   {
     "id": "f1515dc5122a7caff494138e7bcb2c12",
-    "index": 77,
+    "index": 78,
     "text": "What is your business here?",
     "speaker": "Korin",
     "correction": "NARRATOR",
@@ -1015,7 +1028,7 @@
   },
   {
     "id": "ea850f69a9ec25e32e033790c5f47741",
-    "index": 78,
+    "index": 79,
     "text": "I mean only to pass through to the mountains.",
     "speaker": "Krokul",
     "correction": "Nobundo",
@@ -1028,7 +1041,7 @@
   },
   {
     "id": "e272987e0698346e754d71befaebcc4b",
-    "index": 79,
+    "index": 80,
     "text": "We have strict orders. No Krokul are allowed in the camps. You will have to go elsewhere.",
     "speaker": "Nobundo",
     "correction": "NARRATOR",
@@ -1041,7 +1054,7 @@
   },
   {
     "id": "f116077128f8ee7c67216b7d833e9b76",
-    "index": 80,
+    "index": 81,
     "text": "I do not wish to stay in your camp, only to pass through.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1054,7 +1067,7 @@
   },
   {
     "id": "56e88518c92d8063ebd13cc12e530aff",
-    "index": 81,
+    "index": 82,
     "text": "I told you--",
     "speaker": "Nobundo",
     "correction": "NARRATOR",
@@ -1067,7 +1080,7 @@
   },
   {
     "id": "9dc678901f96b33bc83c545e9af484e4",
-    "index": 82,
+    "index": 83,
     "text": "So this is what it is like",
     "speaker": "Nobundo",
     "correction": "",
@@ -1080,7 +1093,7 @@
   },
   {
     "id": "fd278d02d96277a881bf8b6da852dfc0",
-    "index": 83,
+    "index": 84,
     "text": "to have the elements on your side.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1093,7 +1106,7 @@
   },
   {
     "id": "2d2187bc0cfab0601a7d99cdeb24703d",
-    "index": 84,
+    "index": 85,
     "text": "The cataclysm,",
     "speaker": "Nobundo",
     "correction": "",
@@ -1106,7 +1119,7 @@
   },
   {
     "id": "01f82fb7204ce8e6fd032af8c6d44b06",
-    "index": 85,
+    "index": 86,
     "text": "Water.",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -1119,7 +1132,7 @@
   },
   {
     "id": "b2c7bc2f53da0d350fd228b5559f6362",
-    "index": 86,
+    "index": 87,
     "text": "Why have you chosen me?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -1132,7 +1145,7 @@
   },
   {
     "id": "e64b6cfaf6f6f631f0a2945d99bbb2eb",
-    "index": 87,
+    "index": 88,
     "text": "Will I be able to use these abilities to help my people?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -1145,7 +1158,7 @@
   },
   {
     "id": "611762edb48f32915899ee9c1d4726c1",
-    "index": 88,
+    "index": 89,
     "text": "Yes,",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -1158,7 +1171,7 @@
   },
   {
     "id": "276e5785d01913b4cc535c375298852b",
-    "index": 89,
+    "index": 90,
     "text": "I am haunted by the spirits of those who passed at Shattrath. Can the elements assist in this?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -1171,7 +1184,7 @@
   },
   {
     "id": "92b8d2647350b2988649b2671e3c49f2",
-    "index": 90,
+    "index": 91,
     "text": "Will this inner struggle prevent me from realizing my true potential as a shaman?",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -1184,7 +1197,7 @@
   },
   {
     "id": "14e76423570f47eb9fddd80322c1e1eb",
-    "index": 91,
+    "index": 92,
     "text": "No matter how far my journey takes me, I suppose true understanding lies in the knowledge that the journey will never end.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1197,7 +1210,7 @@
   },
   {
     "id": "cb8872d8ed2ca7de6800a7263315564b",
-    "index": 92,
+    "index": 93,
     "text": "I am ready.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1210,7 +1223,7 @@
   },
   {
     "id": "67eedb7384e623b362d60ce1ac9801fc",
-    "index": 93,
+    "index": 94,
     "text": "They will not listen to me! I do not think this was a good idea.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1222,8 +1235,21 @@
     }
   },
   {
+    "id": "d804f1c3eca05c7ed9c01383861873ed",
+    "index": 95,
+    "text": "After all you have been through, all you have overcome, are you really willing to give up now?",
+    "speaker": "Nobundo",
+    "correction": "Velen",
+    "context_before": "knew immediately that he was far too inexperienced at this stage of his journey to commune with this mysterious new element. This was just a glimpse, a gift of understanding...\n\nAn epiphany.\n\nVelen appraised Nobundo with his crystal blue eyes. Nobundo protested, \"They will not listen to me! I do not think this was a good idea.\"\n\nVelen's lip curved upward on one side. He wore that same expression that made Nobundo feel as if the Prophet was aware of so many things beyond Nobundo's understanding. ",
+    "context_after": "\n\n\"I cannot get them to see me as anything more than Krokul, despite what I may have to teach.\"\n\n\"Perhaps the true problem does not lie with them.\"\n\nThat is what the elements said, Nobundo thought.\n\nAs a result of their previous conversations, Nobundo had learned not to try and guess at what the Prophet was thinking, so he stayed silent and waited.\n\nVelen continued, \"I hear the screams in your mind: the women of Shattrath. I am aware of your heart's burden. You have questioned whether or not you",
+    "metadata": {
+      "start_pos": 62215,
+      "end_pos": 62311
+    }
+  },
+  {
     "id": "9944b85c4ad59e0333dd165ca56d6327",
-    "index": 94,
+    "index": 96,
     "text": "I cannot get them to see me as anything more than Krokul, despite what I may have to teach.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1236,7 +1262,7 @@
   },
   {
     "id": "1475a77086d83aab360593511d7e33c0",
-    "index": 95,
+    "index": 97,
     "text": "Perhaps the true problem does not lie with them.",
     "speaker": "Nobundo",
     "correction": "Velen",
@@ -1249,7 +1275,7 @@
   },
   {
     "id": "5fd8e3bd2036915eb48842f702b8dfc6",
-    "index": 96,
+    "index": 98,
     "text": "I hear the screams in your mind: the women of Shattrath. I am aware of your heart's burden. You have questioned whether or not your departure was an act of cowardice.",
     "speaker": "Velen",
     "correction": "",
@@ -1262,7 +1288,7 @@
   },
   {
     "id": "91dc94bb07c354c0ae3b3c0e9e0533f0",
-    "index": 97,
+    "index": 99,
     "text": "A part of you knew even then that it was imperative for you to survive, to embrace your greater destiny. And throughout so many trials from that day on, never once did you give up. That is why I chose you. Why the elements have chosen you. Our people call you Krokul, Broken, but I believe you may present us with our greatest hope.",
     "speaker": "Velen",
     "correction": "",
@@ -1275,7 +1301,7 @@
   },
   {
     "id": "5886bd812e4586ecfbea506d478f9167",
-    "index": 98,
+    "index": 100,
     "text": "Let them go. Let the screams be silenced.",
     "speaker": "Velen",
     "correction": "",
@@ -1288,7 +1314,7 @@
   },
   {
     "id": "06e06d99814734c64e5615a9e0b543a6",
-    "index": 99,
+    "index": 101,
     "text": "Now, for the good of all of us, go. Go and embrace your destiny.",
     "speaker": "Nobundo",
     "correction": "Velen",
@@ -1301,7 +1327,7 @@
   },
   {
     "id": "ca39907cbc0818227cc548f14313b563",
-    "index": 100,
+    "index": 102,
     "text": "Watch and listen.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1314,7 +1340,7 @@
   },
   {
     "id": "257ad552ffaf262f2bf3fd297c99d5f6",
-    "index": 101,
+    "index": 103,
     "text": "You have come here to learn. To one day wield these powers: the powers of the shaman.",
     "speaker": "UNKNOWN",
     "correction": "Nobundo",
@@ -1327,7 +1353,7 @@
   },
   {
     "id": "545781e5faa2e0880d045d07649835ad",
-    "index": 102,
+    "index": 104,
     "text": "But shamanism is an orcish practice!",
     "speaker": "UNKNOWN",
     "correction": "NARRATOR",
@@ -1340,7 +1366,7 @@
   },
   {
     "id": "12e70412e83121f1b15ad6bd96aada06",
-    "index": 103,
+    "index": 105,
     "text": "Yes. A practice they abandoned in favor of communing with demons. Now we will journey the shaman's path, a path that will lead us to a future where no one will kill our women...",
     "speaker": "Nobundo",
     "correction": "",
@@ -1353,7 +1379,7 @@
   },
   {
     "id": "5134e769aa587eb70979101ee0aa82e1",
-    "index": 104,
+    "index": 106,
     "text": "Or our children. Where Krokul and unaffected will work together to realize a dream that has long been forgotten by our people: true freedom.",
     "speaker": "Nobundo",
     "correction": "",
@@ -1366,7 +1392,7 @@
   },
   {
     "id": "a198abc0159acd592528444bb19909eb",
-    "index": 105,
+    "index": 107,
     "text": "Your journey begins with these simple words....",
     "speaker": "Nobundo",
     "correction": "",
@@ -1379,7 +1405,7 @@
   },
   {
     "id": "26e41d3f06cae45faa21a2a573bcc18c",
-    "index": 106,
+    "index": 108,
     "text": "Everything that is, is alive.",
     "speaker": "Nobundo",
     "correction": "",
